@@ -22,9 +22,10 @@ indexing_parent_output_file_name (default ndxPrt)
 ## [8.41] - 2025-05-31
 ### Changed
 - updated manual to this version
-- updated IGEO7 preset to use the new HIERNDX adress specification
+- updated IGEO7 preset to use the new HIERNDX address specification
 ### Added
 - web-based version of the documentation (thanks to @allixender)
+- new parameters (see manual for details): input_hier_ndx_form, input_hier_ndx_system, output_hier_ndx_form, output_hier_ndx_system.
 
 ## [8.4] - 2025-05-29
 ### Added

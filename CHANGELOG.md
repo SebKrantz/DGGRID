@@ -14,6 +14,14 @@ indexing_children_output_file_name (default ndxChld)
 indexing_parent_output_type (default NONE)
 indexing_parent_output_file_name (default ndxPrt)
 
+QUESTIONS:
+A clip_subset_type of SEQNUMS means that The cells to use for coarse clipping can be read-in from one or more text files containing
+SEQNUMS the cells are read in from one or more file(s) containing seqnums
+COARSE_CELLS the cells are listed on the line clip_cell_addresses.
+COARSE_CELLS_FILES the parameter clip_region_files contains the names of one or more text files containing clipping cell addresses (one address per line).
+The address type of the specified coarse cells is as specified by...
+add clip_cell_res to docs?
+
 ## [8.42] - 2025-09-21
 ### Fixed
 - put quotes around name field values in non-gdal geojson output files

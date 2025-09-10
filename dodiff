@@ -1,0 +1,2 @@
+dif='src'
+diff -rwb /Users/sahrk/CODE/DGGRID/DGGRID/$dif /Users/sahrk/CODE/DGGRID/MASTER.V8.41/DGGRID/$dif

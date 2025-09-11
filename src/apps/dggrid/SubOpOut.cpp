@@ -681,9 +681,6 @@ SubOpOut::setupOp (void)
                case DgHierNdxSysType::Z3:
                    outAddType = dgg::addtype::Z3V8;
                    break;
-               case DgHierNdxSysType::Z7:
-                   outAddType = dgg::addtype::Z7V8;
-                   break;
                case DgHierNdxSysType::ZOrder:
                    outAddType = dgg::addtype::ZOrderV8;
                    break;
@@ -693,9 +690,6 @@ SubOpOut::setupOp (void)
            switch (outHierNdxSysType) {
                case DgHierNdxSysType::Z3:
                    outAddType = dgg::addtype::Z3String;
-                   break;
-               case DgHierNdxSysType::Z7:
-                   outAddType = dgg::addtype::Z7String;
                    break;
                case DgHierNdxSysType::ZOrder:
                    outAddType = dgg::addtype::ZOrderString;

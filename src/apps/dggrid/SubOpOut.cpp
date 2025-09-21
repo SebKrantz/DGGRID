@@ -852,7 +852,7 @@ SubOpOut::setupOp (void)
    getParamValue(pList(), "build_shapefile_attributes", buildShapeFileAttributes, false);
 ///// alternate stuff
 >       getParamValue(pList(), "build_shapefile_attributes_source", dummy, false);
-        dummy = dgg::util::toUpper(dummy);
+>       dummy = dgg::util::toUpper(dummy);
 >       if (dummy == std::string("CLIP_FILES"))
 >       {
 >          buildShapeFileAttributes = true;

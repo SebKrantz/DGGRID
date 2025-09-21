@@ -517,6 +517,7 @@ SubOpDGG::setupOp (void)
 
    // hierarchical indexing type
    getParamValue(pList(), "hier_indexing_system_type", dummy, false);
+   dummy = dgg::util::toUpper(dummy);
    hierNdxSysType = dgg::addtype::stringToHierNdxSysType(dummy);
    if (hierNdxSysType != dgg::addtype::InvalidHierNdxSysType) {
       if (hierNdxSysType == dgg::addtype::Z7) {

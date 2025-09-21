@@ -206,7 +206,7 @@ SubOpIn::setupOp (void)
    dummy = dgg::util::toUpper(dummy);
    inHierNdxFormType = dgg::addtype::stringToHierNdxFormType(dummy);
 
-    if (inAddType == dgg::addtype::DgAddressType::HierNdx) {
+   if (inAddType == dgg::addtype::DgAddressType::HierNdx) {
        // KEVIN: this will all go away in version 9.0
         if (inHierNdxFormType == dgg::addtype::Int64) {
            switch (inHierNdxSysType) {

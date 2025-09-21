@@ -226,6 +226,7 @@ SubOpBinPts::setupOp (void) {
 
 /* not yet used
    getParamValue(plist, "bin_method", dummy, false);
+   dummy = dgg::util::toUpper(dummy);
 */
 
    getParamValue(pList(), "bin_coverage", dummy, false);

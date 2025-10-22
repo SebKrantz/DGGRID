@@ -57,7 +57,7 @@ DgHierNdxSystemRFSBase::makeSystem (const DgIDGGSBase& dggsIn,
          sys = DgZ7System::makeSystem(dggsIn, extModeInt, "Z7");
          break;
        case dgg::addtype::ZOrder:
-         if (!dggsIn.isPure() || !(dggsIn.aperture() == 3 || dggsIn.aperture() == 4)) {
+         if (!dggsIn.isPure() || (dggsIn.aperture() != 3 && dggsIn.aperture() != 4)) {
             ::report("DgHexIDGGS::makeRF() ZOrder only available for pure aperture 3 or 4 grids", DgBase::Fatal);
          }
          sys = DgZOrderSystem::makeSystem(dggsIn, extModeInt, "ZOrder");

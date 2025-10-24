@@ -1,6 +1,0 @@
-sed 's/Z7/Z3/g' DgZ7RF.cpp > DgZ3RF.cpp
-sed 's/Z7/Z3/g' DgZ7StringRF.cpp > DgZ3StringRF.cpp
-sed 's/Z7/Z3/g' DgZ7System.cpp > DgZ3System.cpp
-sed 's/Z7/ZOrder/g' DgZ7RF.cpp > DgZOrderRF.cpp
-sed 's/Z7/ZOrder/g' DgZ7StringRF.cpp > DgZOrderStringRF.cpp
-sed 's/Z7/ZOrder/g' DgZ7System.cpp > DgZOrderSystem.cpp

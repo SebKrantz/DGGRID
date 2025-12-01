@@ -135,7 +135,8 @@ class DgApParamList {
 
       void setParam (const std::string& nameIn, const std::string& strValIn, bool fail = true);
 
-      void setPresetParam (const std::string& nameIn, const std::string& strValIn);
+      void setPresetParam (const std::string& nameIn, const std::string& strValIn,
+                 bool failSilent = false);
 
       void insertParam (DgApAssoc* param); // does not make a copy
 

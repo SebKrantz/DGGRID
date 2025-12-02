@@ -7,6 +7,7 @@ add_library(shapelib
   lib/shpopen.c
   lib/shptree.c
   lib/shputils.c
+  include/shapelib/shapefil.h
 )
 
 set_property(TARGET shapelib PROPERTY C_STANDARD 99)

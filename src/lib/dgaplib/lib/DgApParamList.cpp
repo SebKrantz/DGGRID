@@ -130,7 +130,7 @@ DgApParamList::setPresetParam (const std::string& nameIn,
       if (failSilent)
           return;
       else
-         report(string("DgApParamList::setPresetParam() unknown parameter ")
+         report(std::string("DgApParamList::setPresetParam() unknown parameter ")
              + nameIn, DgBase::Fatal);
    } else { // already exists
       // only change value if it was not set explicitly by the user

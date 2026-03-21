@@ -21,12 +21,14 @@ jobs:
           - os: windows-latest
             name: windows
             artifact: dggrid.exe
-          - os: macos-13        # Intel
+          - os: macos-14        # Cross-compile for Intel x86_64
             name: macos-x64
             artifact: dggrid
+            cmake_extra: -DCMAKE_OSX_ARCHITECTURES=x86_64
           - os: macos-14        # Apple Silicon (M1+)
             name: macos-arm64
             artifact: dggrid
+            cmake_extra: ""
 
     runs-on: ${{ matrix.os }}
     name: Build (${{ matrix.name }})
@@ -36,7 +38,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Configure CMake
-        run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release ${{ matrix.cmake_extra }}
 
       - name: Build
         run: cmake --build build --config Release
@@ -49,7 +51,7 @@ jobs:
             # MSVC puts binaries in a Release/ subfolder
             find build -name "dggrid.exe" -exec cp {} staging/ \;
           else
-            find build -name "dggrid" -type f -executable -exec cp {} staging/ \;
+            find build -name "dggrid" -type f -perm +111 -exec cp {} staging/ \;
           fi
           ls -la staging/
 

@@ -51,7 +51,7 @@ jobs:
             # MSVC puts binaries in a Release/ subfolder
             find build -name "dggrid.exe" -exec cp {} staging/ \;
           else
-            find build -name "dggrid" -type f -perm +111 -exec cp {} staging/ \;
+            find build -name "dggrid" -type f -exec cp {} staging/ \;
           fi
           ls -la staging/
 

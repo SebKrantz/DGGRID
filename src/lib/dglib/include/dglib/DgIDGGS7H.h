@@ -52,7 +52,7 @@ class DgIDGGS7H : public DgHexIDGGS {
       DgIDGGS7H (DgRFNetwork& networkIn, const DgGeoSphRF& backFrameIn,
                const DgGeoCoord& vert0, long double azDegs, int nResIn = 1,
                const string& nameIn = "ISEA7H", const string& projType = "ISEA")
-         : DgHexIDGGS (networkIn, backFrameIn, vert0, azDegs, 3, nResIn,
+         : DgHexIDGGS (networkIn, backFrameIn, vert0, azDegs, 7, nResIn,
                 nameIn, projType)
            { frequency_ = sqrtl(aperture()); }
 

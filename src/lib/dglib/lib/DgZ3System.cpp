@@ -33,7 +33,6 @@
 #include <dglib/DgZ3System.h>
 #include <dglib/DgHierNdxRF.h>
 #include <dglib/DgHierNdxSystemRF.h>
-#include <dglib/DgIVec3D.h>
 
 class DgIDGGSBase;
 
@@ -92,12 +91,12 @@ DgZ3System::DgZ3System (const DgIDGGSBase& dggsIn, bool extModeIntIn, const std:
 
 ////////////////////////////////////////////////////////////////////////////////
 DgHierNdxIntCoord
-DgZ3System::toIntCoord (const DgHierNdxStringCoord& addIn) const
+DgZ3System::toIntCoord (const DgHierNdxStringCoord& addIn, int gridRes) const
 {
     std::string addstr = addIn.valString();
     if (addstr.size() - 2 > MAX_Z3_RES) {
        report("DgZ3System::toIntCoord(): "
-        " input resolution exceeds max Z3 resolution of 20", DgBase::Fatal);
+        " input resolution exceeds max Z3 resolution of 30", DgBase::Fatal);
     }
 
     // initialize the Z3 index so it is padded with the correct value
@@ -125,11 +124,9 @@ DgZ3System::toIntCoord (const DgHierNdxStringCoord& addIn) const
     // now get the digits
     int r = 1;
     for (const char& digit: radStr) {
-        /*
-       if (r > res_)
-          report("DgZ3StringtoZ3Converter::convertTypedAddress(): "
+       if (r > gridRes)
+          report("DgZ3System::toIntCoord(): "
           " incoming index exceeds converter resolution", DgBase::Fatal);
-         */
 
        int d = digit - '0'; // convert to int
        Z3_SET_INDEX_DIGIT(z, r, d);
@@ -154,14 +151,14 @@ DgZ3System::toIntCoord (const DgHierNdxStringCoord& addIn) const
 
 ////////////////////////////////////////////////////////////////////////////////
 DgHierNdxStringCoord 
-DgZ3System::toStringCoord (const DgHierNdxIntCoord& addIn) const
+DgZ3System::toStringCoord (const DgHierNdxIntCoord& addIn, int gridRes) const
 {
     uint64_t z = addIn.value();
 
     int quadNum = Z3_GET_QUADNUM(z);
     std::string s = dgg::util::to_string(quadNum, 2);
 
-    for (int r = 1; r <= MAX_Z3_RES; r++) {
+    for (int r = 1; r <= gridRes; r++) {
        // get the integer digit
        char d = Z3_GET_INDEX_DIGIT(z, r);
        // convert to char

@@ -100,8 +100,10 @@ class DgHierNdxSystemRFSBase :
  */
 
      // pure virtual functions to be defined by particular systems
-     virtual DgHierNdxIntCoord toIntCoord (const DgHierNdxStringCoord& c) const = 0;
-     virtual DgHierNdxStringCoord toStringCoord (const DgHierNdxIntCoord& c) const = 0;
+     virtual DgHierNdxIntCoord toIntCoord (const DgHierNdxStringCoord& c,
+                                           int gridRes) const = 0;
+     virtual DgHierNdxStringCoord toStringCoord (const DgHierNdxIntCoord& c,
+                                                 int gridRes) const = 0;
 
      virtual void setAddNdxParent (const DgResAdd<DgHierNdx>& add,
                                    DgLocation& parent) const = 0;

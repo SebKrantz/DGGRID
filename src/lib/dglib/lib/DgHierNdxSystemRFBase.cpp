@@ -206,14 +206,14 @@ DgHierNdxSystemRFBase::invQuantify (const DgHierNdx& ndx) const
 DgHierNdxIntCoord 
 DgHierNdxSystemRFBase::toIntCoord (const DgHierNdxStringCoord& c) const
 {
-    return hierNdxRFS().toIntCoord(c);
+    return hierNdxRFS().toIntCoord(c, res_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 DgHierNdxStringCoord 
 DgHierNdxSystemRFBase::toStringCoord (const DgHierNdxIntCoord& c) const
 {
-    return hierNdxRFS().toStringCoord(c);
+    return hierNdxRFS().toStringCoord(c, res_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -89,12 +89,12 @@ DgZOrderSystem::DgZOrderSystem (const DgIDGGSBase& dggsIn, bool extModeIntIn, co
 
 ////////////////////////////////////////////////////////////////////////////////
 DgHierNdxIntCoord
-DgZOrderSystem::toIntCoord (const DgHierNdxStringCoord& addIn) const
+DgZOrderSystem::toIntCoord (const DgHierNdxStringCoord& addIn, int gridRes) const
 {
     std::string addstr = addIn.valString();
     if (addstr.size() - 2 > MAX_ZORDER_RES) {
      report("DgZOrderSystem::toIntCoord(): "
-        " input resolution exceeds max ZOrder resolution of 20", DgBase::Fatal);
+        " input resolution exceeds max ZOrder resolution of 30", DgBase::Fatal);
     }
 
     uint64_t z = 0;
@@ -114,11 +114,9 @@ DgZOrderSystem::toIntCoord (const DgHierNdxStringCoord& addIn) const
     // now get the digits
     int r = 1;
     for (const char& digit: radStr) {
-        /*
-       if (r > res_)
-          report("DgZOrderStringtoZOrderConverter::convertTypedAddress(): "
+       if (r > gridRes)
+          report("DgZOrderSystem::toIntCoord(): "
           " incoming index exceeds converter resolution", DgBase::Fatal);
-         */
 
        int d = digit - '0'; // convert to int
        ZORDER_SET_INDEX_DIGIT(z, r, d);
@@ -133,14 +131,14 @@ DgZOrderSystem::toIntCoord (const DgHierNdxStringCoord& addIn) const
 
 ////////////////////////////////////////////////////////////////////////////////
 DgHierNdxStringCoord 
-DgZOrderSystem::toStringCoord (const DgHierNdxIntCoord& addIn) const
+DgZOrderSystem::toStringCoord (const DgHierNdxIntCoord& addIn, int gridRes) const
 {
     uint64_t z = addIn.value();
 
     int quadNum = ZORDER_GET_QUADNUM(z);
     std::string s = dgg::util::to_string(quadNum, 2);
 
-    for (int r = 1; r <= MAX_ZORDER_RES; r++) {
+    for (int r = 1; r <= gridRes; r++) {
        // get the integer digit
        char d = ZORDER_GET_INDEX_DIGIT(z, r);
        // convert to char

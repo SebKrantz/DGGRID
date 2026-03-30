@@ -25,7 +25,7 @@
 #include <string.h>
 
 #include <dglib/DgZ3StringRF.h>
-#include <dglib/DgIVec3D.h>
+#include <dglib/DgIVec2D.h>
 #include <dglib/DgRadixString.h>
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -45,137 +45,43 @@ DgZ3StringRF::DgZ3StringRF (const DgHierNdxSystemRFBase& sysIn, int resIn,
 DgHierNdxStringCoord
 DgZ3StringRF::quantify (const DgQ2DICoord& addIn) const
 {
-    // we need to find the correct base cell for this H3 index;
-    // start with the passed in quad and resolution res ijk coordinates
-    // in that quad's coordinate system
-    DgIVec3D ijk = addIn.coord();
-    int baseCell = addIn.quadNum();
-    DgIVec3D baseCellIjk = ijk;
-    int res = dgg().res();
-    bool isClassIII = res % 2; // odd resolutions are Class III
-    // for Class III effective res of q2di is the Class I substrate
-    int effectiveRes = (isClassIII) ? res + 1 : res;
+    std::string qstr = dgg::util::to_string(addIn.quadNum(), 2);
+    std::string addstr = qstr;
 
-    // build the Z3 index from finest res up
-    // adjust r for the fact that the res 0 base cell offsets the indexing
-    // digits
-    DgIVec3D::Direction* digits =
-        (DgIVec3D::Direction*) malloc((res + 1) * sizeof(DgIVec3D::Direction));
-    for (int r = 0; r < res+1; r++) digits[r] = DgIVec3D::INVALID_DIGIT;
-    bool first = true;
-    for (int r = effectiveRes; r >= 0; r--) {
-        DgIVec3D lastIJK = ijk;
-        DgIVec3D lastCenter;
-        // why is H3 different?
-        //if ((r + 1) % 2) { // finer res is Class III
-        //if (!((r + 1) % 2)) { // finer res is Class I
-        if (r % 2) { // Class III
-            // rotate ccw
-            ijk.upAp7();
-            lastCenter = ijk;
-            lastCenter.downAp7();
-        } else {
-            // rotate cw
-            ijk.upAp7r();
-            lastCenter = ijk;
-            lastCenter.downAp7r();
-        }
+    if (effRes_ > 0) {
+       DgRadixString rs1(effRadix_, (int) addIn.coord().i(), effRes_);
+       DgRadixString rs2(effRadix_, (int) addIn.coord().j(), effRes_);
 
-        // res 1 address is our lookup for adjacent base cells
-        if (r == 1)
-            baseCellIjk = ijk;
+       std::string digits1 = rs1.digits();
+       std::string digits2 = rs2.digits();
 
-        // no digit generated for Class I substrate
-        if (first && isClassIII) {
-           first = false;
-           continue;
-        }
+       int n1 = (int) digits1.length();
+       int n2 = (int) digits2.length();
 
-        DgIVec3D diff = lastIJK.diffVec(lastCenter);
-        // don't need to normalize; done in unitIjkPlusToDigit
-        //diff.ijkPlusNormalize();
+       if (n2 < n1) {
+          for (int i = 0; i < (n1 - n2); i++) digits2 = "0" + digits2;
+       } else {
+          for (int i = 0; i < (n2 - n1); i++) digits1 = "0" + digits1;
+       }
 
-        digits[r] = diff.unitIjkPlusToDigit();
-        //H3_SET_INDEX_DIGIT(h, r + 1, _unitIjkToDigit(&diff));
+       static const std::string z3digits[3][3] = {
+           {"00", "22", "21"},
+           {"01", "02", "20"},
+           {"12", "10", "11"}
+       };
+
+       for (unsigned int i = 0; i < digits1.length(); i++) {
+          addstr = addstr +
+               z3digits[digits1[i] - '0'][digits2[i] - '0'];
+       }
+
+       if (!dgg().isClassI() && addstr.length())
+          addstr.pop_back();
     }
-
-    // adjust the base cell if necessary
-    // {i, j} = {0,0}, {1, 0}, {1, 1}, and {0,1} respectively
-    const int adjacentBaseCellTable[12][4] = {
-        { 0, 0, 0, 0 },
-        { 1, 6, 2, 0 },
-        { 2, 7, 3, 0 },
-        { 3, 8, 4, 0 },
-        { 4, 9, 5, 0 },
-        { 5, 10, 1, 0 },
-        { 6, 11, 7, 2 },
-        { 7, 11, 8, 3 },
-        { 8, 11, 9, 4 },
-        { 9, 11, 10, 5 },
-        { 10, 11, 6, 1 },
-        { 11, 11, 0, 0 }
-    };
-
-    int quadOriginBaseCell = baseCell;
-    if (baseCellIjk.i() == 1) {
-        if (baseCellIjk.j() == 0) // { 1, 0 }
-            baseCell = adjacentBaseCellTable[baseCell][1];
-        else // better be 1
-            baseCell = adjacentBaseCellTable[baseCell][2];
-    } else if (baseCellIjk.j() == 1) // { 0, 1 }
-        baseCell = adjacentBaseCellTable[baseCell][3];
-
-    // all base cells should be correct except for 0 and 11
-    // Base Cell 0 maps to all 5’s, rotate into correct subdigit, skip 2
-    // BC 1 - 5 skip subsequence 2
-    // BC 6 - 10 skip subsequence 5
-    // BC 11 maps to all 2’s, rotate into position, skip 5
-
-    // handle the single-cell quads 0 and 11
-    if (baseCell != quadOriginBaseCell) {
-        if (baseCell == 0) {
-            // must be quad 1 - 5
-            // rotate once for each quad past 1
-            for (int q = 1; q < quadOriginBaseCell; q++) {
-                DgIVec3D::rotateDigitVecCCW(digits, res, DgIVec3D::PENTAGON_SKIPPED_DIGIT_TYPE1);
-            }
-        } else if (baseCell == 11) {
-            // must be quad 6 - 10
-            // rotate once for each quad less than 10
-            int numRots = 10 - quadOriginBaseCell;
-            for (int q = 0; q < numRots; q++) {
-                DgIVec3D::rotateDigitVecCCW(digits, res, DgIVec3D::PENTAGON_SKIPPED_DIGIT_TYPE2);
-            }
-        }
-    }
-
-    std::string bcstr = dgg::util::to_string(baseCell, 2);
-    std::string addstr = bcstr;
-    DgIVec3D::Direction skipDigit = ((baseCell < 6) ? DgIVec3D::PENTAGON_SKIPPED_DIGIT_TYPE1 : DgIVec3D::PENTAGON_SKIPPED_DIGIT_TYPE2);
-    int skipRotate = false;
-    int firstNonZero = false;
-    for (int r = 1; r < res+1; r++) {
-        DgIVec3D::Direction d = digits[r];
-        if (!firstNonZero && d != DgIVec3D::CENTER_DIGIT) {
-            firstNonZero = true;
-            if (d == skipDigit)
-                skipRotate = true;
-        }
-         
-        if (skipRotate) {
-            d = DgIVec3D::rotate60ccw(d);
-        }
-
-        addstr = addstr + to_string((int) d);
-    }
-        
-    free(digits);
-    digits = NULL;
 
     DgHierNdxStringCoord c;
     c.setValue(addstr);
-
-   return c;
+    return c;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

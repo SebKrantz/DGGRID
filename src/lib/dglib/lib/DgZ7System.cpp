@@ -104,7 +104,7 @@ DgZ7System::DgZ7System (const DgIDGGSBase& dggsIn, bool extModeIntIn, const std:
 
 ////////////////////////////////////////////////////////////////////////////////
 DgHierNdxIntCoord
-DgZ7System::toIntCoord (const DgHierNdxStringCoord& addIn) const
+DgZ7System::toIntCoord (const DgHierNdxStringCoord& addIn, int gridRes) const
 {
    std::string addstr = addIn.valString();
     if (addstr.size() - 2 > MAX_Z7_RES) {
@@ -132,6 +132,10 @@ DgZ7System::toIntCoord (const DgHierNdxStringCoord& addIn) const
    // now get the digits
    int r = 1;
    for (const char& digit: radStr) {
+      if (r > gridRes)
+         report("DgZ7System::toIntCoord(): "
+         " incoming index exceeds converter resolution", DgBase::Fatal);
+
       int d = digit - '0'; // convert to int
       Z7_SET_INDEX_DIGIT(z, r, d);
       r++;
@@ -150,19 +154,16 @@ DgZ7System::toIntCoord (const DgHierNdxStringCoord& addIn) const
 
 ////////////////////////////////////////////////////////////////////////////////
 DgHierNdxStringCoord 
-DgZ7System::toStringCoord (const DgHierNdxIntCoord& addIn) const
+DgZ7System::toStringCoord (const DgHierNdxIntCoord& addIn, int gridRes) const
 {
    uint64_t z = addIn.value();
 
    int quadNum = Z7_GET_QUADNUM(z);
    std::string s = dgg::util::to_string(quadNum, 2);
 
-   for (int r = 1; r <= MAX_Z7_RES; r++) {
+   for (int r = 1; r <= gridRes; r++) {
       // get the integer digit
       char d = Z7_GET_INDEX_DIGIT(z, r);
-      if (d == DgIVec3D::INVALID_DIGIT)
-         break;
-
       // convert to char
       d += '0';
       // append to index string

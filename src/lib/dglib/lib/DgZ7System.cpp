@@ -126,16 +126,18 @@ DgZ7System::toIntCoord (const DgHierNdxStringCoord& addIn, int gridRes) const
 
    int index = 2; // skip the two quad digits
 
-   // the rest is the radix string
+   // the rest is the radix string — length must match grid resolution
    std::string radStr = addstr.substr(index);
+   if ((int) radStr.size() != gridRes) {
+      report("DgZ7System::toIntCoord(): Z7 digit string must have exactly "
+             "gridRes radix digits after the base cell (2 digits); got " +
+             dgg::util::to_string((int) radStr.size()) + " expected " +
+             dgg::util::to_string(gridRes),
+             DgBase::Fatal);
+   }
 
-   // now get the digits
    int r = 1;
    for (const char& digit: radStr) {
-      if (r > gridRes)
-         report("DgZ7System::toIntCoord(): "
-         " incoming index exceeds converter resolution", DgBase::Fatal);
-
       int d = digit - '0'; // convert to int
       Z7_SET_INDEX_DIGIT(z, r, d);
       r++;

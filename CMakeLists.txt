@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 3.20)
 
 project (dggrid
-  VERSION 8.423
+  VERSION 8.44
   LANGUAGES C CXX
 )
 

@@ -31,7 +31,7 @@
 using namespace std;
 
 #define DGDEBUG             0
-#define DGGRID_VERSION      "8.43"
+#define DGGRID_VERSION      "8.44"
 #define DGGRID_RELEASE_DATE "December 1, 2025"
 
 // adapted from stackoverflow user Pierre

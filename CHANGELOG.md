@@ -3,6 +3,14 @@ All notable changes to this project will be documented in this file.
 
 All changes are by Kevin Sahr, unless otherwise noted.
 
+## [8.44] - 2026-03-30
+### Fixed
+- replaced unnecessary/costly endl's with newlines in output (thanks to @wrenoud)
+### Added
+- web-based doxygen source code documentation (thanks to @allixender)
+### Added
+- pre-built binaries for Windows, Linux, and MacOS using GitHub actions (thanks to @allixender)
+
 ## [8.43] - 2025-12-01
 ### Fixed
 - correctly handle preset DGGS's when operation has no input or output

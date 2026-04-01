@@ -6,6 +6,7 @@ All changes are by Kevin Sahr, unless otherwise noted.
 ## [9.0b] - 2026-04-02
 ### Changed
 - re-architected the discrete RF hierarchy to allow grids with an explicitly discrete back frame (cell geometry specification RF).
+- hierarchical indexing system classes now exist independent of particular input/output forms
 ### Fixed
 - removed unicode characters from comments in clipper.cpp to suppress warnings
 - crashes on some forms of invalid address input
@@ -32,11 +33,6 @@ indexing_parent_output_file_name (default ndxPrt)
 ## [8.42] - 2025-09-21
 ### Fixed
 - put quotes around name field values in non-gdal geojson output files
-- correctly handle lower case string parameter values
-
-## [8.42] - 2025-09-21
-### Fixed
-- put quotes around name field values in geojson output files
 - correctly handle lower case string parameter values
 
 ## [8.41] - 2025-05-31

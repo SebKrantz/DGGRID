@@ -5,7 +5,7 @@ All changes are by Kevin Sahr, unless otherwise noted.
 
 ## [9.0b] - 2026-04-02
 ### Changed
-- re-architected the discrete RF hierarchy to allow grids with an explicitly discrete back frame (i.e., the cell geometry specification).
+- re-architected the discrete RF hierarchy to allow grids with an explicitly discrete back frame (cell geometry specification RF).
 ### Fixed
 - removed unicode characters from comments in clipper.cpp to suppress warnings
 - crashes on some forms of invalid address input
@@ -16,6 +16,14 @@ indexing_children_output_type (default NONE)
 indexing_children_output_file_name (default ndxChld)
 indexing_parent_output_type (default NONE)
 indexing_parent_output_file_name (default ndxPrt)
+
+## [8.44] - 2026-03-30
+### Fixed
+- replaced unnecessary/costly endl's with newlines in output (thanks to @wrenoud)
+### Added
+- web-based doxygen source code documentation (thanks to @allixender)
+### Added
+- pre-built binaries for Windows, Linux, and MacOS using GitHub actions (thanks to @allixender)
 
 ## [8.43] - 2025-12-01
 ### Fixed

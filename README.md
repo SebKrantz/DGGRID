@@ -2,7 +2,7 @@
 
 ## General Information
 
-__DGGRID__ version 9.0b released October 31, 2025
+__DGGRID__ version 9.0b released April 2, 2026
 
 https://github.com/sahrk/DGGRID
 

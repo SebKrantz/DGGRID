@@ -3,41 +3,23 @@ All notable changes to this project will be documented in this file.
 
 All changes are by Kevin Sahr, unless otherwise noted.
 
-## [9.0b] - 2025-XX-XX
+## [9.0b] - 2026-04-02
+### Changed
+- re-architected the discrete RF hierarchy to allow grids with an explicitly discrete back frame (i.e., the cell geometry specification).
 ### Fixed
 - removed unicode characters from comments in clipper.cpp to suppress warnings
 - crashes on some forms of invalid address input
 ### Added 
-- new parameters (see user documentation):
+- indexing parent/children output with new parameters (see user documentation):
 hier_indexing_system_type (default NONE)
 indexing_children_output_type (default NONE)
 indexing_children_output_file_name (default ndxChld)
 indexing_parent_output_type (default NONE)
 indexing_parent_output_file_name (default ndxPrt)
 
-QUESTIONS FOR MANUAL:
-A clip_subset_type of SEQNUMS means that The cells to use for coarse clipping can be read-in from one or more text files containing
-SEQNUMS the cells are read in from one or more file(s) containing seqnums
-COARSE_CELLS the cells are listed on the line clip_cell_addresses.
-COARSE_CELLS_FILES the parameter clip_region_files contains the names of one or more text files containing clipping cell addresses (one address per line).
-The address type of the specified coarse cells is as specified by...
-ADDRESS_FILES -> like ADDRESSES but in files.
-Cleaned up the modes in clip_subset_type. Changed mode ?? to ADDRESSES. Eliminated mode SEQNUMS, which can be accomplished using ADDRESSES with input_address_type of SEQNUM.
-
-, IND..., and SEQNUMS were eliminated, though there functionality is avaliable through modes COARSE_CELLS and COARSE_CELL_FILES, or using operation TRANSFORM.
-
-POINT_FILES uses clip_region_files
-
-A clip_subset_type of SEQNUMS means that The cells to use for coarse clipping can be read-in from one or more text files containing
-SEQNUMS the cells are read in from one or more file(s) containing seqnums
-
-The address type of the specified coarse cells is as specified by...
-COARSE_CELLS the cells are listed on the line
-clip_cell_addresses.
-NOT IN THIS VERSION:
-COARSE_CELL_FILES the parameter clip_region_files contains the names of one or more text files containing clipping cell addresses (one address per line).
-
-add clip_cell_res to docs?
+## [8.43] - 2025-12-01
+### Fixed
+- correctly handle preset DGGS's when operation has no input or output
 
 ## [8.42] - 2025-09-21
 ### Fixed

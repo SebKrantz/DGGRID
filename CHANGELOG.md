@@ -6,7 +6,7 @@ All changes are by Kevin Sahr, unless otherwise noted.
 ## [8.44] - 2026-03-30
 ### Fixed
 - replaced unnecessary/costly endl's with newlines in output (thanks to @wrenoud)
-- description in manual of clip_subset_type operation modes; added new v8.44 manual.
+- description in manual of clip_subset_type operation modes; added new v8.44 manual
 ### Added
 - web-based doxygen source code documentation (thanks to @allixender)
 ### Added

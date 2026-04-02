@@ -109,21 +109,22 @@ SubOpGen::initializeOp (void)
 /* v8
    // clip_subset_type <WHOLE_EARTH | AIGEN | SHAPEFILE | GDAL | SEQNUMS | ADDRESSES |
    //                    COARSE_CELLS | INPUT_ADDRESS_TYPE >
-*/
    // KEVIN: currently no ADDRESSES or COARSE_CELL_FILES
    // clip_subset_type <WHOLE_EARTH | AIGEN | SHAPEFILE | GDAL |
    //                   ADDRESSES | ADDRESS_FILES | COARSE_CELLS | COARSE_CELL_FILES >
+*/
+   // KEVIN: currently no ADDRESSES or COARSE_CELL_FILES
+   // clip_subset_type <WHOLE_EARTH | AIGEN | SHAPEFILE | GDAL |
+   //                   ADDRESS_FILES | COARSE_CELLS >
    choices.push_back(new std::string("WHOLE_EARTH"));
    choices.push_back(new std::string("AIGEN"));
    choices.push_back(new std::string("SHAPEFILE"));
 #ifdef USE_GDAL
    choices.push_back(new std::string("GDAL"));
 #endif
-   //choices.push_back(new std::string("ADDRESSES"));
    choices.push_back(new std::string("ADDRESS_FILES"));
+   choices.push_back(new std::string("INPUT_ADDRESS_TYPE")); // deprecated; same as ADDRESS_FILES
    choices.push_back(new std::string("COARSE_CELLS"));
-   //choices.push_back(new std::string("COARSE_CELL_FILES"));
-   choices.push_back(new std::string("INPUT_ADDRESS_TYPE")); // deprecated
    pList().insertParam(new DgStringChoiceParam("clip_subset_type", "WHOLE_EARTH",
                &choices));
    dgg::util::release(choices);

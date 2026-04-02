@@ -10,6 +10,7 @@ All changes are by Kevin Sahr, unless otherwise noted.
 ### Fixed
 - removed unicode characters from comments in clipper.cpp to suppress warnings
 - crashes on some forms of invalid address input
+- description in manual of clip_subset_type operation
 ### Added 
 - indexing parent/children output with new parameters (see user documentation):
 hier_indexing_system_type (default NONE)

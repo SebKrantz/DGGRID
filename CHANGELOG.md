@@ -7,10 +7,10 @@ All changes are by Kevin Sahr, unless otherwise noted.
 ### Changed
 - re-architected the discrete RF hierarchy to allow grids with an explicitly discrete back frame (cell geometry specification RF).
 - hierarchical indexing system classes now exist independent of particular input/output forms
+- manual upgraded to v9.0b
 ### Fixed
 - removed unicode characters from comments in clipper.cpp to suppress warnings
 - crashes on some forms of invalid address input
-- description in manual of clip_subset_type operation
 ### Added 
 - indexing parent/children output with new parameters (see user documentation):
 hier_indexing_system_type (default NONE)
@@ -18,10 +18,12 @@ indexing_children_output_type (default NONE)
 indexing_children_output_file_name (default ndxChld)
 indexing_parent_output_type (default NONE)
 indexing_parent_output_file_name (default ndxPrt)
+- IGEO7 preset includes hier_indexing_system_type of Z7
 
 ## [8.44] - 2026-03-30
 ### Fixed
 - replaced unnecessary/costly endl's with newlines in output (thanks to @wrenoud)
+- description in manual of clip_subset_type operation modes; added new v8.44 manual.
 ### Added
 - web-based doxygen source code documentation (thanks to @allixender)
 ### Added

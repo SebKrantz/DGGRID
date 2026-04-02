@@ -363,6 +363,7 @@ SubOpDGG::setupOp (void)
          pList().setPresetParam("dggs_aperture_type", "PURE");
          pList().setPresetParam("dggs_aperture", "7");
          pList().setPresetParam("dggs_res_spec", "9");
+         pList().setPresetParam("hier_indexing_system_type", "Z7");
          pList().setPresetParam("input_address_type", "HIERNDX", true);
          pList().setPresetParam("input_hier_ndx_system", "Z7", true);
          pList().setPresetParam("input_hier_ndx_form", "INT64", true);

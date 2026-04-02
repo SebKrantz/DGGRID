@@ -33,15 +33,11 @@ namespace dgg { namespace addtype {
 using namespace dgg::util;
 
 enum DgAddressType { Geo, Plane, ProjTri, Q2DD, Q2DI, SeqNum, Vertex2DD, HierNdx,
-    // remaining types deprecated in 8.4, gone in 9.0
-    //ZOrderV8, ZOrderString, Z3V8, Z3String,
     InvalidAddressType
 };
 
 static const std::string addTypeStrings[] = { "GEO", "PLANE", "PROJTRI", "Q2DD",
     "Q2DI", "SEQNUM", "VERTEX2DD", "HIERNDX",
-    // remaining types deprecated in 8.4, gone in 9.0
-    //"ZORDER", "ZORDER_STRING", "Z3", "Z3_STRING",
     "NONE"
 };
 

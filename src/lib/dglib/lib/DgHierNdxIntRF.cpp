@@ -52,8 +52,8 @@ DgHierNdxIntCoord::valString (void) const {
 
 ////////////////////////////////////////////////////////////////////////////////
 // assumes hexadecimal
-const char* 
-DgHierNdxIntRF::str2add (DgHierNdxIntCoord* c, const char* str, 
+const char*
+DgHierNdxIntRF::str2add (DgHierNdxIntCoord* c, const char* str,
                     char delimiter) const
 {
    char delimStr[2];

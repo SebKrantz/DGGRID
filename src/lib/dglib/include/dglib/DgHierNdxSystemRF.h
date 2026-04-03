@@ -39,7 +39,7 @@ class DgHierNdxSystemRFSBase;
 template <typename TINT, typename TSTR> class DgHierNdxSystemRFS;
 
 ////////////////////////////////////////////////////////////////////////////////
-template <class TINT, class TSTR> class DgHierNdxSystemRF : 
+template <class TINT, class TSTR> class DgHierNdxSystemRF :
                    public DgHierNdxSystemRFBase {
 
    public:
@@ -54,7 +54,7 @@ template <class TINT, class TSTR> class DgHierNdxSystemRF :
    //protected:
 
       DgHierNdxSystemRF<TINT, TSTR> (
-            const DgHierNdxSystemRFS<TINT, TSTR>& hierNdxRFSIn, 
+            const DgHierNdxSystemRFS<TINT, TSTR>& hierNdxRFSIn,
             int resIn = 0, const std::string& nameIn = "DgHierNdxSystemRF")
          : DgHierNdxSystemRFBase(hierNdxRFSIn, resIn, nameIn)
       {

@@ -36,8 +36,8 @@ const DgHierNdxIntCoord DgZ3RF::undefZ3IntCoord(0xffffffffffffffff);
 
 ////////////////////////////////////////////////////////////////////////////////
 DgZ3RF::DgZ3RF (const DgHierNdxSystemRFBase& sysIn, int resIn, const std::string& nameIn)
-    : DgHierNdxIntRF(sysIn, resIn, nameIn) 
-{ 
+    : DgHierNdxIntRF(sysIn, resIn, nameIn)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -68,8 +68,8 @@ DgZ3RF::str2add (DgHierNdxIntCoord* add, const char* str, char delimiter) const
 } // const char* DgZ3RF::str2add
 
 ////////////////////////////////////////////////////////////////////////////////
-DgHierNdxIntCoord 
-DgZ3RF::quantify (const DgQ2DICoord& point) const 
+DgHierNdxIntCoord
+DgZ3RF::quantify (const DgQ2DICoord& point) const
 {
    // use string form to quantify
    DgHierNdxStringCoord strC = system().pStrRF()->quantify(point);
@@ -79,7 +79,7 @@ DgZ3RF::quantify (const DgQ2DICoord& point) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DgQ2DICoord 
+DgQ2DICoord
 DgZ3RF::invQuantify (const DgHierNdxIntCoord& add) const
 {
    // via string form

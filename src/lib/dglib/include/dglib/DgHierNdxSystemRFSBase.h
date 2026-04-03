@@ -36,7 +36,7 @@ class DgIDGGSBase;
 class DgIDGGBase;
 
 ////////////////////////////////////////////////////////////////////////////////
-class DgHierNdxSystemRFSBase : 
+class DgHierNdxSystemRFSBase :
               public DgDiscRFS<DgHierNdx, DgQ2DICoord, long long int> {
 
    public:
@@ -46,12 +46,12 @@ class DgHierNdxSystemRFSBase :
                const std::string& nameIn = "Z3");
 
       static const DgResAdd<DgHierNdx> undefCoord;
-                  
+
       const DgHierNdxSystemRFBase& sysRF (int res) const;
-                  
+
       const DgIDGGSBase& dggs (void) const { return dggs_; }
       const DgIDGGBase& dgg (int res) const;
- 
+
       virtual operator std::string (void) const
       {
          std::string s = "*** DgHierNdxSystemRFSBase";
@@ -72,7 +72,7 @@ class DgHierNdxSystemRFSBase :
       virtual void setNdxParent (const DgResAdd<DgHierNdx>& add, DgLocation& parent) const;
       virtual DgLocation* makeNdxParent (int res, const DgLocation& loc) const;
       virtual DgLocation* makeNdxParent (const DgResAdd<DgHierNdx>& add) const;
-                  
+
       // indexing children
       // only the DgLocation version performs checking on the input
       virtual void setNdxChildren (int res, const DgLocation& loc, DgLocVector& chld) const;
@@ -89,7 +89,7 @@ class DgHierNdxSystemRFSBase :
 
      DgHierNdxSystemRFSBase (const DgIDGGSBase& dggsIn, bool extModeIntIn = true,
             const std::string& nameIn = "HierNdxSystemRFS");
-                  
+
      // from above
      virtual const DgResAdd<DgHierNdx>& undefAddress (void) const;
 /*
@@ -113,7 +113,7 @@ class DgHierNdxSystemRFSBase :
      // state data
      const DgIDGGSBase& dggs_;
      bool extModeInt_;
-                  
+
      friend class DgHierNdxSystemRFBase;
 };
 

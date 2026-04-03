@@ -106,7 +106,7 @@ DgZ3System::toIntCoord (const DgHierNdxStringCoord& addIn, int gridRes) const
         UINT64_C(0xAAAAAAAAAAAAAAAA), // index 2: base-4 digit 2 repeated (10)
         UINT64_C(0xFFFFFFFFFFFFFFFF)  // index 3: base-4 digit 3 repeated (11)
     };
-    
+
     uint64_t z = fillDigit[DgZ3System::defaultInvalidDigit];
 
     // first get the quad number and add to the val
@@ -152,7 +152,7 @@ DgZ3System::toIntCoord (const DgHierNdxStringCoord& addIn, int gridRes) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DgHierNdxStringCoord 
+DgHierNdxStringCoord
 DgZ3System::toStringCoord (const DgHierNdxIntCoord& addIn, int gridRes) const
 {
     uint64_t z = addIn.value();
@@ -176,7 +176,7 @@ DgZ3System::toStringCoord (const DgHierNdxIntCoord& addIn, int gridRes) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void 
+void
 DgZ3System::setAddNdxParent (const DgResAdd<DgHierNdx>& add,
                                    DgLocation& parent) const
 {
@@ -184,7 +184,7 @@ DgZ3System::setAddNdxParent (const DgResAdd<DgHierNdx>& add,
     int pRes = add.res() - 1;
     std::string addStr = add.address().strNdx().value();
     std::string pStr = addStr.substr(0, addStr.size() - 1);
-    
+
     // build the parent address
     DgResAdd<DgHierNdx> pAdd;
     initNdxFromString(pAdd, pRes, pStr);
@@ -192,13 +192,13 @@ DgZ3System::setAddNdxParent (const DgResAdd<DgHierNdx>& add,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void 
+void
 DgZ3System::setAddNdxChildren (const DgResAdd<DgHierNdx>& add,
                                      DgLocVector& children) const
 {
     int chdRes = add.res() + 1;
     std::string valStr = add.address().strNdx().value();
-     
+
     // first get the base cell number
     std::string quadStr = valStr.substr(0, 2);
     if (quadStr[0] == '0') // leading 0
@@ -208,9 +208,9 @@ DgZ3System::setAddNdxChildren (const DgResAdd<DgHierNdx>& add,
            report("DgZ3System::setAddNdxChildren(): "
               "index has invalid base cell number", DgBase::Fatal);
      }
-    
+
     std::string addStr = valStr.substr(2);
-    
+
     // KEVIN: this should all be done with integers and c_str's
     // assume no skip digit
     int skipDigit = -1;
@@ -219,12 +219,12 @@ DgZ3System::setAddNdxChildren (const DgResAdd<DgHierNdx>& add,
     if (pos == std::string::npos) { // all digits are zero
         skipDigit = (quadNum <= 5) ? 2 : 5;
     }
-    
+
     children.clearAddress();
     std::vector<DgAddressBase*>& v = children.addressVec();
     for (int i = 0; i <= 6; i++) {
         // KEVIN pentagon sub-sequence check
-        
+
         // skip pentagon sub-sequence digits as per above
         if (i == skipDigit)
             continue;
@@ -233,7 +233,7 @@ DgZ3System::setAddNdxChildren (const DgResAdd<DgHierNdx>& add,
         std::string chdStr = valStr + std::to_string(i);
         DgResAdd<DgHierNdx> chdAdd;
         initNdxFromString(chdAdd, chdRes, chdStr);
-        
+
         v.push_back(new DgAddress<DgResAdd<DgHierNdx>>(chdAdd));
     }
 }

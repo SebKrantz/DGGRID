@@ -38,10 +38,10 @@ DgHierNdxSystemRFSBase::undefCoord(DgHierNdx::undefCoord, -1);
 DgHierNdxSystemRFSBase*
 DgHierNdxSystemRFSBase::makeSystem (const DgIDGGSBase& dggsIn,
                DgHierNdxSysType sysType, DgHierNdxFormType form,
-               const std::string& nameIn) 
+               const std::string& nameIn)
 {
    DgHierNdxSystemRFSBase* sys = nullptr;
-    
+
    // do some checks
    if (sysType == InvalidHierNdxSysType || form == InvalidHierNdxFormType) {
         ::report("DgHierNdxSystemRFSBase::makeSystem() invalid sytem type or form", DgBase::Fatal);
@@ -72,12 +72,12 @@ DgHierNdxSystemRFSBase::makeSystem (const DgIDGGSBase& dggsIn,
          ::report("DgHexIDGGS::makeRF() invalid hierarchical system type", DgBase::Fatal);
          break;
    }
-    
+
    return sys;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DgHierNdxSystemRFSBase::DgHierNdxSystemRFSBase (const DgIDGGSBase& dggsIn, 
+DgHierNdxSystemRFSBase::DgHierNdxSystemRFSBase (const DgIDGGSBase& dggsIn,
          bool extModeIntIn, const std::string& nameIn)
    : DgDiscRFS<DgHierNdx, DgQ2DICoord, long long int>
                          (dggsIn.network(), dggsIn, dggsIn.nRes(), nameIn),
@@ -125,8 +125,8 @@ DgHierNdxSystemRFSBase::setNdxParent (int res, const DgLocation& loc,
 } // void DgHierNdxSystemRFSBase::setNdxParent
 
 ////////////////////////////////////////////////////////////////////////////////
-void 
-DgHierNdxSystemRFSBase::setNdxParent (const DgResAdd<DgHierNdx>& add, 
+void
+DgHierNdxSystemRFSBase::setNdxParent (const DgResAdd<DgHierNdx>& add,
          const DgRFBase& rf, DgLocation& parent) const
 {
   setNdxParent(add, parent);
@@ -134,8 +134,8 @@ DgHierNdxSystemRFSBase::setNdxParent (const DgResAdd<DgHierNdx>& add,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void 
-DgHierNdxSystemRFSBase::setNdxParent (const DgResAdd<DgHierNdx>& add, 
+void
+DgHierNdxSystemRFSBase::setNdxParent (const DgResAdd<DgHierNdx>& add,
                          DgLocation& parent) const
 {
   //add.clearAddress();
@@ -154,7 +154,7 @@ DgHierNdxSystemRFSBase::setNdxParent (const DgResAdd<DgQ2DICoord>& add,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DgLocation* 
+DgLocation*
 DgHierNdxSystemRFSBase::makeNdxParent (int res, const DgLocation& loc) const
 {
   DgLocation* parent = new DgLocation(*this);
@@ -164,7 +164,7 @@ DgHierNdxSystemRFSBase::makeNdxParent (int res, const DgLocation& loc) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DgLocation* 
+DgLocation*
 DgHierNdxSystemRFSBase::makeNdxParent (const DgResAdd<DgHierNdx>& add) const
 {
   DgLocation* parent = new DgLocation(*this);
@@ -192,7 +192,7 @@ DgHierNdxSystemRFSBase::setNdxChildren (int res, const DgLocation& loc,
 } // void DgHierNdxSystemRFSBase::setNdxChildren
 
 ////////////////////////////////////////////////////////////////////////////////
-void 
+void
 DgHierNdxSystemRFSBase::setNdxChildren (const DgResAdd<DgHierNdx>& add,
        const DgRFBase& rf, DgLocVector& chld) const
 {
@@ -201,7 +201,7 @@ DgHierNdxSystemRFSBase::setNdxChildren (const DgResAdd<DgHierNdx>& add,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void 
+void
 DgHierNdxSystemRFSBase::setNdxChildren (const DgResAdd<DgHierNdx>& add,
        DgLocVector& chld) const
 {
@@ -223,7 +223,7 @@ DgHierNdxSystemRFSBase::setNdxChildren (const DgResAdd<DgQ2DICoord>& add,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DgLocVector* 
+DgLocVector*
 DgHierNdxSystemRFSBase::makeNdxChildren (int res,
      const DgLocation& loc) const
 {
@@ -234,7 +234,7 @@ DgHierNdxSystemRFSBase::makeNdxChildren (int res,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DgLocVector* 
+DgLocVector*
 DgHierNdxSystemRFSBase::makeNdxChildren (const DgResAdd<DgHierNdx>& add) const
 {
   DgLocVector* chld = new DgLocVector(*this);

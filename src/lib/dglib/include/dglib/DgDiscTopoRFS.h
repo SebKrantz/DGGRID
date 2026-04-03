@@ -46,9 +46,9 @@
 template<class A, class B, class DB> class DgDiscTopoRFS
          : public DgDiscTopoRF<DgResAdd<A>, B, DB>,
            public DgDiscRFSGrids<DgDiscTopoRF, A, B, DB, B> {
-   
+
    public:
-      
+
       DgDiscTopoRFS<A, B, DB>& operator= (const DgDiscTopoRFS<A, B, DB>& rf)
       // shallow copy with possible memory leak; don't use if avoidable
           {
@@ -83,7 +83,7 @@ template<class A, class B, class DB> class DgDiscTopoRFS
                                (*(this->grids_))[add.res()]->add2str(add.address(), delimiter); }
 
       virtual const char* str2add (DgResAdd<A>* add, const char* str, char delimiter) const;
-               
+
       unsigned int aperture (void) const { return aperture_; }
 
       DgGridTopology    gridTopo    (void) const { return gridTopo_; }
@@ -326,7 +326,7 @@ template<class A, class B, class DB> class DgDiscTopoRFS
          : DgDiscTopoRF<DgResAdd<A>, B, DB> (rf.network(), rf.backFrame(), rf.name()),
                  DgDiscRFSGrids<DgDiscTopoRF, A, B, DB, B> (rf.backFrame(), rf.nRes())
         { *this = rf; }
-                    
+
       // use default RFS dist
       virtual long long int dist (const DgResAdd<A>& add1,
                                const DgResAdd<A>& add2) const

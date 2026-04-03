@@ -38,7 +38,7 @@ template <class TINT, class TSTR> class DgHierNdxSystemRFS :
 
    protected:
 
-     DgHierNdxSystemRFS (const DgIDGGSBase& dggsIn, bool extModeIntIn = true, 
+     DgHierNdxSystemRFS (const DgIDGGSBase& dggsIn, bool extModeIntIn = true,
             const std::string& nameIn = "HierNdxIDGGS")
         : DgHierNdxSystemRFSBase(dggsIn, extModeIntIn, nameIn)
      {
@@ -48,7 +48,7 @@ template <class TINT, class TSTR> class DgHierNdxSystemRFS :
          for (int r = 0; r < nRes(); r++)
              rfGrids[r] = new DgHierNdxSystemRF<TINT, TSTR>(*this, r,
                                             nameIn + dgg::util::to_string(r));
-         
+
          // initializ
          for (int r = 0; r < nRes(); r++)
              rfGrids[r]->initialize(rfGrids);
@@ -67,7 +67,7 @@ template <class TINT, class TSTR> class DgHierNdxSystemRFS :
          ndx.setRes(res);
          ndx.setAddress(newAdd);
      }
-   
+
      virtual void initNdxFromString (DgResAdd<DgHierNdx>& ndx, int res, const std::string& val) const {
          DgHierNdx newAdd (extModeInt());
          DgHierNdxStringCoord sc(val);
@@ -76,7 +76,7 @@ template <class TINT, class TSTR> class DgHierNdxSystemRFS :
          ndx.setRes(res);
          ndx.setAddress(newAdd);
       }
-                                                                      
+
      // pure virtual functions passed down from above
      virtual DgHierNdxIntCoord toIntCoord (const DgHierNdxStringCoord& c,
                                            int gridRes) const = 0;

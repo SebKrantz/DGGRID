@@ -113,7 +113,7 @@ DgHexGrid2DS::DgHexGrid2DS (DgRFNetwork& networkIn,
                unsigned int apertureIn, bool isCongruentIn, bool isAlignedIn,
                const std::string& nameIn, bool isMixed43In, int numAp4In,
                bool isSuperfundIn, bool isApSeqIn, const DgApSeq& apSeqIn)
-        : DgDiscRFS2D (networkIn, backFrameIn, nResIn, Hexagon, D6, apertureIn, 
+        : DgDiscRFS2D (networkIn, backFrameIn, nResIn, Hexagon, D6, apertureIn,
               isCongruentIn, isAlignedIn, nameIn),
           apSeq_ (apSeqIn),
           isMixed43_ (isMixed43In), numAp4_ (numAp4In), isSuperfund_ (isSuperfundIn),

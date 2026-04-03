@@ -54,7 +54,7 @@ SubOpDGG::SubOpDGG (OpBasic& op, bool _activate)
      placeRandom (false), orientCenter (false), orientRand (0),
      numGrids (1), curGrid (0), lastGrid (false), sampleCount(0), nSamplePts(0),
      azimuthDegs (0.0), datum (""), apertureType (""),
-     isMixed43 (false), isSuperfund (false), isApSeq (false), 
+     isMixed43 (false), isSuperfund (false), isApSeq (false),
      hierNdxSysType (dgg::addtype::InvalidHierNdxSysType)
 {
 }
@@ -89,7 +89,7 @@ SubOpDGG::addressTypeToRF (DgAddressType type, DgHierNdxSysType hierNdxSysType, 
        DgHierNdxSystemRFSBase* hierNdxSys = DgHierNdxSystemRFSBase::makeSystem(dggs(), hierNdxSysType, hierNdxForm);
        if (hierNdxSysOut) // caller wants the hier ndx system
            *hierNdxSysOut = hierNdxSys;
-       
+
        if (hierNdxSys) {
           int r = (forceRes >= 0) ? forceRes : dgg->res();
           if (rf) *rf = &hierNdxSys->sysRF(r);
@@ -104,50 +104,50 @@ SubOpDGG::addressTypeToRF (DgAddressType type, DgHierNdxSysType hierNdxSysType, 
             if (chdRF) *chdRF = &this->chdDeg();
             if (prtRF) *prtRF = this->prtDeg();
             break;
-   
+
          case Plane:
             if (rf) *rf = &dgg->planeRF();
             if (chdRF) *chdRF = &chdDgg->planeRF();
             if (prtRF) *prtRF = &prtDgg->planeRF();
             break;
-   
+
          case ProjTri:
             if (rf) *rf = &dgg->projTriRF();
             if (chdRF) *chdRF = &chdDgg->projTriRF();
             if (prtRF) *prtRF = &prtDgg->projTriRF();
             break;
-   
+
          case Q2DD:
             if (rf) *rf = &dgg->q2ddRF();
             if (chdRF) *chdRF = &chdDgg->q2ddRF();
             if (prtRF) *prtRF = &prtDgg->q2ddRF();
             break;
-   
+
          case Q2DI:
             if (rf) *rf = dgg;
             if (chdRF) *chdRF = chdDgg;
               if (prtRF) *prtRF = prtDgg;
             break;
-   
+
          case SeqNum:
    /*
             if (isInput && dgg->isApSeq)
                ::report("input_address_type of SEQNUM not supported for dggs_aperture_type of SEQUENCE",
                      DgBase::Fatal);
    */
-   
+
             seqNum = true;
             if (rf) *rf = dgg;
             if (chdRF) *chdRF = chdDgg;
             if (prtRF) *prtRF = prtDgg;
             break;
-   
+
          case Vertex2DD:
             if (rf) *rf = &dgg->vertexRF();
             if (chdRF) *chdRF = &chdDgg->vertexRF();
             if (prtRF) *prtRF = &prtDgg->vertexRF();
             break;
-   
+
          case HierNdx: // should be caught above
          case InvalidAddressType:
          default:
@@ -534,7 +534,7 @@ SubOpDGG::setupOp (void)
        } else {
          ::report("SubOpDGG::setupOp() invalid hier_indexing_system_type", DgBase::Fatal);
       }
-   } 
+   }
 
    // get the digit to fill unused resolutions in Z3
    // this is used by all Z3 values, whether input, output, or hier system
@@ -584,7 +584,7 @@ SubOpDGG::executeOp (void) {
 
    // child dgg
    _pChdDgg = &dggs().idggBase(actualRes + 1);
-    
+
    // parent dgg (for hierarchical indexing)
    _pPrtDgg = ((actualRes > 0) ? &dggs().idggBase(actualRes - 1) : nullptr);
 

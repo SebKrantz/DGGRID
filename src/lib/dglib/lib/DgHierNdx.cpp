@@ -32,16 +32,16 @@ DgHierNdx::undefCoord(DgHierNdxIntRF::undefCoord, DgHierNdxStringRF::undefCoord,
 
 ////////////////////////////////////////////////////////////////////////////////
 DgHierNdx::DgHierNdx (bool extModeIntIn)
-   : intNdx_ (undefCoord.intNdx()), strNdx_(undefCoord.strNdx()), 
+   : intNdx_ (undefCoord.intNdx()), strNdx_(undefCoord.strNdx()),
                    extModeInt_ (extModeIntIn)
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 std::string
-DgHierNdx::valString (void) const 
-{ 
-  if (extModeInt()) 
+DgHierNdx::valString (void) const
+{
+  if (extModeInt())
      return intNdx_.valString();
   else
      return strNdx_.valString();

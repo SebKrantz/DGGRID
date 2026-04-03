@@ -84,7 +84,7 @@ class DgIDGGSBase;
 DgZOrderSystem::DgZOrderSystem (const DgIDGGSBase& dggsIn, bool extModeIntIn, const std::string& nameIn)
    : DgHierNdxSystemRFS<DgZOrderRF, DgZOrderStringRF>(dggsIn, extModeIntIn, nameIn)
 {
-     
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -132,7 +132,7 @@ DgZOrderSystem::toIntCoord (const DgHierNdxStringCoord& addIn, int gridRes) cons
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DgHierNdxStringCoord 
+DgHierNdxStringCoord
 DgZOrderSystem::toStringCoord (const DgHierNdxIntCoord& addIn, int gridRes) const
 {
     uint64_t z = addIn.value();
@@ -156,7 +156,7 @@ DgZOrderSystem::toStringCoord (const DgHierNdxIntCoord& addIn, int gridRes) cons
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void 
+void
 DgZOrderSystem::setAddNdxParent (const DgResAdd<DgHierNdx>& add,
                                    DgLocation& parent) const
 {
@@ -164,7 +164,7 @@ DgZOrderSystem::setAddNdxParent (const DgResAdd<DgHierNdx>& add,
     int pRes = add.res() - 1;
     std::string addStr = add.address().strNdx().value();
     std::string pStr = addStr.substr(0, addStr.size() - 1);
-    
+
     // build the parent address
     DgResAdd<DgHierNdx> pAdd;
     initNdxFromString(pAdd, pRes, pStr);
@@ -172,13 +172,13 @@ DgZOrderSystem::setAddNdxParent (const DgResAdd<DgHierNdx>& add,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void 
+void
 DgZOrderSystem::setAddNdxChildren (const DgResAdd<DgHierNdx>& add,
                                      DgLocVector& children) const
 {
     int chdRes = add.res() + 1;
     std::string valStr = add.address().strNdx().value();
-     
+
     // first get the base cell number
     std::string quadStr = valStr.substr(0, 2);
     if (quadStr[0] == '0') // leading 0
@@ -188,9 +188,9 @@ DgZOrderSystem::setAddNdxChildren (const DgResAdd<DgHierNdx>& add,
            report("DgZOrderSystem::setAddNdxChildren(): "
               "index has invalid base cell number", DgBase::Fatal);
      }
-    
+
     std::string addStr = valStr.substr(2);
-    
+
     // KEVIN: this should all be done with integers and c_str's
     // assume no skip digit
     int skipDigit = -1;
@@ -199,12 +199,12 @@ DgZOrderSystem::setAddNdxChildren (const DgResAdd<DgHierNdx>& add,
     if (pos == std::string::npos) { // all digits are zero
         skipDigit = (quadNum <= 5) ? 2 : 5;
     }
-    
+
     children.clearAddress();
     std::vector<DgAddressBase*>& v = children.addressVec();
     for (int i = 0; i <= 6; i++) {
         // KEVIN pentagon sub-sequence check
-        
+
         // skip pentagon sub-sequence digits as per above
         if (i == skipDigit)
             continue;
@@ -213,7 +213,7 @@ DgZOrderSystem::setAddNdxChildren (const DgResAdd<DgHierNdx>& add,
         std::string chdStr = valStr + std::to_string(i);
         DgResAdd<DgHierNdx> chdAdd;
         initNdxFromString(chdAdd, chdRes, chdStr);
-        
+
         v.push_back(new DgAddress<DgResAdd<DgHierNdx>>(chdAdd));
     }
 }

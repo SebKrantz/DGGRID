@@ -38,7 +38,7 @@ DgSqrD8Grid2DS::DgSqrD8Grid2DS (DgRFNetwork& networkIn,
                const DgRF<DgDVec2D, long double>& backFrameIn, int nResIn,
                unsigned int apertureIn, bool isCongruentIn, bool isAlignedIn,
                const std::string& nameIn)
-        : DgDiscRFS2D (networkIn, backFrameIn, nResIn, Square, D8, apertureIn, 
+        : DgDiscRFS2D (networkIn, backFrameIn, nResIn, Square, D8, apertureIn,
                        isCongruentIn, isAlignedIn, nameIn)
 {
    // determine the radix

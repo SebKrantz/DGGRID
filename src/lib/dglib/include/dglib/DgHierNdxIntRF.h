@@ -35,13 +35,13 @@
 ////////////////////////////////////////////////////////////////////////////////
 class DgHierNdxIntCoord : public DgHierNdxCoord<HIERNDX_INT_TYPE> {
 
-   public: 
+   public:
 
       DgHierNdxIntCoord (void);
 
       DgHierNdxIntCoord (HIERNDX_INT_TYPE val)
          : DgHierNdxCoord<HIERNDX_INT_TYPE>(val) { }
-        
+
       // define abstract method from above
       // output as hexadecimal string
       virtual std::string valString (void) const;

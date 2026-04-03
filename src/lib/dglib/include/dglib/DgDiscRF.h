@@ -95,7 +95,7 @@ class DgDiscRF : public DgRF<A, long long int> {
       // concept of distance
       virtual long long int dist (const A& add1, const A& add2) const
                   { return -1; }
-    
+
       // remind users of the pure virtual functions remaining from above
 
       virtual std::string add2str (const A& add) const = 0;

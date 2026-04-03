@@ -40,12 +40,12 @@ class DgZ3System : public DgHierNdxSystemRFS<DgZ3RF, DgZ3StringRF> {
                              const std::string& nameIn = "Z3System") {
           return new DgZ3System (dggsIn, extModeIntIn, nameIn);
       }
- 
+
    protected:
 
-     DgZ3System (const DgIDGGSBase& dggsIn, bool extModeIntIn = true, 
+     DgZ3System (const DgIDGGSBase& dggsIn, bool extModeIntIn = true,
                  const std::string& nameIn = "Z3System");
- 
+
      // default methods quantize via string representation; redefine to
      // get different behavior
      //virtual DgHierNdx quantify (const DgQ2DICoord& point) const;

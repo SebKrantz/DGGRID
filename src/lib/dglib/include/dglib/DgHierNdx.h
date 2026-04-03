@@ -33,35 +33,35 @@
 class DgHierNdx {
 
    public:
-    
+
       static const DgHierNdx undefCoord;
- 
+
       DgHierNdx (const DgHierNdxIntCoord& intNdxIn, const DgHierNdxStringCoord& strNdxIn,
                  bool extModeIntIn = true)
          : intNdx_ (intNdxIn), strNdx_(strNdxIn), extModeInt_ (extModeIntIn)
          { }
-    
+
       DgHierNdx (const DgHierNdx& ndxIn)
        : intNdx_ (ndxIn.intNdx()), strNdx_(ndxIn.strNdx()), extModeInt_ (ndxIn.extModeInt())
        { }
 
       DgHierNdx (bool extModeIntIn = true);
-    
+
       // either int or string
       bool extModeInt (void) const { return extModeInt_; }
-    
+
       const DgHierNdxIntCoord&    intNdx (void) const { return intNdx_; }
       const DgHierNdxStringCoord& strNdx (void) const { return strNdx_; }
-      
+
       void setIntNdx (const DgHierNdxIntCoord& intNdxIn) { intNdx_ = intNdxIn; }
       void setStrNdx (const DgHierNdxStringCoord& strNdxIn) { strNdx_ = strNdxIn; }
-    
+
       void setIntFromStringCoord (void);
-    
+
       void setOutModeInt (bool extModeIntIn) { extModeInt_ = extModeIntIn; }
 
       virtual const DgHierNdx& undefAddress (void) const { return undefCoord; }
-    
+
       operator std::string (void) const { return valString(); }
 
       std::string valString (void) const;
@@ -83,16 +83,16 @@ class DgHierNdx {
                setStrNdx(ndx.strNdx());
                setOutModeInt(ndx.extModeInt());
            }
-           
+
            return *this;
         }
-    
+
    private:
 
       DgHierNdxIntCoord intNdx_;
       DgHierNdxStringCoord strNdx_;
       bool extModeInt_;
-    
+
     friend class DgHierNdxSystemRFBase;
 };
 

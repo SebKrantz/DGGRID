@@ -33,34 +33,34 @@
 ////////////////////////////////////////////////////////////////////////////////
 DgHierNdxStringToIntConverter::DgHierNdxStringToIntConverter (
                   const DgHierNdxStringRF& from, const DgHierNdxIntRF& to)
-         : DgConverter<DgHierNdxStringCoord, long long int, 
+         : DgConverter<DgHierNdxStringCoord, long long int,
                     DgHierNdxIntCoord, long long int> (from, to),
            sys(from.system())
       { }
 
 ////////////////////////////////////////////////////////////////////////////////
-DgHierNdxIntCoord 
+DgHierNdxIntCoord
 DgHierNdxStringToIntConverter::convertTypedAddress
                                 (const DgHierNdxStringCoord& addIn) const
-{ 
-   return sys.toIntCoord(addIn); 
+{
+   return sys.toIntCoord(addIn);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DgHierNdxIntToStringConverter:: 
-      DgHierNdxIntToStringConverter (const DgHierNdxIntRF& from, 
+DgHierNdxIntToStringConverter::
+      DgHierNdxIntToStringConverter (const DgHierNdxIntRF& from,
             const DgHierNdxStringRF& to)
-         : DgConverter<DgHierNdxIntCoord, long long int, 
+         : DgConverter<DgHierNdxIntCoord, long long int,
                     DgHierNdxStringCoord, long long int> (from, to),
            sys(from.system())
       { }
 
 ////////////////////////////////////////////////////////////////////////////////
-DgHierNdxStringCoord 
+DgHierNdxStringCoord
 DgHierNdxIntToStringConverter::convertTypedAddress
                                 (const DgHierNdxIntCoord& addIn) const
-{ 
-   return sys.toStringCoord(addIn); 
+{
+   return sys.toStringCoord(addIn);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -79,11 +79,11 @@ DgHierNdxSystemRFBase::DgHierNdxSystemRFBase (
               hierNdxRFSIn.dggs()[resIn], nameIn),
      hierNdxRFS_ (hierNdxRFSIn), dggs_ (hierNdxRFSIn.dggs()), res_ (resIn),
      aperture_ (hierNdxRFSIn.dggs().aperture()),
-     pRes_ {nullptr, nullptr, nullptr}, curRes_ {nullptr, nullptr, nullptr}, 
+     pRes_ {nullptr, nullptr, nullptr}, curRes_ {nullptr, nullptr, nullptr},
      chRes_ {nullptr, nullptr, nullptr}
 {
    // sub-classes need to assign appropriate RF's to curRes_
-   // RFS has to call initialize to set up the parent and child systems 
+   // RFS has to call initialize to set up the parent and child systems
    // after the grids_ are all initialized
 }
 
@@ -102,17 +102,17 @@ DgHierNdxSystemRFBase::add2str (const DgHierNdx& add, char delimiter) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const char* 
+const char*
 DgHierNdxSystemRFBase::str2add (DgHierNdx* ndx, const char* str, char delimiter) const
 {
   const char* newS = str;
   if (extModeInt()) {
-     DgHierNdxIntCoord intNdx;     
+     DgHierNdxIntCoord intNdx;
      newS = intRF()->str2add(&intNdx, str, delimiter);
      ndx->setIntNdx(intNdx);
      setStringFromIntCoord(*ndx);
   } else {
-     DgHierNdxStringCoord strNdx;     
+     DgHierNdxStringCoord strNdx;
      newS = strRF()->str2add(&strNdx, str, delimiter);
      ndx->setStrNdx(strNdx);
      setIntFromStringCoord(*ndx);
@@ -122,30 +122,30 @@ DgHierNdxSystemRFBase::str2add (DgHierNdx* ndx, const char* str, char delimiter)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const DgHierNdx& 
+const DgHierNdx&
 DgHierNdxSystemRFBase::undefAddress (void) const
 {
    return DgHierNdx::undefCoord;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool 
+bool
 DgHierNdxSystemRFBase::extModeInt (void) const
 {
-   return hierNdxRFS().extModeInt(); 
+   return hierNdxRFS().extModeInt();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void 
+void
 DgHierNdxSystemRFBase::setIntFromStringCoord (DgHierNdx& hn) const
-{ 
+{
    hn.intNdx_ = this->toIntCoord(hn.strNdx());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void 
+void
 DgHierNdxSystemRFBase::setStringFromIntCoord (DgHierNdx& hn) const
-{ 
+{
    hn.strNdx_ = this->toStringCoord(hn.intNdx());
 }
 
@@ -158,12 +158,12 @@ DgHierNdxSystemRFBase::setSystemSet (DgSystemSet& set, std::vector<DgHierNdxSyst
    set.strRF_ = nullptr;
    if (res < 0 || res >= hierNdxRFS_.nRes())
       return 1;
-    
+
    // if we're here res is valid
    set.dgg_ = rfGrids[res]->dgg();
    set.intRF_ = rfGrids[res]->intRF();
    set.strRF_ = rfGrids[res]->strRF();
-    
+
    return 0;
 }
 
@@ -184,7 +184,7 @@ DgHierNdx
 DgHierNdxSystemRFBase::quantify (const DgQ2DICoord& point) const
 {
    DgHierNdx ndx(extModeInt());
-      
+
    ndx.strNdx_ = strRF()->quantify(point);
    setIntFromStringCoord(ndx);
 
@@ -192,7 +192,7 @@ DgHierNdxSystemRFBase::quantify (const DgQ2DICoord& point) const
    //return add;
    return ndx;
 }
-   
+
 ////////////////////////////////////////////////////////////////////////////////
 DgQ2DICoord
 DgHierNdxSystemRFBase::invQuantify (const DgHierNdx& ndx) const
@@ -203,14 +203,14 @@ DgHierNdxSystemRFBase::invQuantify (const DgHierNdx& ndx) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DgHierNdxIntCoord 
+DgHierNdxIntCoord
 DgHierNdxSystemRFBase::toIntCoord (const DgHierNdxStringCoord& c) const
 {
     return hierNdxRFS().toIntCoord(c, res_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DgHierNdxStringCoord 
+DgHierNdxStringCoord
 DgHierNdxSystemRFBase::toStringCoord (const DgHierNdxIntCoord& c) const
 {
     return hierNdxRFS().toStringCoord(c, res_);

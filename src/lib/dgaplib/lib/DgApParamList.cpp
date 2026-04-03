@@ -120,7 +120,7 @@ DgApParamList::setParam (const std::string& nameIn, const std::string& strValIn,
 
 ////////////////////////////////////////////////////////////////////////////////
 void
-DgApParamList::setPresetParam (const std::string& nameIn, 
+DgApParamList::setPresetParam (const std::string& nameIn,
            const std::string& strValIn, bool failSilent)
 {
    if (toLower(strValIn) == std::string("invalid")) return;

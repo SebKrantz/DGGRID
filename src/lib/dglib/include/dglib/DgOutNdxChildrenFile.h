@@ -47,7 +47,7 @@ class DgOutNdxChildrenFile : public DgOutputStream {
                         const std::string& suffix = std::string("ndxChd"),
                         DgReportLevel failLevel = DgBase::Fatal);
 
-      virtual DgOutNdxChildrenFile& insert 
+      virtual DgOutNdxChildrenFile& insert
                       (const DgLocation& center, DgLocVector& vec);
 
    private:

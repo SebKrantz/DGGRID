@@ -179,12 +179,12 @@ template<class A, class B, class BG, class DB> class DgDiscRFSGridsBase {
  *   A - the DiscRF type to be wrapped in DgResAdd
  *   B - background RF type for DgResAdd<A>
  *   DB - distance type of background RF
- *   BG -  background RF for each resolution grid 
- *   
+ *   BG -  background RF for each resolution grid
+ *
  *   each resolution in the grids_ array is a DRF<A, BG, DB>*
  */
 
-template<template <class, class, class> class DRF, class A, class B, class DB, class BG> class DgDiscRFSGrids 
+template<template <class, class, class> class DRF, class A, class B, class DB, class BG> class DgDiscRFSGrids
                : public DgDiscRFSGridsBase<A, B, BG, DB> {
 
    public:

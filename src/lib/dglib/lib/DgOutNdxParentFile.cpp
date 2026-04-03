@@ -32,7 +32,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 ///
 DgOutNdxParentFile::DgOutNdxParentFile (const std::string& fileName,
-                        const DgIDGGBase& dgg, 
+                        const DgIDGGBase& dgg,
                         const DgIDGGBase& ndxPrtDgg,
                         const DgRFBase* outRF,
                         const DgRFBase* ndxPrtOutRF,

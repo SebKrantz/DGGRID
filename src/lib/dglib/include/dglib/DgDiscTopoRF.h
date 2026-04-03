@@ -183,7 +183,7 @@ class DgDiscTopoRF : public DgDiscRF<A, B, DB> {
                 DgGridMetric gridMetricIn = D6,
                 long double eIn = 1.0L,
                 long double rIn = 1.0L, long double cIn = 1.0L, long double areaIn = 1.0L)
-        : DgDiscRF<A, B, DB> (networkIn, backFrameIn, nameIn), 
+        : DgDiscRF<A, B, DB> (networkIn, backFrameIn, nameIn),
           e_ (eIn), r_ (rIn), c_ (cIn), area_ (areaIn), gridTopo_ (gridTopoIn),
           gridMetric_ (gridMetricIn)
         { }

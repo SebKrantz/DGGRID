@@ -34,8 +34,8 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 DgZ7RF::DgZ7RF (const DgHierNdxSystemRFBase& sysIn, int resIn, const std::string& nameIn)
-    : DgHierNdxIntRF(sysIn, resIn, nameIn) 
-{ 
+    : DgHierNdxIntRF(sysIn, resIn, nameIn)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -66,8 +66,8 @@ DgZ7RF::str2add (DgHierNdxIntCoord* add, const char* str, char delimiter) const
 } // const char* DgZ7RF::str2add
 
 ////////////////////////////////////////////////////////////////////////////////
-DgHierNdxIntCoord 
-DgZ7RF::quantify (const DgQ2DICoord& point) const 
+DgHierNdxIntCoord
+DgZ7RF::quantify (const DgQ2DICoord& point) const
 {
    // use string form to quantify
    DgHierNdxStringCoord strC = system().pStrRF()->quantify(point);
@@ -77,7 +77,7 @@ DgZ7RF::quantify (const DgQ2DICoord& point) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DgQ2DICoord 
+DgQ2DICoord
 DgZ7RF::invQuantify (const DgHierNdxIntCoord& add) const
 {
    // via string form

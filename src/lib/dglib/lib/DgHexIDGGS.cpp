@@ -44,7 +44,7 @@ DgHexIDGGS::makeRF (DgRFNetwork& network, const DgGeoSphRF& backFrame,
 {
     DgHexIDGGS* idggs = new DgHexIDGGS(network, backFrame, vert0, azDegs, aperture, nRes, name,
                projType, isApSeq, apSeq, isMixed43, numAp4, isSuperfund, hierNdxSysType);
-        
+
     return idggs;
 }
 
@@ -101,13 +101,13 @@ DgHexIDGGS::DgHexIDGGS (DgRFNetwork& network, const DgGeoSphRF& backFrame,
 
    for (int r = 0; r < nRes; r++)
        Dg2WayTopoResAddConverter<DgQ2DICoord, DgGeoCoord, long double>(*this, *(grids()[r]), r);
-    
-    
+
+
     // create the hierarchical indexing system
      if (hierNdxSysType != InvalidHierNdxSysType) {
         hierNdxSystem_ = DgHierNdxSystemRFSBase::makeSystem(*this, hierNdxSysType, Int64);
      }
-       
+
 } // DgHexIDGGS::DgHexIDGGS
 
 ////////////////////////////////////////////////////////////////////////////////

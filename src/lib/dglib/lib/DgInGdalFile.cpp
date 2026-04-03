@@ -261,10 +261,10 @@ DgInGdalFile::extractDataFields (void)
                                       (*oFeature_)[iField].GetInteger());
                  break;
               case OFTInteger64:
-                  
+
 //int64_t ggg = (*oFeature_)[iField].GetInteger64();
     //              int64_t abc = 0;
-                   
+
                  fld = new DgDataFieldInt64(fldName,
                                       (*oFeature_)[iField].GetInteger64());
                  break;

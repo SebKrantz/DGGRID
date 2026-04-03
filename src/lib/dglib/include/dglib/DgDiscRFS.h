@@ -50,7 +50,7 @@ template<class A, class B, class DB> class DgDiscRFS
       DgDiscRFS (const DgDiscRFS<A, B, DB>& rf) // uses dubious operator=
         : DgDiscRF<DgResAdd<A>, DgResAdd<B>, DB> (rf)
         { *this = rf; }
-               
+
       // abstract functions from DgDiscRF
       // these functions are the same as in DgDiscRFS
 
@@ -62,11 +62,11 @@ template<class A, class B, class DB> class DgDiscRFS
                            this->grids()[add.res()]->add2str(add.address(), delimiter); }
 
       virtual const char* str2add (DgResAdd<A>* add, const char* str, char delimiter) const;
-               
+
       //std::vector<const DgDiscRF<A, B, DB>*>& gridsMutable (void) const { return *grids_; }
 
       protected:
-               
+
          virtual long long int dist (const DgResAdd<A>& add1,
                                         const DgResAdd<A>& add2) const
                               { return this->distRFS(add1, add2); }

@@ -32,7 +32,7 @@
 //const DgZ3StringCoord DgZ3StringCoord::undefDgZ3StringCoord(0xffffffffffffffff);
 
 ////////////////////////////////////////////////////////////////////////////////
-DgZ3StringRF::DgZ3StringRF (const DgHierNdxSystemRFBase& sysIn, int resIn, 
+DgZ3StringRF::DgZ3StringRF (const DgHierNdxSystemRFBase& sysIn, int resIn,
               const std::string& nameIn)
    : DgHierNdxStringRF(sysIn, resIn, nameIn), unitScaleClassIres_ (0)
 {
@@ -85,7 +85,7 @@ DgZ3StringRF::quantify (const DgQ2DICoord& addIn) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DgQ2DICoord 
+DgQ2DICoord
 DgZ3StringRF::invQuantify (const DgHierNdxStringCoord& addIn) const
 {
     std::string addstr = addIn.valString();
@@ -159,6 +159,6 @@ DgZ3StringRF::invQuantify (const DgHierNdxStringCoord& addIn) const
     //dgcout << "q2di: " << q2di << std::endl;
 
     return q2di;
-} 
+}
 
 ////////////////////////////////////////////////////////////////////////////////

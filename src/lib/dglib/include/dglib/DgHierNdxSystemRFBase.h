@@ -59,7 +59,7 @@ class DgHierNdxStringToIntConverter :
 
    private:
 
-      DgHierNdxStringToIntConverter (const DgHierNdxStringRF& from, 
+      DgHierNdxStringToIntConverter (const DgHierNdxStringRF& from,
                                      const DgHierNdxIntRF& to);
 
       const DgHierNdxSystemRFBase& sys;
@@ -69,7 +69,7 @@ class DgHierNdxStringToIntConverter :
 
 ////////////////////////////////////////////////////////////////////////////////
 class DgHierNdxIntToStringConverter :
-        public DgConverter<DgHierNdxIntCoord, long long int, DgHierNdxStringCoord, 
+        public DgConverter<DgHierNdxIntCoord, long long int, DgHierNdxStringCoord,
                             long long int>
 {
    public:
@@ -79,7 +79,7 @@ class DgHierNdxIntToStringConverter :
 
    private:
 
-      DgHierNdxIntToStringConverter (const DgHierNdxIntRF& from, 
+      DgHierNdxIntToStringConverter (const DgHierNdxIntRF& from,
             const DgHierNdxStringRF& to);
 
       const DgHierNdxSystemRFBase& sys;
@@ -107,7 +107,7 @@ class DgHierNdxSystemRFBase
    };
 
    public:
-            
+
       static const DgHierNdx undefCoord;
 
       const DgHierNdxSystemRFSBase& hierNdxRFS (void) const
@@ -119,7 +119,7 @@ class DgHierNdxSystemRFBase
 
       int res      (void) const { return res_; }
       int aperture (void) const { return aperture_; }
-      
+
       const DgIDGGBase*        dgg   (void) const { return curRes_.dgg_; }
       const DgHierNdxIntRF*    intRF (void) const { return curRes_.intRF_; }
       const DgHierNdxStringRF* strRF (void) const { return curRes_.strRF_; }
@@ -127,7 +127,7 @@ class DgHierNdxSystemRFBase
       const DgIDGGBase*        pDgg   (void) const { return pRes_.dgg_; }
       const DgHierNdxIntRF*    pIntRF (void) const { return pRes_.intRF_; }
       const DgHierNdxStringRF* pStrRF (void) const { return pRes_.strRF_; }
-      
+
       const DgIDGGBase*        chDgg   (void) const { return chRes_.dgg_; }
       const DgHierNdxIntRF*    chIntRF (void) const { return chRes_.intRF_; }
       const DgHierNdxStringRF* chStrRF (void) const { return chRes_.strRF_; }
@@ -138,16 +138,16 @@ class DgHierNdxSystemRFBase
       // provide default methods that quantify via the string representation
       virtual DgHierNdx quantify (const DgQ2DICoord& point) const;
       virtual DgQ2DICoord invQuantify (const DgHierNdx& add) const;
-    
+
       // abstract methods
       virtual std::string add2str (const DgHierNdx& add) const;
-       
+
       virtual std::string add2str (const DgHierNdx& add, char delimiter) const;
-                          
+
       virtual const DgHierNdx& undefAddress (void) const;
 
       virtual const char* str2add (DgHierNdx* add, const char* str, char delimiter) const;
-                                    
+
       // abstract methods for sub-classes; given dummy definitions here
       virtual DgHierNdxIntCoord toIntCoord (const DgHierNdxStringCoord& c) const;
       virtual DgHierNdxStringCoord toStringCoord (const DgHierNdxIntCoord& c) const;

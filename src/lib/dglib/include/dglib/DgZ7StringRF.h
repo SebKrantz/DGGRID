@@ -45,7 +45,7 @@ class DgZ7StringRF : public DgHierNdxStringRF {
    protected:
 
     DgZ7StringRF (const DgHierNdxSystemRFBase& sysIn, int resIn, const std::string& nameIn);
-    
+
     unsigned long long int unitScaleClassIres_;
 
     friend DgZ7System;

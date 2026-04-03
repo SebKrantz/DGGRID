@@ -29,7 +29,7 @@
 #include <dglib/DgRadixString.h>
 
 ////////////////////////////////////////////////////////////////////////////////
-DgZOrderStringRF::DgZOrderStringRF (const DgHierNdxSystemRFBase& sysIn, int resIn, 
+DgZOrderStringRF::DgZOrderStringRF (const DgHierNdxSystemRFBase& sysIn, int resIn,
               const std::string& nameIn)
    : DgHierNdxStringRF(sysIn, resIn, nameIn), unitScaleClassIres_ (0)
 {
@@ -80,7 +80,7 @@ DgZOrderStringRF::quantify (const DgQ2DICoord& addIn) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DgQ2DICoord 
+DgQ2DICoord
 DgZOrderStringRF::invQuantify (const DgHierNdxStringCoord& addIn) const
 {
     std::string addstr = addIn.valString();
@@ -143,6 +143,6 @@ DgZOrderStringRF::invQuantify (const DgHierNdxStringCoord& addIn) const
     //dgcout << "q2di: " << q2di << std::endl;
 
     return q2di;
-} 
+}
 
 ////////////////////////////////////////////////////////////////////////////////

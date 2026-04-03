@@ -348,64 +348,64 @@ SubOpGen::executeOp (void)
    std::set<unsigned long int> seqnums;
    //if (addressGen || coarseCellClip) {
    if (addressGen) {
-        
+
       op.outOp.nCellsAccepted = 0;
       op.outOp.nCellsTested = 0;
-        
+
       // read from files or the parameter line
       if (addressFiles) {
-            
+
          // read-in the sequence numbers from files
          for (const auto &regionfile: regionFiles) {
             DgInputStream fin(regionfile.c_str(), "", DgBase::Fatal);
-                
+
             while (1) {
                op.outOp.nCellsTested++;
-                    
+
                // get the next line
                fin.getline(buff, maxLine);
                if (fin.eof()) break;
-                    
+
                unsigned long int sNum = 0;
                if (op.inOp.inAddType == SeqNum) {
-                  if (sscanf(buff, "%lu", &sNum) != 1) 
-                     ::report("genGrid(): invalid SEQNUM " + std::string(buff), DgBase::Fatal); 
+                  if (sscanf(buff, "%lu", &sNum) != 1)
+                     ::report("genGrid(): invalid SEQNUM " + std::string(buff), DgBase::Fatal);
                   } else { // must be some index
                      // parse the address
                      DgLocation* tmpLoc = NULL;
                      tmpLoc = new DgLocation(*op.inOp.pInRF);
                      tmpLoc->fromString(buff, op.inOp.inputDelimiter);
                      dgg.convert(tmpLoc);
-                            
+
                      sNum = static_cast<const DgIDGGBase&>(dgg).bndRF().seqNum(*tmpLoc);
                      delete tmpLoc;
                   }
-                    
+
                   seqnums.insert(sNum);
             }
-                
+
             fin.close();
          }
       } else {
          // handling the indices on the parameter line would go here
       }
    }
-        
+
    // generate the cells
    if (addressGen) {
       for (std::set<unsigned long int>::iterator i=seqnums.begin();i!=seqnums.end();i++) {
-                
+
          DgLocation* loc = static_cast<const DgIDGG&>(dgg).bndRF().locFromSeqNum(*i);
          if (!dgg.bndRF().validLocation(*loc)) {
                     dgcerr<<"genGrid(): SEQNUM " << (*i)<< " is not a valid location"<<std::endl;
                     ::report("genGrid(): Invalid SEQNUM found.", DgBase::Fatal);
          }
-                
+
          op.outOp.nCellsAccepted++;
          outputStatus();
-                
+
          op.outOp.outputCellAdd2D(*loc);
-                
+
          delete loc;
       }
 /*

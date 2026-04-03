@@ -45,7 +45,7 @@ class DgZOrderStringRF : public DgHierNdxStringRF {
    protected:
 
     DgZOrderStringRF (const DgHierNdxSystemRFBase& sysIn, int resIn, const std::string& nameIn);
-    
+
     unsigned long long int unitScaleClassIres_;
 
     friend DgZOrderSystem;

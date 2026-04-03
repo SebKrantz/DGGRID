@@ -47,7 +47,7 @@ class DgOutNdxParentFile : public DgOutputStream {
                         const std::string& suffix = std::string("ndxPrt"),
                         DgReportLevel failLevel = DgBase::Fatal);
 
-      virtual DgOutNdxParentFile& insert 
+      virtual DgOutNdxParentFile& insert
                       (const DgLocation& center, DgLocation& parent);
 
    private:

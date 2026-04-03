@@ -733,7 +733,7 @@ SubOpOut::setupOp (void)
 
     }
      */
-    
+
     if (outAddType == dgg::addtype::HierNdx && outHierNdxSysType == dgg::addtype::Z3) {
         ::report("in DGGRID version 9.0 the default padding digit for Z3 indexes has switched "
                  "from 0 to 3.\n"

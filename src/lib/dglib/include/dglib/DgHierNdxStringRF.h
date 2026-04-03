@@ -34,7 +34,7 @@
 class DgHierNdxStringCoord : public DgHierNdxCoord<std::string> {
 
    public:
-    
+
       DgHierNdxStringCoord (void);
 
       DgHierNdxStringCoord (std::string val)
@@ -52,7 +52,7 @@ class DgHierNdxStringRF : public DgHierNdxRF<DgHierNdxStringCoord> {
    public:
 
       static const DgHierNdxStringCoord undefCoord;
-  
+
       virtual const DgHierNdxStringCoord& undefAddress (void) const
                        { return undefCoord; }
 
@@ -60,7 +60,7 @@ class DgHierNdxStringRF : public DgHierNdxRF<DgHierNdxStringCoord> {
                         { return add.value(); }
 
       virtual const char* str2add (DgHierNdxStringCoord* c, const char* str, char delimiter) const;
-    
+
       // these need to be defined by specializations
       // they have dummy definitions from the superclass
       //virtual DgHierNdxStringCoord quantify (const DgQ2DICoord& point) const

@@ -37,7 +37,7 @@ DgDmdD4Grid2DS::DgDmdD4Grid2DS (DgRFNetwork& networkIn,
                const DgRF<DgDVec2D, long double>& backFrameIn, int nResIn,
                unsigned int apertureIn, bool isCongruentIn, bool isAlignedIn,
                const std::string& nameIn)
-        : DgDiscRFS2D (networkIn, backFrameIn, nResIn, Diamond, D4, apertureIn, 
+        : DgDiscRFS2D (networkIn, backFrameIn, nResIn, Diamond, D4, apertureIn,
                        isCongruentIn, isAlignedIn, nameIn)
 {
    // determine the radix

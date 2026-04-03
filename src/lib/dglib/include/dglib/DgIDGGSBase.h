@@ -68,13 +68,13 @@ class DgIDGGSBase : public DgDiscTopoRFS<DgQ2DICoord, DgGeoCoord, long double> {
              { return static_cast<const DgIDGGBase&>(operator[](res)); }
 
       DgHierNdxSysType   heirNdxSysType (void) const { return hierNdxSysType_; }
-    
+
       const DgGeoSphRF&  geoRF       (void) const { return geoRF_; }
       const DgGeoCoord&  vert0       (void) const { return vert0_; }
       long double        azDegs      (void) const { return azDegs_; }
       bool               isPure      (void) const { return isPure_; }
       const std::string& projType    (void) const { return projType_; }
-    
+
       const DgHierNdxSystemRFSBase* hierNdxSystem (void) const { return hierNdxSystem_; }
 /*
       DgGridTopology    gridTopo    (void) const { return gridTopo_; }

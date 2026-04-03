@@ -31,7 +31,7 @@
 //const DgZ7StringCoord DgZ7StringCoord::undefDgZ7StringCoord(0xffffffffffffffff);
 
 ////////////////////////////////////////////////////////////////////////////////
-DgZ7StringRF::DgZ7StringRF (const DgHierNdxSystemRFBase& sysIn, int resIn, 
+DgZ7StringRF::DgZ7StringRF (const DgHierNdxSystemRFBase& sysIn, int resIn,
               const std::string& nameIn)
    : DgHierNdxStringRF(sysIn, resIn, nameIn), unitScaleClassIres_ (0)
 {
@@ -161,14 +161,14 @@ DgZ7StringRF::quantify (const DgQ2DICoord& addIn) const
             if (d == skipDigit)
                 skipRotate = true;
         }
-         
+
         if (skipRotate) {
             d = DgIVec3D::rotate60ccw(d);
         }
 
         addstr = addstr + to_string((int) d);
     }
-        
+
     free(digits);
     digits = NULL;
 
@@ -179,7 +179,7 @@ DgZ7StringRF::quantify (const DgQ2DICoord& addIn) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DgQ2DICoord 
+DgQ2DICoord
 DgZ7StringRF::invQuantify (const DgHierNdxStringCoord& addIn) const
 {
    std::string addstr = addIn.valString();
@@ -370,6 +370,6 @@ DgZ7StringRF::invQuantify (const DgHierNdxStringCoord& addIn) const
 
    return q2di;
 
-} 
+}
 
 ////////////////////////////////////////////////////////////////////////////////

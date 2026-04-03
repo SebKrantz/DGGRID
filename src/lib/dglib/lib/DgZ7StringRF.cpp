@@ -22,101 +22,36 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <cmath>
-#include <climits>
-#include <cfloat>
 #include <string.h>
 
 #include <dglib/DgZ7StringRF.h>
-#include <dglib/DgIDGGBase.h>
-#include <dglib/DgIDGGSBase.h>
 #include <dglib/DgIVec3D.h>
 
 ////////////////////////////////////////////////////////////////////////////////
-const DgZ7StringCoord DgZ7StringCoord::undefDgZ7StringCoord("99");
+//const DgZ7StringCoord DgZ7StringCoord::undefDgZ7StringCoord(0xffffffffffffffff);
 
 ////////////////////////////////////////////////////////////////////////////////
-const char*
-DgZ7StringRF::str2add (DgZ7StringCoord* add, const char* str,
-                         char delimiter) const
+DgZ7StringRF::DgZ7StringRF (const DgHierNdxSystemRFBase& sysIn, int resIn, 
+              const std::string& nameIn)
+   : DgHierNdxStringRF(sysIn, resIn, nameIn), unitScaleClassIres_ (0)
 {
-   if (!add) add = new DgZ7StringCoord();
-
-   char delimStr[2];
-   delimStr[0] = delimiter;
-   delimStr[1] = '\0';
-
-   char* tmpStr = new char[strlen(str) + 1];
-   strcpy(tmpStr, str);
-   char* tok = strtok(tmpStr, delimStr);
-
-   add->setValString(tok);
-
-   unsigned long offset = strlen(tok) + 1;
-   delete[] tmpStr;
-
-   if (offset >= strlen(str)) return 0;
-   else return &str[offset];
-
-} // const char* DgZ7StringRF::str2add
+    int numClassI = (res() + 1) / 2;
+    unitScaleClassIres_ = 1;
+    for (int r = 0; r < numClassI; r++)
+       unitScaleClassIres_ *= 7;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
-DgQ2DItoZ7StringConverter::DgQ2DItoZ7StringConverter
-                (const DgRF<DgQ2DICoord, long long int>& from,
-                 const DgRF<DgZ7StringCoord, long long int>& to)
-        : DgConverter<DgQ2DICoord, long long int, DgZ7StringCoord, long long int> (from, to),
-          pIDGG_ (NULL), effRes_ (0), effRadix_ (0)
+DgHierNdxStringCoord
+DgZ7StringRF::quantify (const DgQ2DICoord& addIn) const
 {
-   pIDGG_ = dynamic_cast<const DgIDGGBase*>(&fromFrame());
-   if (!pIDGG_) {
-      report("DgQ2DItoZ7StringConverter::DgQ2DItoZ7StringConverter(): "
-         " fromFrame not of type DgIDGGBase", DgBase::Fatal);
-   }
-
-   const DgZ7StringRF* zRF = dynamic_cast<const DgZ7StringRF*>(&toFrame());
-   if (!zRF) {
-      report("DgQ2DItoZ7StringConverter::DgQ2DItoZ7StringConverter(): "
-         " toFrame not of type DgZ7StringRF", DgBase::Fatal);
-   }
-
-   if (IDGG().dggs()->aperture() != zRF->aperture() || IDGG().res() != zRF->res()) {
-       report("DgQ2DItoZ7StringConverter::DgQ2DItoZ7StringConverter(): "
-         "fromFrame and toFrame apertures or resolutions do not match", DgBase::Fatal);
-   }
-
-   if (IDGG().gridTopo() != Hexagon || IDGG().dggs()->aperture() != 7) {
-      report("DgQ2DItoZ7StringConverter::DgQ2DItoZ7StringConverter(): "
-         "only implemented for aperture 7 hexagon grids", DgBase::Fatal);
-   }
-
-   effRadix_ = 7;
-
-   // effRes_ is the number of Class I resolutions
-   effRes_ = (IDGG().res() + 1) / 2;
-
-} // DgQ2DItoZ7StringConverter::DgQ2DItoZ7StringConverter
-
-////////////////////////////////////////////////////////////////////////////////
-DgZ7StringCoord
-DgQ2DItoZ7StringConverter::convertTypedAddress (const DgQ2DICoord& addIn) const
-{
-   //printf("DgQ2DItoZ7StringConverter::convertTypedAddress\n");
-/*
-   // check for res 0/base cell
-    if (res == 0) {
-        H3_SET_BASE_CELL(h, _faceIjkToBaseCell(fijk));
-        return h;
-    }
-*/
-    //dgcout << "KEVIN " << addIn << " ";
-
-    // we need to find the correct base cell for this H3 index;
+    // we need to find the correct base cell for this index;
     // start with the passed in quad and resolution res ijk coordinates
     // in that quad's coordinate system
     DgIVec3D ijk = addIn.coord();
     int baseCell = addIn.quadNum();
     DgIVec3D baseCellIjk = ijk;
-    int res = IDGG().res();
+    int res = dgg().res();
     bool isClassIII = res % 2; // odd resolutions are Class III
     // for Class III effective res of q2di is the Class I substrate
     int effectiveRes = (isClassIII) ? res + 1 : res;
@@ -164,9 +99,6 @@ DgQ2DItoZ7StringConverter::convertTypedAddress (const DgQ2DICoord& addIn) const
         //H3_SET_INDEX_DIGIT(h, r + 1, _unitIjkToDigit(&diff));
     }
 
-    //for (int r = 0; r < res+1; r++)
-    //    dgcout << digits[r]; // KEVIN
-
     // adjust the base cell if necessary
     // {i, j} = {0,0}, {1, 0}, {1, 1}, and {0,1} respectively
     const int adjacentBaseCellTable[12][4] = {
@@ -193,8 +125,6 @@ DgQ2DItoZ7StringConverter::convertTypedAddress (const DgQ2DICoord& addIn) const
     } else if (baseCellIjk.j() == 1) // { 0, 1 }
         baseCell = adjacentBaseCellTable[baseCell][3];
 
-    //dgcout << " " << quadOriginBaseCell << "/" << baseCell << " "; // KEVIN
-
     // all base cells should be correct except for 0 and 11
     // Base Cell 0 maps to all 5’s, rotate into correct subdigit, skip 2
     // BC 1 - 5 skip subsequence 2
@@ -203,14 +133,12 @@ DgQ2DItoZ7StringConverter::convertTypedAddress (const DgQ2DICoord& addIn) const
 
     // handle the single-cell quads 0 and 11
     if (baseCell != quadOriginBaseCell) {
-
         if (baseCell == 0) {
             // must be quad 1 - 5
             // rotate once for each quad past 1
             for (int q = 1; q < quadOriginBaseCell; q++) {
                 DgIVec3D::rotateDigitVecCCW(digits, res, DgIVec3D::PENTAGON_SKIPPED_DIGIT_TYPE1);
             }
-
         } else if (baseCell == 11) {
             // must be quad 6 - 10
             // rotate once for each quad less than 10
@@ -221,10 +149,8 @@ DgQ2DItoZ7StringConverter::convertTypedAddress (const DgQ2DICoord& addIn) const
         }
     }
 
-   // dgcout << " "; // KEVIN
-
-    string bcstr = dgg::util::to_string(baseCell, 2);
-    string addstr = bcstr;
+    std::string bcstr = dgg::util::to_string(baseCell, 2);
+    std::string addstr = bcstr;
     DgIVec3D::Direction skipDigit = ((baseCell < 6) ? DgIVec3D::PENTAGON_SKIPPED_DIGIT_TYPE1 : DgIVec3D::PENTAGON_SKIPPED_DIGIT_TYPE2);
     int skipRotate = false;
     int firstNonZero = false;
@@ -235,87 +161,45 @@ DgQ2DItoZ7StringConverter::convertTypedAddress (const DgQ2DICoord& addIn) const
             if (d == skipDigit)
                 skipRotate = true;
         }
-
+         
         if (skipRotate) {
             d = DgIVec3D::rotate60ccw(d);
         }
 
         addstr = addstr + to_string((int) d);
     }
-
+        
     free(digits);
     digits = NULL;
 
-    DgZ7StringCoord z7str;
-    z7str.setValString(addstr);
-//dgcout << z7str << endl; // KEVIN
-    //dgcout << "KEVIN addIn: " << addIn << " baseijk: " << baseCellIjk << " z7str: " << z7str << endl;
-    //dgcout << z7str << " " << addIn << endl;
+    DgHierNdxStringCoord c;
+    c.setValue(addstr);
 
-    return z7str;
-
-} // DgZ7StringCoord DgQ2DItoZ7StringConverter::convertTypedAddress
+   return c;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
-DgZ7StringToQ2DIConverter::DgZ7StringToQ2DIConverter
-                (const DgRF<DgZ7StringCoord, long long int>& from,
-                 const DgRF<DgQ2DICoord, long long int>& to)
-        : DgConverter<DgZ7StringCoord, long long int, DgQ2DICoord, long long int> (from, to),
-          pIDGG_ (NULL), res_ (0), numClassI_ (0), unitScaleClassIres_ (0)
+DgQ2DICoord 
+DgZ7StringRF::invQuantify (const DgHierNdxStringCoord& addIn) const
 {
-   pIDGG_ = dynamic_cast<const DgIDGGBase*>(&toFrame());
-   if (!pIDGG_) {
-      report("DgZ7StringToQ2DIConverter::DgZ7StringToQ2DIConverter(): "
-         " toFrame not of type DgIDGGBase", DgBase::Fatal);
-   }
+   std::string addstr = addIn.valString();
 
-   const DgZ7StringRF* zRF = dynamic_cast<const DgZ7StringRF*>(&fromFrame());
-   if (!zRF) {
-      report("DgQ2DItoZ7StringConverter::DgQ2DItoZ7StringConverter(): "
-         " fromFrame not of type DgZ7StringRF", DgBase::Fatal);
-   }
-
-   if (IDGG().dggs()->aperture() != zRF->aperture() || IDGG().res() != zRF->res()) {
-      report("DgQ2DItoZ7StringConverter::DgQ2DItoZ7StringConverter(): "
-         " fromFrame and toFrame apertures or resolutions do not match", DgBase::Fatal);
-   }
-
-   if (IDGG().gridTopo() != Hexagon || IDGG().dggs()->aperture() != 7) {
-      report("DgZ7StringToQ2DIConverter::DgZ7StringToQ2DIConverter(): "
-         "only implemented for aperture 3 hexagon grids", DgBase::Fatal);
-   }
-
-   res_ = IDGG().res();
-   numClassI_ = (IDGG().res() + 1) / 2;
-   unitScaleClassIres_ = 1;
-   for (int r = 0; r < numClassI_; r++)
-      unitScaleClassIres_ *= 7;
-
-} // DgZ7StringToQ2DIConverter::DgZ7StringToQ2DIConverter
-
-////////////////////////////////////////////////////////////////////////////////
-DgQ2DICoord
-DgZ7StringToQ2DIConverter::convertTypedAddress (const DgZ7StringCoord& addIn) const
-{
-   //printf("DgZ7StringToQ2DIConverter::convertTypedAddress\n");
-
-   string addstr = addIn.valString();
    // first get the base cell number
-   string bstr = addstr.substr(0, 2);
+   std::string bstr = addstr.substr(0, 2);
    if (bstr[0] == '0') // leading 0
       bstr = bstr.substr(1, 1);
    int bcNum = std::stoi(bstr);
     if (bcNum < 0 || bcNum > 11) {
-        report("DgZ7StringToQ2DIConverter::convertTypedAddress(): "
+        report("DgZ7StringRF::invQuantify(): "
            "index has invalid base cell number", DgBase::Fatal);
      }
 
    // the rest is the Z7 digit string
    int index = 2; // skip the two base cell digits
-   string z7str = addstr.substr(index);
+    std::string z7str = addstr.substr(index);
     int res = (int) z7str.length();
-    if (res != res_) {
-        report("DgZ7StringToQ2DIConverter::convertTypedAddress(): "
+    if (res != this->res()) {
+        report("DgZ7StringRF::invQuantify(): "
            "index does not match DGG resolution", DgBase::Fatal);
      }
 
@@ -368,8 +252,6 @@ DgZ7StringToQ2DIConverter::convertTypedAddress (const DgZ7StringCoord& addIn) co
 
     bool negI = ij.i() < 0;
     bool negJ = ij.j() < 0;
-    //if (negI || negJ) printf(" NEG "); // KEVIN
-
     long int origI = ij.i();
     if (bcNum == 0) {
         if (!negI) {
@@ -480,23 +362,14 @@ DgZ7StringToQ2DIConverter::convertTypedAddress (const DgZ7StringCoord& addIn) co
             ij.setJ(ij.j() + unitScaleClassIres_ - origI);
 
             quadNum = inverseAdjacentBaseCellTable[bcNum][0];
-        /*
-            // only do if leading ??
-            // need to rotate digit ? into the missing digit 5 area
-            DgIVec3D ijk(ij);
-            ijk.ijkRotate60ccw();
-            ij = DgIVec2D(ijk);
-         */
-
         }
     }
 
    DgQ2DICoord q2di(quadNum, ij);
-   //dgcout << addIn << " " << q2di << endl; // KEVIN
+   //dgcout << addIn << " " << q2di << std::endl;
 
    return q2di;
 
-} // DgQ2DICoord DgZ7StringToQ2DIConverter::convertTypedAddress
+} 
 
-////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////

@@ -28,21 +28,37 @@
 
 #include <dglib/DgHexIDGGS.h>
 #include <dglib/DgContCartRF.h>
-#include <dglib/DgDiscRF.h>
+#include <dglib/DgDiscTopoRF.h>
 #include <dglib/DgHexC1Grid2D.h>
 #include <dglib/DgHexC2Grid2D.h>
+#include <dglib/DgHierNdxSystemRFSBase.h>
 
 ////////////////////////////////////////////////////////////////////////////////
+const DgHexIDGGS*
+DgHexIDGGS::makeRF (DgRFNetwork& network, const DgGeoSphRF& backFrame,
+         const DgGeoCoord& vert0, long double azDegs, unsigned int aperture,
+         int nRes, const std::string& name, const std::string& projType,
+         bool isApSeq, const DgApSeq& apSeq,
+         bool isMixed43, int numAp4, bool isSuperfund,
+         DgHierNdxSysType hierNdxSysType)
+{
+    DgHexIDGGS* idggs = new DgHexIDGGS(network, backFrame, vert0, azDegs, aperture, nRes, name,
+               projType, isApSeq, apSeq, isMixed43, numAp4, isSuperfund, hierNdxSysType);
+        
+    return idggs;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 DgHexIDGGS::DgHexIDGGS (DgRFNetwork& network, const DgGeoSphRF& backFrame,
                   const DgGeoCoord& vert0, long double azDegs,
                   unsigned int aperture, int nRes,
-                  const string& name, const string& projType,
-                  const DgApSeq& apSeq, bool isApSeq,
-                  bool isMixed43, int numAp4, bool isSuperfund)
+                  const std::string& name, const std::string& projType,
+                  bool isApSeq, const DgApSeq& apSeq,
+                  bool isMixed43, int numAp4, bool isSuperfund,
+                  const DgHierNdxSysType hierNdxSysType)
         : DgIDGGS (network, backFrame, vert0, azDegs, aperture, nRes,
-                       Hexagon, D6, name, projType, isMixed43, numAp4,
-                       isSuperfund, isApSeq, apSeq),
+                       Hexagon, D6, name, projType, isApSeq, apSeq, isMixed43, numAp4,
+                       isSuperfund, hierNdxSysType),
           apSeq_ (apSeq)
 {
    if (!isApSeq) { // need to build the apSeq
@@ -84,8 +100,14 @@ DgHexIDGGS::DgHexIDGGS (DgRFNetwork& network, const DgGeoSphRF& backFrame,
    }
 
    for (int r = 0; r < nRes; r++)
-      Dg2WayResAddConverter<DgQ2DICoord, DgGeoCoord, long double>(*this, *(grids()[r]), r);
-
+       Dg2WayTopoResAddConverter<DgQ2DICoord, DgGeoCoord, long double>(*this, *(grids()[r]), r);
+    
+    
+    // create the hierarchical indexing system
+     if (hierNdxSysType != InvalidHierNdxSysType) {
+        hierNdxSystem_ = DgHierNdxSystemRFSBase::makeSystem(*this, hierNdxSysType, Int64);
+     }
+       
 } // DgHexIDGGS::DgHexIDGGS
 
 ////////////////////////////////////////////////////////////////////////////////

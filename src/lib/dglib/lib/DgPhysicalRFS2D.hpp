@@ -24,12 +24,11 @@
 
 template<class C>
 DgPhysicalRFS2D<C>::DgPhysicalRFS2D (const DgBoundedRFS2D& rfIn, bool allocate)
-   : DgPhysicalRF<DgResAdd<DgIVec2D>, C, DgDVec2D, long double> (rfIn),
-     boundedRFS2D_ (rfIn)
+   : DgPhysicalRF<DgResAdd<DgIVec2D>, C> (rfIn), boundedRFS2D_ (rfIn)
 {
    int nRes = rfIn.grids().size();
 
-   grids_ = new vector<DgPhysicalRF2D<C>*>(nRes);
+   grids_ = new std::vector<DgPhysicalRF2D<C>*>(nRes);
 
    for (int i = 0; i < nRes; i++)
    {

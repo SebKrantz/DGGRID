@@ -39,20 +39,20 @@ DgSphIcosa::DgSphIcosa (const DgGeoCoord& vert0, long double azimuthDegs)
 } // DgSphIcosa::DgSphIcosa
 
 ////////////////////////////////////////////////////////////////////////////////
-ostream& operator<< (ostream& str, const DgSphIcosa& dgsi)
+std::ostream& operator<< (std::ostream& str, const DgSphIcosa& dgsi)
 {
    const SphIcosa& si = dgsi.sphIcosa_;
 
    DgGeoCoord tmp(si.pt);
-   str << "vert0: " << tmp << endl;
-   str << "az0: " << si.azimuth * 180.0 / M_PI << endl;
+   str << "vert0: " << tmp << std::endl;
+   str << "az0: " << si.azimuth * 180.0 / M_PI << std::endl;
 
    str << "vertices:\n";
    str << "{\n";
    for (int i = 0; i < 12; i++)
    {
       DgGeoCoord tmp(si.icoverts[i]);
-      str << "  " << i << ": " << tmp << endl;
+      str << "  " << i << ": " << tmp << std::endl;
    }
    str << "}\n";
 
@@ -66,13 +66,13 @@ ostream& operator<< (ostream& str, const DgSphIcosa& dgsi)
          DgGeoCoord tmp(si.icotri[i][j]);
          str << " " << tmp;
       }
-      str << endl;
+      str << std::endl;
    }
    str << "}\n";
 
    return str;
 
-} // ostream& operator<<
+} // std::ostream& operator<<
 
 ////////////////////////////////////////////////////////////////////////////////
 GeoCoord coordtrans(const GeoCoord& newNPold, const GeoCoord& ptold,
@@ -307,13 +307,12 @@ DgProjTriRF::str2add (DgProjTriCoord* add, const char* str, char delimiter)
    strcpy(tmpStr, str);
 
    // get the triNum
-
    char* tok = strtok(tmpStr, delimStr);
-   int t;
-   if (sscanf(tok, "%d", &t) != 1)
+   int t = -1;
+   if (!tok || sscanf(tok, "%d", &t) != 1)
    {
       ::report("DgProjTriRF::fromString() invalid value in string " +
-               string(tok), DgBase::Fatal);
+               ((tok) ? std::string(tok) : std::string("\"\"")), DgBase::Fatal);
    }
 
    const char* tmp = &(str[strlen(tok) + 1]);

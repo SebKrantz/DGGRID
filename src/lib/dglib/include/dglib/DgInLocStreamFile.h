@@ -30,8 +30,6 @@
 #include <fstream>
 #include <string>
 
-using namespace std;
-
 class DgGeoSphDegRF;
 class DgLocList;
 class DgLocVector;
@@ -42,21 +40,21 @@ class DgCell;
 class DgRFBase;
 
 ////////////////////////////////////////////////////////////////////////////////
-class DgInLocStreamFile : public ifstream, public DgInLocFile {
+class DgInLocStreamFile : public std::ifstream, public DgInLocFile {
 
    public:
 
       DgInLocStreamFile (const DgRFBase& rfIn,
-                       const string* fileNameIn = NULL,
+                       const std::string* fileNameIn = NULL,
                        bool isPointFileIn = false,
                        DgReportLevel failLevel = DgBase::Fatal);
 
       void rewind (void) { seekg(std::streampos(0)); clear(); }
 
-      virtual bool open (const string* fileName = NULL,
+      virtual bool open (const std::string* fileName = NULL,
                  DgReportLevel failLevel = DgBase::Fatal);
 
-      virtual void close (void) { ifstream::close(); }
+      virtual void close (void) { std::ifstream::close(); }
 
       virtual bool isEOF (void) { return eof(); }
 

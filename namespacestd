@@ -1,0 +1,13 @@
+string
+ifstream
+ostream
+istringstream
+ostringstream
+vector
+list<
+set<
+endl
+cerr
+cout
+ios::in
+ios::out

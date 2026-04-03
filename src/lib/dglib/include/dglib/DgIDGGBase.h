@@ -31,12 +31,12 @@
 #include <dglib/DgIDGGutil.h>
 
 class DgIDGGSBase;
-class DgZ3RF;
-class DgZ3StringRF;
-class DgZ7RF;
-class DgZ7StringRF;
-class DgZOrderRF;
-class DgZOrderStringRF;
+//class DgZ3RF;
+//class DgZ3StringRF;
+//class DgZ7System;
+//class DgZOrderRF;
+//class DgZOrderStringRF;
+//class DgHierNdxSystemRFSBase;
 
 using namespace dgg::topo;
 
@@ -45,14 +45,14 @@ using namespace dgg::topo;
 //
 //  Icosahedral DGG class.
 //
-class DgIDGGBase : public DgDiscRF<DgQ2DICoord, DgGeoCoord, long double> {
+class DgIDGGBase : public DgDiscTopoRF<DgQ2DICoord, DgGeoCoord, long double> {
 
-   using DgDiscRF<DgQ2DICoord, DgGeoCoord, long double>::setVertices;
+   using DgDiscTopoRF<DgQ2DICoord, DgGeoCoord, long double>::setVertices;
 
    public:
 
       static const DgIDGGBase* makeRF (const DgIDGGSBase* dggs, const DgGeoSphRF& geoRFIn,
-                  unsigned int apertureIn, int resIn, const string& nameIn = "IDGG",
+                  unsigned int apertureIn, int resIn, const std::string& nameIn = "IDGG",
                   DgGridTopology gridTopo = Hexagon, DgGridMetric gridMetric = D6,
                   unsigned int precisionIn = DEFAULT_PRECISION)
          { return new DgIDGGBase (dggs, geoRFIn, apertureIn, resIn, nameIn,
@@ -65,7 +65,7 @@ class DgIDGGBase : public DgDiscRF<DgQ2DICoord, DgGeoCoord, long double> {
       const DgGeoSphRF&  geoRF      (void) const;
       const DgGeoCoord&  vert0      (void) const;
       long double        azDegs     (void) const;
-      const string&      projType   (void) const;
+      const std::string& projType   (void) const;
       DgGridTopology     gridTopo   (void) const;
       DgGridMetric       gridMetric (void) const;
 
@@ -94,18 +94,6 @@ class DgIDGGBase : public DgDiscRF<DgQ2DICoord, DgGeoCoord, long double> {
       const DgBoundedIDGG&  bndRF     (void) const { return *bndRF_; }
       const DgPlaneTriRF&   planeRF   (void) const { return *planeRF_; }
 
-      // these are only defined for aperture 3 so must be NULL-able
-      const DgZ3RF*       z3RF     (void) const { return z3RF_; }
-      const DgZ3StringRF* z3StrRF  (void) const { return z3StrRF_; }
-
-      // these are only defined for aperture 7 so must be NULL-able
-      const DgZ7RF*       z7RF     (void) const { return z7RF_; }
-      const DgZ7StringRF* z7StrRF  (void) const { return z7StrRF_; }
-
-      // these are only defined for aperture 3 and 4 so must be NULL-able
-      const DgZOrderRF*       zorderRF     (void) const { return zorderRF_; }
-      const DgZOrderStringRF* zorderStrRF  (void) const { return zorderStrRF_; }
-
       const DgContCartRF&   ccFrame (void) const { return *ccFrame_; }
       const DgDiscRF2D&     grid2D  (void) const { return *grid2D_; }
 
@@ -117,10 +105,10 @@ class DgIDGGBase : public DgDiscRF<DgQ2DICoord, DgGeoCoord, long double> {
         { precision_ = precisionIn;
           gridStats_.setPrecision(precision()); }
 
-      virtual string add2str (const DgQ2DICoord& add) const
-                 { return string(add); }
+      virtual std::string add2str (const DgQ2DICoord& add) const
+                 { return std::string(add); }
 
-      virtual string add2str (const DgQ2DICoord& add, char delimiter) const
+      virtual std::string add2str (const DgQ2DICoord& add, char delimiter) const
         { return dgg::util::to_string(add.quadNum()) + delimiter +
                  dgg::util::to_string(add.coord().i()) + delimiter +
                  dgg::util::to_string(add.coord().j()); }
@@ -146,7 +134,7 @@ class DgIDGGBase : public DgDiscRF<DgQ2DICoord, DgGeoCoord, long double> {
 
       virtual long long int dist (const DgQ2DICoord&, const DgQ2DICoord&) const
            {
-              report(string("DgIDGGBase::dist() this method has not been defined "
+              report(std::string("DgIDGGBase::dist() this method has not been defined "
                      "for DgIDGGBase ") + this->name(), DgBase::Fatal);
 
 	      return M_ZERO;
@@ -173,7 +161,7 @@ class DgIDGGBase : public DgDiscRF<DgQ2DICoord, DgGeoCoord, long double> {
    protected:
 
       DgIDGGBase (const DgIDGGSBase* dggs, const DgGeoSphRF& geoRFIn,
-                  unsigned int apertureIn, int resIn, const string& nameIn = "IDGG",
+                  unsigned int apertureIn, int resIn, const std::string& nameIn = "IDGG",
                   DgGridTopology gridTopo = Hexagon, DgGridMetric gridMetric = D6,
                   unsigned int precisionIn = DEFAULT_PRECISION);
 
@@ -225,24 +213,16 @@ class DgIDGGBase : public DgDiscRF<DgQ2DICoord, DgGeoCoord, long double> {
       const DgBoundedIDGG* bndRF_;
       const DgPlaneTriRF* planeRF_;
 
-      // possible I/O RFs
-      const DgZOrderRF*       zorderRF_;
-      const DgZOrderStringRF* zorderStrRF_;
-      const DgZ3RF*       z3RF_;
-      const DgZ3StringRF* z3StrRF_;
-      const DgZ7RF*       z7RF_;
-      const DgZ7StringRF* z7StrRF_;
-
    friend class DgQ2DItoDConverter;
    friend class DgQ2DDtoIConverter;
    friend class DgBoundedIDGG;
 
-   friend ostream& operator<< (ostream& stream, const DgIDGGBase& dgg);
+   friend std::ostream& operator<< (std::ostream& stream, const DgIDGGBase& dgg);
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-inline ostream&
-operator<< (ostream& stream, const DgIDGGBase& dgg)
+inline std::ostream&
+operator<< (std::ostream& stream, const DgIDGGBase& dgg)
 {
    stream << "geoRF: " << dgg.geoRF();
    stream << "\nvert0: " << dgg.vert0();
@@ -274,7 +254,7 @@ operator<< (ostream& stream, const DgIDGGBase& dgg)
    stream << "\nfirstAdd: " << dgg.firstAdd_;
    stream << "\nlastAdd: " << dgg.lastAdd_;
 
-   stream << "\nprecision: " << dgg.precision_ << endl;
+   stream << "\nprecision: " << dgg.precision_ << std::endl;
 
    return stream;
 }

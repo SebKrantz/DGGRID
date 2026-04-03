@@ -25,6 +25,7 @@
 #include <dglib/DgLocation.h>
 #include <dglib/DgInLocTextFile.h>
 #include <dglib/DgInGdalFile.h>
+//#include <dglib/DgHierNdxSysType.h>
 
 #include "OpBasic.h"
 #include "SubOpBasicMulti.h"
@@ -38,7 +39,8 @@ using dgg::addtype::DgHierNdxFormType;
 SubOpIn::SubOpIn (OpBasic& op, bool _activate)
    : SubOpBasic (op, _activate),
      inFile (nullptr), pInRF (nullptr),
-     inAddType (dgg::addtype::InvalidAddressType), isPointInput (false),
+     inAddType (dgg::addtype::InvalidAddressType),
+     inHierNdxSysType(InvalidHierNdxSysType), inHierNdxFormType(Int64), isPointInput (false),
      inSeqNum (false), inputDelimiter (' ')
 {
 }
@@ -47,7 +49,7 @@ SubOpIn::SubOpIn (OpBasic& op, bool _activate)
 int
 SubOpIn::initializeOp (void)
 {
-   vector<string*> choices;
+   std::vector<std::string*> choices;
 
    // input_files <fileName1 fileName2 ... fileNameN>
    pList().insertParam(new DgStringParam("input_files", "vals.txt"));
@@ -60,10 +62,10 @@ SubOpIn::initializeOp (void)
    if (op.mainOp.operation == "TRANSFORM_POINTS") {
       // input_address_field_type < FIRST_FIELD | NAMED_FIELD | GEO_POINT >
       // where is the location address in a feature?
-      choices.push_back(new string("FIRST_FIELD"));
-      choices.push_back(new string("NAMED_FIELD"));
+      choices.push_back(new std::string("FIRST_FIELD"));
+      choices.push_back(new std::string("NAMED_FIELD"));
 */
-      choices.push_back(new string("GEO_POINT")); // determines the index from the input point geometry
+      choices.push_back(new std::string("GEO_POINT")); // determines the index from the input point geometry
                                                // note this differs from having a geo point in a (text)
                                                // field (that is the intent when fully implemented)
       pList().insertParam(new DgStringChoiceParam("input_address_field_type", "GEO_POINT",
@@ -76,12 +78,12 @@ SubOpIn::initializeOp (void)
    }
 */
    // point_input_file_type <NONE | TEXT | GDAL>
-   choices.push_back(new string("NONE"));
+   choices.push_back(new std::string("NONE"));
 #ifdef USE_GDAL
-   choices.push_back(new string("GDAL"));
+   choices.push_back(new std::string("GDAL"));
 #endif
-   choices.push_back(new string("TEXT"));
-   string def = ((op.mainOp.operation == "GENERATE_GRID") ? "NONE" : "TEXT");
+   choices.push_back(new std::string("TEXT"));
+   std::string def = ((op.mainOp.operation == "GENERATE_GRID") ? "NONE" : "TEXT");
    pList().insertParam(new DgStringChoiceParam("point_input_file_type", def, &choices));
    dgg::util::release(choices);
 
@@ -95,9 +97,9 @@ SubOpIn::initializeOp (void)
    // input_address_type < GEO | PLANE | PROJTRI | Q2DD | Q2DI |
    //        SEQNUM | VERTEX2DD | HIERNDX >
    for (int i = 0; ; i++) {
-      if (dgg::addtype::addTypeStrings[i] == "INVALID")
+      if (dgg::addtype::addTypeStrings[i] == "NONE")
          break;
-      choices.push_back(new string(dgg::addtype::addTypeStrings[i]));
+      choices.push_back(new std::string(dgg::addtype::addTypeStrings[i]));
    }
 
    // KEVIN?? def = ((op.mainOp.operation != "TRANSFORM_POINTS") ? "GEO" : "SEQNUM");
@@ -108,20 +110,20 @@ SubOpIn::initializeOp (void)
     // input_hier_ndx_system < ZORDER | Z3 | Z7 >
     // used if input_address_type is HIERNDX
     for (int i = 0; ; i++) {
-       if (dgg::addtype::hierNdxSysTypeStrings[i] == "INVALID")
+       choices.push_back(new std::string(dgg::addtype::hierNdxSysTypeStrings[i]));
+       if (dgg::addtype::hierNdxSysTypeStrings[i] == "NONE")
           break;
-       choices.push_back(new string(dgg::addtype::hierNdxSysTypeStrings[i]));
     }
     def = "Z3";
     pList().insertParam(new DgStringChoiceParam("input_hier_ndx_system", def, &choices));
     dgg::util::release(choices);
 
-    // input_hier_ndx_form < INT64 | DIGIT_STRING >
+    // input_hier_ndx_form < INT64 | DIGIT_STRING | NONE >
     // used if input_address_type is HIERNDX
     for (int i = 0; ; i++) {
-       if (dgg::addtype::hierNdxFormTypeStrings[i] == "INVALID")
+       choices.push_back(new std::string(dgg::addtype::hierNdxFormTypeStrings[i]));
+       if (dgg::addtype::hierNdxFormTypeStrings[i] == "NONE")
           break;
-       choices.push_back(new string(dgg::addtype::hierNdxFormTypeStrings[i]));
     }
     def = "INT64";
     pList().insertParam(new DgStringChoiceParam("input_hier_ndx_form", def, &choices));
@@ -140,7 +142,7 @@ SubOpIn::setupOp (void)
 {
    /////// fill state variables from the parameter list //////////
 
-   string inFileStr;
+   std::string inFileStr;
    getParamValue(pList(), "input_files", inFileStr, false);
 
    // input file name
@@ -156,12 +158,12 @@ SubOpIn::setupOp (void)
    }
 
    char* names = new char[inFileStr.length() + 1];
-   inFileStr.copy(names, string::npos);
+   inFileStr.copy(names, std::string::npos);
    names[inFileStr.length()] = 0;
 
    char* name = strtok(names, " ");
    while (name != NULL) {
-      inputFiles.push_back(string(name));
+      inputFiles.push_back(std::string(name));
       name = strtok(NULL, " ");
    }
    delete [] names;
@@ -191,62 +193,48 @@ SubOpIn::setupOp (void)
 */
 
    // input address type
-   string dummy;
+   std::string dummy;
    getParamValue(pList(), "input_address_type", dummy, false);
    dummy = dgg::util::toUpper(dummy);
    inAddType = dgg::addtype::stringToAddressType(dummy);
 
    getParamValue(pList(), "input_hier_ndx_system", dummy, false);
    dummy = dgg::util::toUpper(dummy);
-   DgHierNdxSysType inHierNdxSysType = dgg::addtype::stringToHierNdxSysType(dummy);
+   inHierNdxSysType = dgg::addtype::stringToHierNdxSysType(dummy);
+
    getParamValue(pList(), "input_hier_ndx_form", dummy, false);
    dummy = dgg::util::toUpper(dummy);
-   DgHierNdxFormType inHierNdxFormType = dgg::addtype::stringToHierNdxFormType(dummy);
-
-    if (inAddType == dgg::addtype::HierNdx) {
+   inHierNdxFormType = dgg::addtype::stringToHierNdxFormType(dummy);
+/*
+   if (inAddType == dgg::addtype::DgAddressType::HierNdx) {
        // KEVIN: this will all go away in version 9.0
         if (inHierNdxFormType == dgg::addtype::Int64) {
            switch (inHierNdxSysType) {
-               case DgHierNdxSysType::Z3:
-                   inAddType = dgg::addtype::Z3;
+               case dgg::addtype::DgHierNdxSysType::Z3:
+                   inAddType = dgg::addtype::Z3V8;
                    break;
-               case DgHierNdxSysType::Z7:
-                   inAddType = dgg::addtype::Z7;
-                   break;
-               case DgHierNdxSysType::ZOrder:
-                   inAddType = dgg::addtype::ZOrder;
+                case dgg::addtype::DgHierNdxSysType::ZOrder:
+                   inAddType = dgg::addtype::DgAddressType::ZOrderV8;
                    break;
                default: ;
            }
        } else { // must be DigitString
            switch (inHierNdxSysType) {
-               case DgHierNdxSysType::Z3:
+               case dgg::addtype::DgHierNdxSysType::Z3:
                    inAddType = dgg::addtype::Z3String;
                    break;
-               case DgHierNdxSysType::Z7:
-                   inAddType = dgg::addtype::Z7String;
-                   break;
-               case DgHierNdxSysType::ZOrder:
+               case dgg::addtype::DgHierNdxSysType::ZOrder:
                    inAddType = dgg::addtype::ZOrderString;
                    break;
                default: ;
            }
        }
 
-    } else if (inAddType > dgg::addtype::HierNdx) { // these are deprecated
-      ::report(
-         "input_address_type values of ZORDER, ZORDER_STRING, Z3, Z3_STRING, Z7, and "
-         "Z7_STRING are deprecated and will go away in version 9.0. Instead set "
-         "input_address_type to HIERNDX, new parameter input_hier_ndx_system to the "
-         "desired system ZORDER, Z3, or Z7 (Z3 is the default), and new parameter "
-         "input_hier_ndx_form to the specific input format INT64 or DIGIT_STRING "
-         "(default is INT64).",
-      DgBase::Warning);
-   }
-
-    if (inAddType == dgg::addtype::Z3) {
-        ::report("the default padding digit for Z3 INT64 indexes will switch "
-                 "from 0 to 3 starting with DGGRID version 9.0.\n"
+    }
+ */
+    if (inAddType == dgg::addtype::HierNdx && inHierNdxSysType == dgg::addtype::Z3) {
+        ::report("in DGGRID version 9.0 the default padding digit for Z3 indexes has switched "
+                 "from 0 to 3.\n"
                  "Set parameter z3_invalid_digit if you want a different digit used.",
                  DgBase::Warning);
     }
@@ -275,7 +263,7 @@ SubOpIn::cleanupOp (void) {
 
 //////////////////////////////////////////////////////////////////////////////
 DgInLocStreamFile*
-SubOpIn::makeNewInFile (const DgRFBase& rfIn, const string* fileNameIn,
+SubOpIn::makeNewInFile (const DgRFBase& rfIn, const std::string* fileNameIn,
            DgBase::DgReportLevel failLevel)
 {
    DgInLocStreamFile* newFile = nullptr;
@@ -349,7 +337,7 @@ SubOpIn::getNextLoc (void) {
    }
 
 #if DGDEBUG
-   if (loc) dgcout << "INPUT: " << *loc << endl;
+   if (loc) dgcout << "INPUT: " << *loc << std::endl;
 #endif
    return loc;
 
@@ -388,13 +376,12 @@ SubOpIn::executeOp (void) {
     if (inSeqNum) {
         pInRF = &dgg;
     } else if (!op.dggOp.isSuperfund) { // use input address type
-
-      inSeqNum = op.dggOp.addressTypeToRF(inAddType, &pInRF);
+      inSeqNum = op.dggOp.addressTypeToRF(inAddType, inHierNdxSysType, inHierNdxFormType, &pInRF);
       if (!pInRF)
          ::report("SubOpIn::executeOp(): invalid input RF", DgBase::Fatal);
    }
 
-    if (op.dggOp.isApSeq && inSeqNum)
+   if (op.dggOp.isApSeq && inSeqNum)
         ::report("SubOpIn::executeOp(): sequence number input not supported for aperture sequence DGGS", DgBase::Fatal);
 
    // open first file

@@ -1,112 +1,114 @@
 cmake_minimum_required (VERSION 3.20)
 
 add_library(dglib
-  lib/DgAddressBase.cpp
-  lib/DgAddressType.cpp
-  lib/DgApSeq.cpp
-  lib/DgBase.cpp
-  lib/DgBoundedHexC2RF2D.cpp
-  lib/DgBoundedHexC3C2RF2D.cpp
-  lib/DgBoundedHexC3RF2D.cpp
-  lib/DgBoundedIDGG.cpp
-  lib/DgBoundedIDGGS.cpp
-  lib/DgBoundedRF2D.cpp
-  lib/DgBoundedRFBase0.cpp
-  lib/DgBoundedRF.hpp
-  lib/DgBoundedRFS2D.cpp
-  lib/DgCell.cpp
-  lib/DgColor.cpp
-  lib/DgConverterBase.cpp
-  lib/DgDataFieldBase.cpp
-  lib/DgDataList.cpp
-  lib/DgDiscRF.hpp
-  lib/DgDiscRFS2D.cpp
-  lib/DgDiscRFS.hpp
-  lib/DgDistanceBase.cpp
-  lib/DgDmdD4Grid2D.cpp
-  lib/DgDmdD4Grid2DS.cpp
-  lib/DgDmdD8Grid2D.cpp
-  lib/DgDmdD8Grid2DS.cpp
-  lib/DgDmdIDGG.cpp
-  lib/DgDVec2D.cpp
-  lib/DgDVec3D.cpp
-  lib/DgEllipsoidRF.cpp
-  lib/DgGeoSphRF.cpp
-  lib/DgGridTopo.cpp
-  lib/DgHexC1Grid2D.cpp
-  lib/DgHexC2Grid2D.cpp
-  lib/DgHexC3Grid2D.cpp
-  lib/DgHexGrid2DS.cpp
-  lib/DgHexIDGG.cpp
-  lib/DgHexIDGGS.cpp
-  lib/DgIcosaMap.cpp
-  lib/DgIDGGBase.cpp
-  lib/DgIDGG.cpp
-  lib/DgIDGGS3H.cpp
-  lib/DgIDGGS43H.cpp
-  lib/DgIDGGS4D.cpp
-  lib/DgIDGGS4H.cpp
-  lib/DgIDGGS7H.cpp
-  lib/DgIDGGS4T.cpp
-  lib/DgIDGGSBase.cpp
-  lib/DgIDGGS.cpp
-  lib/DgIDGGutil.cpp
-  lib/DgInAIGenFile.cpp
-  lib/DgInGdalFile.cpp
-  lib/DgInLocStreamFile.cpp
-  lib/DgInLocTextFile.cpp
-  lib/DgInputStream.cpp
-  lib/DgInShapefileAtt.cpp
-  lib/DgInShapefile.cpp
-  lib/DgIVec2D.cpp
-  lib/DgIVec3D.cpp
-  lib/DgLocation.cpp
-  lib/DgLocBase.cpp
-  lib/DgLocList.cpp
-  lib/DgLocVector.cpp
-  lib/DgOutAIGenFile.cpp
-  lib/DgOutChildrenFile.cpp
-  lib/DgOutGdalFile.cpp
-  lib/DgOutGeoJSONFile.cpp
-  lib/DgOutKMLfile.cpp
-  lib/DgOutLocFile.cpp
-  lib/DgOutLocTextFile.cpp
-  lib/DgOutNeighborsFile.cpp
-  lib/DgOutPRCellsFile.cpp
-  lib/DgOutPRPtsFile.cpp
-  lib/DgOutPtsText.cpp
-  lib/DgOutputStream.cpp
-  lib/DgOutRandPtsText.cpp
-  lib/DgOutShapefile.cpp
-  lib/DgPhysicalRF2D.hpp
-  lib/DgPhysicalRFBase.hpp
-  lib/DgPhysicalRF.hpp
-  lib/DgPhysicalRFS2D.hpp
-  lib/DgPolygon.cpp
-  lib/DgProjFuller.cpp
-  lib/DgProjGnomonicRF.cpp
-  lib/DgProjISEA.cpp
-  lib/DgProjTriRF.cpp
-  lib/DgRandom.cpp
-  lib/DgRFBase.cpp
-  lib/DgRF.hpp
-  lib/DgRFNetwork.cpp
-  lib/DgSeriesConverter.cpp
-  lib/DgSqrD4Grid2D.cpp
-  lib/DgSqrD4Grid2DS.cpp
-  lib/DgSqrD8Grid2D.cpp
-  lib/DgSqrD8Grid2DS.cpp
-  lib/DgSuperfund.cpp
-  lib/DgTriGrid2D.cpp
-  lib/DgTriGrid2DS.cpp
-  lib/DgTriIDGG.cpp
-  lib/DgUtil.cpp
-  lib/DgZ3RF.cpp
-  lib/DgZ3StringRF.cpp
-  lib/DgZ7RF.cpp
-  lib/DgZ7StringRF.cpp
-  lib/DgZOrderRF.cpp
-  lib/DgZOrderStringRF.cpp
+   lib/DgAddressBase.cpp
+   lib/DgAddressType.cpp
+   lib/DgApSeq.cpp
+   lib/DgBase.cpp
+   lib/DgBoundedHexC2RF2D.cpp
+   lib/DgBoundedHexC3C2RF2D.cpp
+   lib/DgBoundedHexC3RF2D.cpp
+   lib/DgBoundedIDGG.cpp
+   lib/DgBoundedIDGGS.cpp
+   lib/DgBoundedRF2D.cpp
+   lib/DgBoundedRFBase0.cpp
+   lib/DgBoundedRFS2D.cpp
+   lib/DgCell.cpp
+   lib/DgColor.cpp
+   lib/DgConverterBase.cpp
+   lib/DgDataFieldBase.cpp
+   lib/DgDataList.cpp
+   lib/DgDiscRFS2D.cpp
+   lib/DgDistanceBase.cpp
+   lib/DgDmdD4Grid2D.cpp
+   lib/DgDmdD4Grid2DS.cpp
+   lib/DgDmdD8Grid2D.cpp
+   lib/DgDmdD8Grid2DS.cpp
+   lib/DgDmdIDGG.cpp
+   lib/DgDVec2D.cpp
+   lib/DgDVec3D.cpp
+   lib/DgEllipsoidRF.cpp
+   lib/DgGeoSphRF.cpp
+   lib/DgGridTopo.cpp
+   lib/DgHexC1Grid2D.cpp
+   lib/DgHexC2Grid2D.cpp
+   lib/DgHexC3Grid2D.cpp
+   lib/DgHexGrid2DS.cpp
+   lib/DgHexIDGG.cpp
+   lib/DgHexIDGGS.cpp
+   lib/DgHierNdx.cpp
+   lib/DgHierNdxIntRF.cpp
+   lib/DgHierNdxStringRF.cpp
+   lib/DgHierNdxSystemRFBase.cpp
+   lib/DgHierNdxSystemRFSBase.cpp
+   lib/DgIcosaMap.cpp
+   lib/DgIDGG.cpp
+   lib/DgIDGGBase.cpp
+   lib/DgIDGGS.cpp
+   lib/DgIDGGS3H.cpp
+   lib/DgIDGGS43H.cpp
+   lib/DgIDGGS4D.cpp
+   lib/DgIDGGS4H.cpp
+   lib/DgIDGGS4T.cpp
+   lib/DgIDGGS7H.cpp
+   lib/DgIDGGSBase.cpp
+   lib/DgIDGGutil.cpp
+   lib/DgInAIGenFile.cpp
+   lib/DgInGdalFile.cpp
+   lib/DgInLocStreamFile.cpp
+   lib/DgInLocTextFile.cpp
+   lib/DgInputStream.cpp
+   lib/DgInShapefile.cpp
+   lib/DgInShapefileAtt.cpp
+   lib/DgIVec2D.cpp
+   lib/DgIVec3D.cpp
+   lib/DgLocation.cpp
+   lib/DgLocBase.cpp
+   lib/DgLocList.cpp
+   lib/DgLocVector.cpp
+   lib/DgOutAIGenFile.cpp
+   lib/DgOutChildrenFile.cpp
+   lib/DgOutGdalFile.cpp
+   lib/DgOutGeoJSONFile.cpp
+   lib/DgOutKMLfile.cpp
+   lib/DgOutLocFile.cpp
+   lib/DgOutLocTextFile.cpp
+   lib/DgOutNdxChildrenFile.cpp
+   lib/DgOutNdxParentFile.cpp
+   lib/DgOutNeighborsFile.cpp
+   lib/DgOutPRCellsFile.cpp
+   lib/DgOutPRPtsFile.cpp
+   lib/DgOutPtsText.cpp
+   lib/DgOutputStream.cpp
+   lib/DgOutRandPtsText.cpp
+   lib/DgOutShapefile.cpp
+   lib/DgPolygon.cpp
+   lib/DgProjFuller.cpp
+   lib/DgProjGnomonicRF.cpp
+   lib/DgProjISEA.cpp
+   lib/DgProjTriRF.cpp
+   lib/DgRandom.cpp
+   lib/DgRFBase.cpp
+   lib/DgRFNetwork.cpp
+   lib/DgSeriesConverter.cpp
+   lib/DgSqrD4Grid2D.cpp
+   lib/DgSqrD4Grid2DS.cpp
+   lib/DgSqrD8Grid2D.cpp
+   lib/DgSqrD8Grid2DS.cpp
+   lib/DgSuperfund.cpp
+   lib/DgTriGrid2D.cpp
+   lib/DgTriGrid2DS.cpp
+   lib/DgTriIDGG.cpp
+   lib/DgUtil.cpp
+   lib/DgZ3RF.cpp
+   lib/DgZ3StringRF.cpp
+   lib/DgZ3System.cpp
+   lib/DgZ7RF.cpp
+   lib/DgZ7StringRF.cpp
+   lib/DgZ7System.cpp
+   lib/DgZOrderRF.cpp
+   lib/DgZOrderStringRF.cpp
+   lib/DgZOrderSystem.cpp
    include/dglib/Dg2WayConverter.h
    include/dglib/DgAddress.h
    include/dglib/DgAddressBase.h
@@ -129,8 +131,6 @@ add_library(dglib
    include/dglib/DgContCartRF.h
    include/dglib/DgConverter.h
    include/dglib/DgConverterBase.h
-   include/dglib/DgDVec2D.h
-   include/dglib/DgDVec3D.h
    include/dglib/DgDataField.h
    include/dglib/DgDataFieldBase.h
    include/dglib/DgDataList.h
@@ -138,12 +138,17 @@ add_library(dglib
    include/dglib/DgDiscRF2D.h
    include/dglib/DgDiscRFS.h
    include/dglib/DgDiscRFS2D.h
+   include/dglib/DgDiscRFSGrids.h
+   include/dglib/DgDiscTopoRF.h
+   include/dglib/DgDiscTopoRFS.h
    include/dglib/DgDistance.h
    include/dglib/DgDmdD4Grid2D.h
    include/dglib/DgDmdD4Grid2DS.h
    include/dglib/DgDmdD8Grid2D.h
    include/dglib/DgDmdD8Grid2DS.h
    include/dglib/DgDmdIDGG.h
+   include/dglib/DgDVec2D.h
+   include/dglib/DgDVec3D.h
    include/dglib/DgEllipsoidRF.h
    include/dglib/DgGeoDatumRF.h
    include/dglib/DgGeoProjConverter.h
@@ -156,6 +161,16 @@ add_library(dglib
    include/dglib/DgHexGrid2DS.h
    include/dglib/DgHexIDGG.h
    include/dglib/DgHexIDGGS.h
+   include/dglib/DgHierNdx.h
+   include/dglib/DgHierNdxIntRF.h
+   include/dglib/DgHierNdxRF.h
+   include/dglib/DgHierNdxStringRF.h
+   include/dglib/DgHierNdxSystemRF.h
+   include/dglib/DgHierNdxSystemRFBase.h
+   include/dglib/DgHierNdxSystemRFS.h
+   include/dglib/DgHierNdxSystemRFSBase.h
+   include/dglib/DgIcosaMap.h
+   include/dglib/DgIcosaProj.h
    include/dglib/DgIDGG.h
    include/dglib/DgIDGGBase.h
    include/dglib/DgIDGGS.h
@@ -167,22 +182,20 @@ add_library(dglib
    include/dglib/DgIDGGS7H.h
    include/dglib/DgIDGGSBase.h
    include/dglib/DgIDGGutil.h
-   include/dglib/DgIVec2D.h
-   include/dglib/DgIVec3D.h
-   include/dglib/DgIcosaMap.h
-   include/dglib/DgIcosaProj.h
    include/dglib/DgInAIGenFile.h
    include/dglib/DgInGdalFile.h
    include/dglib/DgInLocFile.h
    include/dglib/DgInLocStreamFile.h
    include/dglib/DgInLocTextFile.h
+   include/dglib/DgInputStream.h
    include/dglib/DgInShapefile.h
    include/dglib/DgInShapefileAtt.h
-   include/dglib/DgInputStream.h
+   include/dglib/DgIVec2D.h
+   include/dglib/DgIVec3D.h
+   include/dglib/DgLocation.h
    include/dglib/DgLocBase.h
    include/dglib/DgLocList.h
    include/dglib/DgLocVector.h
-   include/dglib/DgLocation.h
    include/dglib/DgOutAIGenFile.h
    include/dglib/DgOutChildrenFile.h
    include/dglib/DgOutGdalFile.h
@@ -190,13 +203,15 @@ add_library(dglib
    include/dglib/DgOutKMLfile.h
    include/dglib/DgOutLocFile.h
    include/dglib/DgOutLocTextFile.h
+   include/dglib/DgOutNdxChildrenFile.h
+   include/dglib/DgOutNdxParentFile.h
    include/dglib/DgOutNeighborsFile.h
    include/dglib/DgOutPRCellsFile.h
    include/dglib/DgOutPRPtsFile.h
    include/dglib/DgOutPtsText.h
+   include/dglib/DgOutputStream.h
    include/dglib/DgOutRandPtsText.h
    include/dglib/DgOutShapefile.h
-   include/dglib/DgOutputStream.h
    include/dglib/DgPhysicalRF.h
    include/dglib/DgPhysicalRF2D.h
    include/dglib/DgPhysicalRFBase.h
@@ -206,11 +221,11 @@ add_library(dglib
    include/dglib/DgProjGnomonicRF.h
    include/dglib/DgProjISEA.h
    include/dglib/DgProjTriRF.h
+   include/dglib/DgRadixString.h
+   include/dglib/DgRandom.h
    include/dglib/DgRF.h
    include/dglib/DgRFBase.h
    include/dglib/DgRFNetwork.h
-   include/dglib/DgRadixString.h
-   include/dglib/DgRandom.h
    include/dglib/DgRunningStats.h
    include/dglib/DgSeriesConverter.h
    include/dglib/DgSpatialDB.h
@@ -226,10 +241,13 @@ add_library(dglib
    include/dglib/DgUtil.h
    include/dglib/DgZ3RF.h
    include/dglib/DgZ3StringRF.h
+   include/dglib/DgZ3System.h
    include/dglib/DgZ7RF.h
    include/dglib/DgZ7StringRF.h
+   include/dglib/DgZ7System.h
    include/dglib/DgZOrderRF.h
    include/dglib/DgZOrderStringRF.h
+   include/dglib/DgZOrderSystem.h
 )
 
 if(GDAL_FOUND)

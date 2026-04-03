@@ -60,18 +60,18 @@ class DgPolygon : public DgLocVector {
 
       void addHole (DgPolygon* hole); // does not make copy
 
-      const vector<DgPolygon*>& holes (void) const { return holes_; }
+      const std::vector<DgPolygon*>& holes (void) const { return holes_; }
 
    protected:
 
       // takes ownership of holes' memory
-      vector<DgPolygon*> holes_;
+      std::vector<DgPolygon*> holes_;
 
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-inline ostream& operator<< (ostream& stream, const DgPolygon& poly)
+inline std::ostream& operator<< (std::ostream& stream, const DgPolygon& poly)
 {
    stream << poly.rf().name() << " {\n";
 
@@ -87,8 +87,8 @@ inline ostream& operator<< (ostream& stream, const DgPolygon& poly)
       stream << "]\n";
    }
 
-   return stream << "}" << endl;
+   return stream << "}" << std::endl;
 
-} // inline ostream& operator<<
+} // inline std::ostream& operator<<
 
 #endif

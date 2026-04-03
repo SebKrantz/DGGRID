@@ -36,7 +36,7 @@ template <typename T> class DgDataField : public DgDataFieldBase {
    public:
 
       DgDataField (void) {}
-      DgDataField (string _name, DgDataType _type, T _value)
+      DgDataField (std::string _name, DgDataType _type, T _value)
          : DgDataFieldBase (_name, _type), value_ (_value)
       { }
 
@@ -45,7 +45,7 @@ template <typename T> class DgDataField : public DgDataFieldBase {
       T& value (void) { return value_; }
       const T& value (void) const { return value_; }
 
-      virtual string valString (void) const = 0;
+      virtual std::string valString (void) const = 0;
 
 #ifdef USE_GDAL
       virtual void setField (OGRFeature* feature) const
@@ -54,7 +54,7 @@ template <typename T> class DgDataField : public DgDataFieldBase {
 
    protected:
 
-      virtual ostream& writeTo (ostream& stream) const
+      virtual std::ostream& writeTo (std::ostream& stream) const
                           { return stream << value_; }
 
       T value_;
@@ -69,7 +69,7 @@ class DgDataField<long int> : public DgDataFieldBase {
    public:
 
       DgDataField (void) {}
-      DgDataField (string _name, DgDataType _type, long int _value)
+      DgDataField (std::string _name, DgDataType _type, long int _value)
          : DgDataFieldBase (_name, _type), value_ (_value)
       { }
 
@@ -78,7 +78,7 @@ class DgDataField<long int> : public DgDataFieldBase {
       long int& value (void) { return value_; }
       const long int& value (void) const { return value_; }
 
-      virtual string valString (void) const {
+      virtual std::string valString (void) const {
          return dgg::util::to_string(value_);
       }
 
@@ -90,7 +90,7 @@ class DgDataField<long int> : public DgDataFieldBase {
 
    protected:
 
-      virtual ostream& writeTo (ostream& stream) const
+      virtual std::ostream& writeTo (std::ostream& stream) const
                           { return stream << value_; }
 
       long int value_;
@@ -103,8 +103,8 @@ class DgDataFieldDouble : public DgDataField<double> {
 
    public:
 
-      DgDataFieldDouble (string _name, double _value = 0.0,
-                string _fmtStr = "%#.6LF")
+      DgDataFieldDouble (std::string _name, double _value = 0.0,
+                std::string _fmtStr = "%#.6LF")
          : DgDataField<double> (_name, FIELD_DOUBLE, _value),
            fmtStr (_fmtStr)
       { }
@@ -114,11 +114,11 @@ class DgDataFieldDouble : public DgDataField<double> {
             return 0;
          }
 
-      virtual string valString (void) const {
+      virtual std::string valString (void) const {
          return dgg::util::to_string(value_, fmtStr.c_str());
       }
 
-      string fmtStr;
+      std::string fmtStr;
 
 };
 
@@ -127,7 +127,7 @@ class DgDataFieldInt : public DgDataField<int> {
 
    public:
 
-      DgDataFieldInt (string _name, int _value = 0)
+      DgDataFieldInt (std::string _name, int _value = 0)
          : DgDataField<int> (_name, FIELD_INT, _value)
       { }
 
@@ -136,7 +136,7 @@ class DgDataFieldInt : public DgDataField<int> {
             return 0;
          }
 
-      virtual string valString (void) const {
+      virtual std::string valString (void) const {
          return dgg::util::to_string(value_);
       }
 };
@@ -146,7 +146,7 @@ class DgDataFieldInt64 : public DgDataField<int64_t> {
 
    public:
 
-      DgDataFieldInt64 (string _name, int _value = 0.0)
+      DgDataFieldInt64 (std::string _name, int64_t _value = 0)
          : DgDataField<int64_t> (_name, FIELD_INT64, _value)
       { }
 
@@ -155,7 +155,7 @@ class DgDataFieldInt64 : public DgDataField<int64_t> {
             return 0;
          }
 
-      virtual string valString (void) const {
+      virtual std::string valString (void) const {
          return dgg::util::to_string(value_);
       }
 
@@ -172,12 +172,12 @@ class DgDataFieldString : public DgDataField<char*> {
 
    public:
 
-      DgDataFieldString (const string& _name, char* _value = nullptr, int _fldWdth = 32)
+      DgDataFieldString (const std::string& _name, char* _value = nullptr, int _fldWdth = 32)
          : DgDataField<char*> (_name, FIELD_STRING, _value),
            fldWdth_ (_fldWdth)
       { }
 
-      DgDataFieldString (const string& _name, const string& _value = "", int _fldWdth = 32)
+      DgDataFieldString (const std::string& _name, const std::string& _value = "", int _fldWdth = 32)
          : DgDataField<char*> (_name, FIELD_STRING, nullptr),
            fldWdth_ (_fldWdth)
       {
@@ -193,8 +193,8 @@ class DgDataFieldString : public DgDataField<char*> {
             return 1;
          }
 
-      virtual string valString (void) const {
-         return string(value_);
+      virtual std::string valString (void) const {
+         return std::string(value_);
       }
 
       int fldWdth_;

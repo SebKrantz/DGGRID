@@ -45,6 +45,8 @@
 #include <dglib/DgOutPRCellsFile.h>
 #include <dglib/DgOutNeighborsFile.h>
 #include <dglib/DgOutChildrenFile.h>
+#include <dglib/DgOutNdxChildrenFile.h>
+#include <dglib/DgOutNdxParentFile.h>
 #include <dglib/DgHexIDGG.h>
 #include <dglib/DgHexIDGGS.h>
 #include <dglib/DgIDGGBase.h>
@@ -62,12 +64,12 @@
 #include <dglib/DgDmdD4Grid2DS.h>
 #include <dglib/DgTriGrid2D.h>
 #include <dglib/DgOutRandPtsText.h>
+#include <dglib/DgHierNdxSystemRFSBase.h>
 #include "DgHexSF.h"
 
 #include "OpBasic.h"
 #include "SubOpOut.h"
 
-using namespace std;
 using namespace dgg::addtype;
 
 namespace {
@@ -76,7 +78,7 @@ const char* newline = "\n";
 
 ////////////////////////////////////////////////////////////////////////////////
 void
-SubOpOut::genRandPts (const DgQ2DICoord& add2D, const string& label)
+SubOpOut::genRandPts (const DgQ2DICoord& add2D, const std::string& label)
 {
    const DgIDGGBase& dgg = op.dggOp.dgg();
    const DgContCartRF& deg = op.dggOp.deg();
@@ -100,8 +102,7 @@ SubOpOut::genRandPts (const DgQ2DICoord& add2D, const string& label)
 
    delete cp;
 
-   if (op.mainOp.megaVerbose)
-   {
+   if (op.mainOp.megaVerbose) {
       DgDVec2D tvec = cpv - cpv00;
       dgcout << " " << tvec << newline;
    }
@@ -228,7 +229,7 @@ SubOpOut::genRandPts (const DgQ2DICoord& add2D, const string& label)
 
       if (!randPtsOutType.compare("TEXT")) {
           // pack more info into the cell label
-          ostringstream os;
+          std::ostringstream os;
           os << op.dggOp.sampleCount << ", " << op.dggOp.curGrid << ", "
                    << label << ", " << op.dggOp.nSamplePts << ", ";
 
@@ -242,13 +243,13 @@ SubOpOut::genRandPts (const DgQ2DICoord& add2D, const string& label)
 
 ////////////////////////////////////////////////////////////////////////////////
 void
-SubOpOut::outputCellAdd2D (const DgLocation& add2D, const string* labelIn,
+SubOpOut::outputCellAdd2D (const DgLocation& add2D, const std::string* labelIn,
                DgDataList* dataList)
 {
    const DgIDGGBase& dgg = op.dggOp.dgg();
 
    // create the output label
-   string label;
+   std::string label;
    if (labelIn)
       label = *labelIn;
    else {
@@ -358,6 +359,7 @@ SubOpOut::outputCellAdd2D (const DgLocation& add2D, const string* labelIn,
          runStats.push(dgg.geoRF().dist(ctrGeo, neighbors[i]));
    }
 
+   // spatial children
    //const DgHexIDGG& hexdgg = static_cast<const DgHexIDGG&>(dgg);
    DgResAdd<DgQ2DICoord> q2diR(q2di, dgg.res());
    DgLocVector children;
@@ -369,15 +371,51 @@ SubOpOut::outputCellAdd2D (const DgLocation& add2D, const string* labelIn,
          chdOut->insert(add2D, children);
    }
 
+   // indexing parent
+   const DgHierNdxSystemRFSBase* hierNdxSystem = op.dggOp.dggs().hierNdxSystem();
+   DgLocation ndxParent;
+   if (ndxParentOutType != "NONE") {
+      if (!hierNdxSystem) {
+          ::report("indexing parents require a hierarchical indexing system.", DgBase::Fatal);
+      }
+
+      hierNdxSystem->setNdxParent(q2diR, ndxParent);
+
+      if (ndxPrtOut)
+         ndxPrtOut->insert(add2D, ndxParent);
+   }
+
+/*
+        const DgHierNdxSystemRFBase& hierRF = hierNdxSystem->sysRF(dgg.res());
+        hierRF.setAllChildren(q2diR, children);
+  */
+
+   // indexing children
+   // reuse variables from the spatial children above
+   DgLocVector ndxChildren;
+   if (ndxChildrenOutType != "NONE") {
+       if (!hierNdxSystem) {
+           ::report("indexing parents require a hierarchical indexing system.", DgBase::Fatal);
+       }
+
+       hierNdxSystem->setNdxChildren(q2diR, ndxChildren);
+
+       if (ndxChdOut)
+           ndxChdOut->insert(add2D, ndxChildren);
+   }
+
    if (collectOut) {
       collectOut->insert(dgg, cell,
             (pointOutType == "GDAL_COLLECTION"),
             (cellOutType == "GDAL_COLLECTION"),
-            op.dggOp.chdDgg(),
+            op.dggOp.chdDgg(), op.dggOp.prtDgg(),
             ((outSeqNum || useEnumLbl) ? NULL : pOutRF),
             ((outSeqNum || useEnumLbl) ? NULL : pChdOutRF),
-            ((neighborsOutType == "GDAL_COLLECTION") ? &neighbors : NULL),
-            ((childrenOutType == "GDAL_COLLECTION") ? &children : NULL));
+            ((outSeqNum || useEnumLbl) ? NULL : pPrtOutRF),
+            ((neighborsOutType == "GDAL_COLLECTION") ? &neighbors : nullptr),
+            ((childrenOutType == "GDAL_COLLECTION") ? &children : nullptr),
+            ((ndxParentOutType == "GDAL_COLLECTION") ? &ndxParent : nullptr),
+            ((ndxChildrenOutType == "GDAL_COLLECTION") ? &ndxChildren : nullptr));
    }
 
 } // void SubOpOut::outputCell
@@ -386,14 +424,18 @@ SubOpOut::outputCellAdd2D (const DgLocation& add2D, const string* labelIn,
 ////////////////////////////////////////////////////////////////////////////////
 SubOpOut::SubOpOut (OpBasic& op, bool _activate)
    : SubOpBasic (op, _activate),
-     pOutRF (0), pChdOutRF (0),
+     pOutRF (0), pChdOutRF (0), pPrtOutRF (0),
+     outHierNdxSys (0),
      outAddType (dgg::addtype::InvalidAddressType),
+     outHierNdxSysType (dgg::addtype::InvalidHierNdxSysType),
+     outHierNdxFormType(dgg::addtype::Int64),
      outSeqNum (false), outputDelimiter (' '), nDensify (1),
      lonWrapMode (DgGeoSphRF::Wrap), unwrapPts (true),
      doRandPts (true), ptsRand (0), nRandPts (0),
      nCellsTested(0), nCellsAccepted (0),
      dataOut (0), cellOut (0), ptOut (0), collectOut (0), randPtsOut (0),
      cellOutShp (0), ptOutShp (0), prCellOut (0), nbrOut (0), chdOut (0),
+     ndxChdOut(0), ndxPrtOut(0),
      concatPtOut (true), useEnumLbl (false),
      nOutputFile (0), nCellsOutputToFile (0)
 { }
@@ -402,15 +444,15 @@ SubOpOut::SubOpOut (OpBasic& op, bool _activate)
 int
 SubOpOut::initializeOp (void)
 {
-   vector<string*> choices;
-   string def;
+   std::vector<std::string*> choices;
+   std::string def;
 
    // output_file_name <fileName>
    pList().insertParam(new DgStringParam("output_file_name", "valsout.txt"));
 
    // output_file_type <NONE | TEXT >
-   choices.push_back(new string("NONE"));
-   choices.push_back(new string("TEXT"));
+   choices.push_back(new std::string("NONE"));
+   choices.push_back(new std::string("TEXT"));
 
    def = ((op.mainOp.operation == "BIN_POINT_VALS" ||
            op.mainOp.operation == "BIN_POINT_PRESENCE" ||
@@ -424,9 +466,9 @@ SubOpOut::initializeOp (void)
    //        SEQNUM | VERTEX2DD | HIERNDX >
    // KEVIN: still supports version 8 z* types
     for (int i = 0; ; i++) {
-       if (dgg::addtype::addTypeStrings[i] == "INVALID")
+       if (dgg::addtype::addTypeStrings[i] == "NONE")
           break;
-       choices.push_back(new string(dgg::addtype::addTypeStrings[i]));
+       choices.push_back(new std::string(dgg::addtype::addTypeStrings[i]));
     }
     pList().insertParam(new DgStringChoiceParam("output_address_type",
                 "SEQNUM", &choices));
@@ -435,9 +477,9 @@ SubOpOut::initializeOp (void)
     // output_hier_ndx_system < ZORDER | Z3 | Z7 >
     // used if output_address_type is HIERNDX
     for (int i = 0; ; i++) {
-       if (dgg::addtype::hierNdxSysTypeStrings[i] == "INVALID")
+       if (dgg::addtype::hierNdxSysTypeStrings[i] == "NONE")
           break;
-       choices.push_back(new string(dgg::addtype::hierNdxSysTypeStrings[i]));
+       choices.push_back(new std::string(dgg::addtype::hierNdxSysTypeStrings[i]));
     }
     def = "Z3";
     pList().insertParam(new DgStringChoiceParam("output_hier_ndx_system", def, &choices));
@@ -446,9 +488,9 @@ SubOpOut::initializeOp (void)
     // output_hier_ndx_form < INT64 | DIGIT_STRING >
     // used if output_address_type is HIERNDX
     for (int i = 0; ; i++) {
-       if (dgg::addtype::hierNdxFormTypeStrings[i] == "INVALID")
+       if (dgg::addtype::hierNdxFormTypeStrings[i] == "NONE")
           break;
-       choices.push_back(new string(dgg::addtype::hierNdxFormTypeStrings[i]));
+       choices.push_back(new std::string(dgg::addtype::hierNdxFormTypeStrings[i]));
     }
     def = "INT64";
     pList().insertParam(new DgStringChoiceParam("output_hier_ndx_form", def, &choices));
@@ -461,9 +503,9 @@ SubOpOut::initializeOp (void)
     pList().insertParam(new DgIntParam("densification", 0, 0, 500));
 
    // longitude_wrap_mode < WRAP | UNWRAP_WEST | UNWRAP_EAST >
-   choices.push_back(new string("WRAP"));
-   choices.push_back(new string("UNWRAP_WEST"));
-   choices.push_back(new string("UNWRAP_EAST"));
+   choices.push_back(new std::string("WRAP"));
+   choices.push_back(new std::string("UNWRAP_WEST"));
+   choices.push_back(new std::string("UNWRAP_EAST"));
    pList().insertParam(new DgStringChoiceParam("longitude_wrap_mode", "WRAP",
                &choices));
    dgg::util::release(choices);
@@ -473,12 +515,12 @@ SubOpOut::initializeOp (void)
    pList().insertParam(new DgBoolParam("unwrap_points", true));
 
    // output_cell_label_type <GLOBAL_SEQUENCE | ENUMERATION | SUPERFUND | OUTPUT_ADDRESS_TYPE >
-   choices.push_back(new string("GLOBAL_SEQUENCE"));
-   choices.push_back(new string("ENUMERATION"));
-   choices.push_back(new string("SUPERFUND"));
-   choices.push_back(new string("OUTPUT_ADDRESS_TYPE"));
+   choices.push_back(new std::string("GLOBAL_SEQUENCE"));
+   choices.push_back(new std::string("ENUMERATION"));
+   choices.push_back(new std::string("SUPERFUND"));
+   choices.push_back(new std::string("OUTPUT_ADDRESS_TYPE"));
 
-   string outLblDef("GLOBAL_SEQUENCE");
+   std::string outLblDef("GLOBAL_SEQUENCE");
    if (op.mainOp.operation == "TRANSFORM_POINTS")
       outLblDef = "OUTPUT_ADDRESS_TYPE";
    pList().insertParam(new DgStringChoiceParam("output_cell_label_type", outLblDef,
@@ -488,44 +530,44 @@ SubOpOut::initializeOp (void)
    ////// output parameters //////
 
    // cell_output_type <NONE | AIGEN | GDAL | KML | GEOJSON | SHAPEFILE | GDAL_COLLECTION>
-   choices.push_back(new string("NONE"));
-   choices.push_back(new string("AIGEN"));
+   choices.push_back(new std::string("NONE"));
+   choices.push_back(new std::string("AIGEN"));
 #ifdef USE_GDAL
-   choices.push_back(new string("GDAL"));
+   choices.push_back(new std::string("GDAL"));
 #endif
-   choices.push_back(new string("KML"));
-   choices.push_back(new string("GEOJSON"));
-   choices.push_back(new string("SHAPEFILE"));
-   choices.push_back(new string("GDAL_COLLECTION"));
-   //choices.push_back(new string("TEXT"));
+   choices.push_back(new std::string("KML"));
+   choices.push_back(new std::string("GEOJSON"));
+   choices.push_back(new std::string("SHAPEFILE"));
+   choices.push_back(new std::string("GDAL_COLLECTION"));
+   //choices.push_back(new std::string("TEXT"));
    def = ((op.mainOp.operation == "GENERATE_GRID") ? "AIGEN" : "NONE");
    pList().insertParam(new DgStringChoiceParam("cell_output_type", def, &choices));
    dgg::util::release(choices);
 
    // point_output_type <NONE | AIGEN | GDAL | KML | GEOJSON | SHAPEFILE | TEXT | GDAL_COLLECTION>
-   choices.push_back(new string("NONE"));
-   choices.push_back(new string("AIGEN"));
+   choices.push_back(new std::string("NONE"));
+   choices.push_back(new std::string("AIGEN"));
 #ifdef USE_GDAL
-   choices.push_back(new string("GDAL"));
+   choices.push_back(new std::string("GDAL"));
 #endif
-   choices.push_back(new string("KML"));
-   choices.push_back(new string("GEOJSON"));
-   choices.push_back(new string("SHAPEFILE"));
-   choices.push_back(new string("TEXT"));
-   choices.push_back(new string("GDAL_COLLECTION"));
+   choices.push_back(new std::string("KML"));
+   choices.push_back(new std::string("GEOJSON"));
+   choices.push_back(new std::string("SHAPEFILE"));
+   choices.push_back(new std::string("TEXT"));
+   choices.push_back(new std::string("GDAL_COLLECTION"));
    pList().insertParam(new DgStringChoiceParam("point_output_type", "NONE", &choices));
    dgg::util::release(choices);
 
    // randpts_output_type <NONE | AIGEN | GDAL | KML | GEOJSON | SHAPEFILE | TEXT>
-   choices.push_back(new string("NONE"));
-   choices.push_back(new string("AIGEN"));
+   choices.push_back(new std::string("NONE"));
+   choices.push_back(new std::string("AIGEN"));
 #ifdef USE_GDAL
-   choices.push_back(new string("GDAL"));
+   choices.push_back(new std::string("GDAL"));
 #endif
-   choices.push_back(new string("KML"));
-   choices.push_back(new string("SHAPEFILE"));
-   choices.push_back(new string("GEOJSON"));
-   choices.push_back(new string("TEXT"));
+   choices.push_back(new std::string("KML"));
+   choices.push_back(new std::string("SHAPEFILE"));
+   choices.push_back(new std::string("GEOJSON"));
+   choices.push_back(new std::string("TEXT"));
    pList().insertParam(new DgStringChoiceParam("randpts_output_type", "NONE", &choices));
    dgg::util::release(choices);
 
@@ -576,12 +618,10 @@ SubOpOut::initializeOp (void)
    pList().insertParam(new DgStringParam("kml_description",
                DgOutLocFile::defaultKMLDescription));
 
-   ///// PlanetRisk output formats /////
-
    // neighbor_output_type <NONE | TEXT | GEOJSON_COLLECTION>
-   choices.push_back(new string("NONE"));
-   choices.push_back(new string("TEXT"));
-   choices.push_back(new string("GDAL_COLLECTION"));
+   choices.push_back(new std::string("NONE"));
+   choices.push_back(new std::string("TEXT"));
+   choices.push_back(new std::string("GDAL_COLLECTION"));
    pList().insertParam(new DgStringChoiceParam("neighbor_output_type", "NONE",
                &choices));
    dgg::util::release(choices);
@@ -590,15 +630,37 @@ SubOpOut::initializeOp (void)
    pList().insertParam(new DgStringParam("neighbor_output_file_name", "nbr"));
 
    // children_output_type <NONE | TEXT | GDAL_COLLECTION>
-   choices.push_back(new string("NONE"));
-   choices.push_back(new string("TEXT"));
-   choices.push_back(new string("GDAL_COLLECTION"));
+   choices.push_back(new std::string("NONE"));
+   choices.push_back(new std::string("TEXT"));
+   choices.push_back(new std::string("GDAL_COLLECTION"));
    pList().insertParam(new DgStringChoiceParam("children_output_type", "NONE",
                &choices));
    dgg::util::release(choices);
 
    // children_output_file_name <outputFileName>
    pList().insertParam(new DgStringParam("children_output_file_name", "chld"));
+
+   // indexing_children_output_type <NONE | TEXT | GDAL_COLLECTION>
+   choices.push_back(new std::string("NONE"));
+   choices.push_back(new std::string("TEXT"));
+   choices.push_back(new std::string("GDAL_COLLECTION"));
+   pList().insertParam(new DgStringChoiceParam("indexing_children_output_type", "NONE",
+               &choices));
+   dgg::util::release(choices);
+
+   // indexing_children_output_file_name <outputFileName>
+   pList().insertParam(new DgStringParam("indexing_children_output_file_name", "ndxChld"));
+
+   // indexing_parent_output_type <NONE | TEXT | GDAL_COLLECTION>
+   choices.push_back(new std::string("NONE"));
+   choices.push_back(new std::string("TEXT"));
+   choices.push_back(new std::string("GDAL_COLLECTION"));
+   pList().insertParam(new DgStringChoiceParam("indexing_parent_output_type", "NONE",
+               &choices));
+   dgg::util::release(choices);
+
+   // indexing_parent_output_file_name <outputFileName>
+   pList().insertParam(new DgStringParam("indexing_parent_output_file_name", "ndxPrt"));
 
    ///// additional random points parameters /////
 
@@ -630,7 +692,7 @@ SubOpOut::setupOp (void)
 {
    /////// fill state variables from the parameter list //////////
 
-   string dummy;
+   std::string dummy;
 
    // output address type
    getParamValue(pList(), "output_address_type", dummy, false);
@@ -639,32 +701,28 @@ SubOpOut::setupOp (void)
 
    getParamValue(pList(), "output_hier_ndx_system", dummy, false);
    dummy = dgg::util::toUpper(dummy);
-   DgHierNdxSysType inHierNdxSysType = dgg::addtype::stringToHierNdxSysType(dummy);
+   outHierNdxSysType = dgg::addtype::stringToHierNdxSysType(dummy);
+
    getParamValue(pList(), "output_hier_ndx_form", dummy, false);
    dummy = dgg::util::toUpper(dummy);
-   DgHierNdxFormType inHierNdxFormType = dgg::addtype::stringToHierNdxFormType(dummy);
+   outHierNdxFormType = dgg::addtype::stringToHierNdxFormType(dummy);
+    /*
    if (outAddType == dgg::addtype::HierNdx) {
        // KEVIN: this will all go away in version 9.0
-        if (inHierNdxFormType == dgg::addtype::Int64) {
-           switch (inHierNdxSysType) {
+        if (outHierNdxFormType == dgg::addtype::Int64) {
+           switch (outHierNdxSysType) {
                case DgHierNdxSysType::Z3:
-                   outAddType = dgg::addtype::Z3;
-                   break;
-               case DgHierNdxSysType::Z7:
-                   outAddType = dgg::addtype::Z7;
+                   outAddType = dgg::addtype::Z3V8;
                    break;
                case DgHierNdxSysType::ZOrder:
-                   outAddType = dgg::addtype::ZOrder;
+                   outAddType = dgg::addtype::ZOrderV8;
                    break;
                default: ;
            }
        } else { // must be DigitString
-           switch (inHierNdxSysType) {
+           switch (outHierNdxSysType) {
                case DgHierNdxSysType::Z3:
                    outAddType = dgg::addtype::Z3String;
-                   break;
-               case DgHierNdxSysType::Z7:
-                   outAddType = dgg::addtype::Z7String;
                    break;
                case DgHierNdxSysType::ZOrder:
                    outAddType = dgg::addtype::ZOrderString;
@@ -673,20 +731,12 @@ SubOpOut::setupOp (void)
            }
        }
 
-    } else if (outAddType > dgg::addtype::HierNdx) { // these are deprecated
-      ::report(
-         "output_address_type values of ZORDER, ZORDER_STRING, Z3, Z3_STRING, Z7, and "
-         "Z7_STRING are deprecated and will go away in version 9.0. Instead set "
-         "output_address_type to HIERNDX, new parameter output_hier_ndx_system to the "
-         "desired system ZORDER, Z3, or Z7 (Z3 is the default), and new parameter "
-         "output_hier_ndx_form to the specific output format INT64 or DIGIT_STRING "
-         "(default is INT64).",
-      DgBase::Warning);
-   }
-
-    if (outAddType == dgg::addtype::Z3) {
-        ::report("the default padding digit for Z3 INT64 indexes will switch "
-                 "from 0 to 3 starting with DGGRID version 9.0.\n"
+    }
+     */
+    
+    if (outAddType == dgg::addtype::HierNdx && outHierNdxSysType == dgg::addtype::Z3) {
+        ::report("in DGGRID version 9.0 the default padding digit for Z3 indexes has switched "
+                 "from 0 to 3.\n"
                  "Set parameter z3_invalid_digit if you want a different digit used.",
                  DgBase::Warning);
     }
@@ -732,10 +782,15 @@ SubOpOut::setupOp (void)
    getParamValue(pList(), "randpts_output_type", randPtsOutType, "NONE");
    getParamValue(pList(), "neighbor_output_type", neighborsOutType, "NONE");
    getParamValue(pList(), "children_output_type", childrenOutType, "NONE");
-
+   getParamValue(pList(), "indexing_children_output_type", ndxChildrenOutType, "NONE");
+   getParamValue(pList(), "indexing_parent_output_type", ndxParentOutType, "NONE");
    getParamValue(pList(), "neighbor_output_file_name", neighborsOutFileNameBase,
                    false);
    getParamValue(pList(), "children_output_file_name", childrenOutFileNameBase,
+                   false);
+   getParamValue(pList(), "indexing_children_output_file_name", ndxChildrenOutFileNameBase,
+                   false);
+   getParamValue(pList(), "indexing_parent_output_file_name", ndxParentOutFileNameBase,
                    false);
 
    getParamValue(pList(), "output_file_name", dataOutFileNameBase, false);
@@ -761,7 +816,7 @@ SubOpOut::setupOp (void)
    getParamValue(pList(), "output_first_seqnum", outFirstSeqNum, false);
    getParamValue(pList(), "output_last_seqnum", outLastSeqNum, false);
 
-   string outLblType;
+   std::string outLblType;
    getParamValue(pList(), "output_cell_label_type", outLblType, false);
 
    if (outLblType == "SUPERFUND" && !op.dggOp.isSuperfund)
@@ -809,13 +864,13 @@ SubOpOut::setupOp (void)
    getParamValue(pList(), "build_shapefile_attributes", buildShapeFileAttributes, false);
 ///// alternate stuff
 >       getParamValue(pList(), "build_shapefile_attributes_source", dummy, false);
-        dummy = dgg::util::toUpper(dummy);
->       if (dummy == string("CLIP_FILES"))
+>       dummy = dgg::util::toUpper(dummy);
+>       if (dummy == std::string("CLIP_FILES"))
 >       {
 >          buildShapeFileAttributes = true;
 >          buildClipFileAttributes = true;
 >       }
->       else if (dummy == string("SHAPEFILES"))
+>       else if (dummy == std::string("SHAPEFILES"))
 >       {
 >          buildShapeFileAttributes = true;
 >          buildClipFileAttributes = false;
@@ -870,6 +925,8 @@ SubOpOut::resetFiles (void) {
    metaOutFileName = metaOutFileNameBase;
    neighborsOutFileName = neighborsOutFileNameBase;
    childrenOutFileName = childrenOutFileNameBase;
+   ndxChildrenOutFileName = ndxChildrenOutFileNameBase;
+   ndxParentOutFileName = ndxParentOutFileNameBase;
 
    // Flush and close any input files we may have used:
    delete dataOut; dataOut = NULL;
@@ -880,6 +937,8 @@ SubOpOut::resetFiles (void) {
    delete prCellOut; prCellOut = NULL;
    delete nbrOut; nbrOut = NULL;
    delete chdOut; chdOut = NULL;
+   delete ndxChdOut; ndxChdOut = NULL;
+   delete ndxPrtOut; ndxPrtOut = NULL;
 
    cellOutShp = NULL; // this is a ptr to cellOut so don't delete
    ptOutShp = NULL; // this is a ptr to ptOut so don't delete
@@ -919,20 +978,19 @@ SubOpOut::executeOp (void) {
    if (outSeqNum || useEnumLbl)
       pOutRF = &dgg;
    else if (!op.dggOp.isSuperfund) { // use input address type
-
-      outSeqNum = op.dggOp.addressTypeToRF(outAddType, &pOutRF, &pChdOutRF);
+      outSeqNum = op.dggOp.addressTypeToRF(outAddType, outHierNdxSysType, outHierNdxFormType, &pOutRF, &outHierNdxSys, &pChdOutRF, &pPrtOutRF);
       if (!pOutRF)
          ::report("SubOpOut::executeOp(): invalid output RF", DgBase::Fatal);
    }
 
-   string suffix = string("");
+   std::string suffix = std::string("");
    if (op.dggOp.numGrids > 1) {
-      suffix += string(".") + dgg::util::to_string(op.dggOp.curGrid, 4);
+      suffix += std::string(".") + dgg::util::to_string(op.dggOp.curGrid, 4);
       metaOutFileName += suffix;
    }
 
    if (maxCellsPerFile)
-      suffix += string("_") + dgg::util::to_string(nOutputFile);
+      suffix += std::string("_") + dgg::util::to_string(nOutputFile);
 
    if (!suffix.empty()) {
       dataOutFileName += suffix;
@@ -960,9 +1018,9 @@ SubOpOut::executeOp (void) {
    // now create all the files
 
    if (dataOutType == "TEXT") {
-      dataOut = new ofstream();
+      dataOut = new std::ofstream();
       dataOut->open(dataOutFileName.c_str());
-      dataOut->setf(ios::fixed, ios::floatfield);
+      dataOut->setf(std::ios::fixed, std::ios::floatfield);
       dataOut->precision(op.mainOp.precision);
    }
 
@@ -1019,7 +1077,6 @@ SubOpOut::executeOp (void) {
 
    ///// children/neighbor output files /////
    if (neighborsOutType == "TEXT") {
-
       if (op.dggOp.gridTopo == Triangle)
          ::report("Neighbors not implemented for Triangle grids", DgBase::Fatal);
 
@@ -1031,6 +1088,23 @@ SubOpOut::executeOp (void) {
       chdOut = new DgOutChildrenFile(childrenOutFileName, dgg, op.dggOp.chdDgg(),
                ((outSeqNum || useEnumLbl) ? NULL : pOutRF), pChdOutRF, "chd");
    }
+
+    if (ndxChildrenOutType == "TEXT") {
+       ndxChdOut = new DgOutNdxChildrenFile(ndxChildrenOutFileName, dgg, op.dggOp.chdDgg(),
+                ((outSeqNum || useEnumLbl) ? NULL : pOutRF), pChdOutRF, "ndxChd");
+    }
+
+    if (ndxParentOutType != "NONE") {
+        ndxPrtOut = nullptr;
+        if (!op.dggOp.prtDgg())
+            ::report("resolution 0 cells do not have parents.", DgBase::Warning);
+        else {
+            if (ndxParentOutType == "TEXT") {
+                ndxPrtOut = new DgOutNdxParentFile(ndxParentOutFileName, dgg, *op.dggOp.prtDgg(),
+                        ((outSeqNum || useEnumLbl) ? NULL : pOutRF), pPrtOutRF, "ndxPrt");
+            }
+        }
+    }
 
    return 0;
 

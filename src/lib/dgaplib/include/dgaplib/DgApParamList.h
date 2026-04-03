@@ -39,27 +39,27 @@ class DgApAssoc {
 
    public:
 
-      DgApAssoc (const string& nameIn)
+      DgApAssoc (const std::string& nameIn)
          : isApplicable_(false), isValid_(false), isDefault_(true),
            isUserSet_(false), isUsed_(false)
          { name_ = toLower(nameIn); }
 
       virtual ~DgApAssoc (void);
 
-      virtual string valToStr (void) const = 0;
+      virtual std::string valToStr (void) const = 0;
 
-      const string& name (void) const { return name_; }
+      const std::string& name (void) const { return name_; }
 
-      string asString (void) const
-           { return name() + " " + (isValid() ? valToStr() : string("INVALID"))
+     std::string asString (void) const
+           { return name() + " " + (isValid() ? valToStr() :std::string("INVALID"))
                     + " (" +
-                       (!isApplicable() ? string("N/A") :
-                         (isDefault() ? string("default") : string("user set")))
+                       (!isApplicable() ? std::string("N/A") :
+                         (isDefault() ? std::string("default") : std::string("user set")))
                     + ")"; }
 
-      string validationErrMsg (void) const { return validationErrMsg_; }
+     std::string validationErrMsg (void) const { return validationErrMsg_; }
 
-      void setValidationErrMsg (const string& valErrMsgIn)
+      void setValidationErrMsg (const std::string& valErrMsgIn)
                { validationErrMsg_ = valErrMsgIn; }
 
       bool isApplicable (void) const { return isApplicable_; }
@@ -82,7 +82,7 @@ class DgApAssoc {
 
       bool setIsUsed (bool isUsedIn) { return (isUsed_ = isUsedIn); }
 
-      virtual void setValStr (const string& valStr) = 0;
+      virtual void setValStr (const std::string& valStr) = 0;
 
       DgApAssoc& operator= (const DgApAssoc& obj)
         {
@@ -99,8 +99,8 @@ class DgApAssoc {
 
    protected:
 
-      string name_;
-      string validationErrMsg_;
+      std::string name_;
+      std::string validationErrMsg_;
 
       bool isApplicable_;
       bool isValid_;
@@ -110,13 +110,13 @@ class DgApAssoc {
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-inline ostream& operator<< (ostream& stream, const DgApAssoc& assoc)
+inline std::ostream& operator<< (std::ostream& stream, const DgApAssoc& assoc)
 {
-   stream << assoc.asString() << endl;
+   stream << assoc.asString() << std::endl;
 
    return stream;
 
-} // inline ostream& operator<<
+} // inline std::ostream& operator<<
 
 ////////////////////////////////////////////////////////////////////////////////
 class DgApParamList {
@@ -127,26 +127,26 @@ class DgApParamList {
 
      ~DgApParamList (void);
 
-      vector<DgApAssoc*> parameters;
+      std::vector<DgApAssoc*> parameters;
 
       void clearList (void);
 
-      void loadParams (const string& fileName, bool fail = true);
+      void loadParams (const std::string& fileName, bool fail = true);
 
-      void setParam (const string& nameIn, const string& strValIn, bool fail = true);
+      void setParam (const std::string& nameIn, const std::string& strValIn, bool fail = true);
 
-      void setPresetParam (const string& nameIn, const string& strValIn,
-                           bool failSilent = false);
+      void setPresetParam (const std::string& nameIn, const std::string& strValIn,
+                 bool failSilent = false);
 
       void insertParam (DgApAssoc* param); // does not make a copy
 
-      DgApAssoc* getParam (const string& nameIn,
+      DgApAssoc* getParam (const std::string& nameIn,
                          bool setToIsApplicable = true) const;
 
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-inline ostream& operator<< (ostream& stream, const DgApParamList& plist)
+inline std::ostream& operator<< (std::ostream& stream, const DgApParamList& plist)
 {
    for (unsigned int i = 0; i < plist.parameters.size(); i++) {
       if (plist.parameters[i]->isUsed())
@@ -155,29 +155,29 @@ inline ostream& operator<< (ostream& stream, const DgApParamList& plist)
 
    return stream;
 
-} // inline ostream& operator<<
+} // inline std::ostream& operator<<
 
 ////////////////////////////////////////////////////////////////////////////////
 template<class T> class DgParameter : public DgApAssoc {
 
    public:
 
-      DgParameter<T> (const string& nameIn) : DgApAssoc (nameIn) { }
+      DgParameter<T> (const std::string& nameIn) : DgApAssoc (nameIn) { }
 
-      DgParameter<T> (const string& nameIn, const T& valIn, bool validIn = true)
+      DgParameter<T> (const std::string& nameIn, const T& valIn, bool validIn = true)
         : DgApAssoc (nameIn), value_ (valIn) { DgApAssoc::setIsValid(validIn); }
 
       const T& value (void) const { return value_; }
 
       virtual void setValue (const T& value) { value_ = value; validate(); }
 
-      virtual void setValStr (const string& valStr)
+      virtual void setValStr (const std::string& valStr)
         {
            setValue(strToVal(valStr));
         }
 
-      virtual string valToStr (void) const = 0;
-      virtual T strToVal (const string& strVal) const = 0;
+      virtual std::string valToStr (void) const = 0;
+      virtual T strToVal (const std::string& strVal) const = 0;
 
       DgParameter<T>& operator= (const DgParameter<T>& obj)
         {
@@ -194,7 +194,7 @@ template<class T> class DgParameter : public DgApAssoc {
          const DgParameter<T>* objT = dynamic_cast<const DgParameter<T>*>(&obj);
          if (!objT) {
             report(
-            string("DgParameter::operator=() conflicting types for parameter "
+           std::string("DgParameter::operator=() conflicting types for parameter "
                      + name(), DgBase::Fatal));
          }
 
@@ -213,13 +213,13 @@ template<class T> class DgParameter : public DgApAssoc {
 
 ////////////////////////////////////////////////////////////////////////////////
 template<class T> bool getParamValue (const DgApParamList& plist,
-                                      const string& name, T& var,
+                                      const std::string& name, T& var,
                                       bool dieOnFail = true)
 {
    DgApAssoc* assoc = plist.getParam(name);
    if (!assoc) {
       if (dieOnFail) {
-         report(string("getParamValue() missing required parameter ") + name,
+         report(std::string("getParamValue() missing required parameter ") + name,
                 DgBase::Fatal);
       } else {
          return false;
@@ -229,7 +229,7 @@ template<class T> bool getParamValue (const DgApParamList& plist,
    const DgParameter<T>* assocT = dynamic_cast<const DgParameter<T>*>(assoc);
    if (!assocT) {
       if (dieOnFail) {
-         report(string("getParamValue() type mismatch on parameter ") + name,
+         report(std::string("getParamValue() type mismatch on parameter ") + name,
                 DgBase::Fatal);
       } else {
          return false;
@@ -247,23 +247,23 @@ template<class T> bool getParamValue (const DgApParamList& plist,
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-class DgStringParam : public DgParameter<string> {
+class DgStringParam : public DgParameter<std::string> {
 
    public:
 
-      DgStringParam (const string& nameIn)
-         : DgParameter<string> (nameIn), strip_ (false) { }
+      DgStringParam (const std::string& nameIn)
+         : DgParameter<std::string> (nameIn), strip_ (false) { }
 
-      DgStringParam (const string& nameIn, const string& valIn,
+      DgStringParam (const std::string& nameIn, const std::string& valIn,
                      bool validIn = true, bool stripIn = true)
-        : DgParameter<string> (nameIn, valIn, validIn), strip_ (stripIn) { }
+        : DgParameter<std::string> (nameIn, valIn, validIn), strip_ (stripIn) { }
 
-      virtual void setValue (const string& val)
-       { DgParameter<string>::setValue(
+      virtual void setValue (const std::string& val)
+       { DgParameter<std::string>::setValue(
               ((strip_) ? dgg::util::stripQuotes(val) : val)); }
 
-      virtual string valToStr (void) const { return value_; }
-      virtual string strToVal (const string& strVal) const { return strVal; }
+      virtual std::string valToStr (void) const { return value_; }
+      virtual std::string strToVal (const std::string& strVal) const { return strVal; }
 
       private:
          bool strip_;
@@ -274,29 +274,29 @@ class DgBoolParam : public DgParameter<bool> {
 
    public:
 
-      DgBoolParam (const string& nameIn) : DgParameter<bool> (nameIn) { }
+      DgBoolParam (const std::string& nameIn) : DgParameter<bool> (nameIn) { }
 
-      DgBoolParam (const string& nameIn, bool valIn, bool validIn = true)
+      DgBoolParam (const std::string& nameIn, bool valIn, bool validIn = true)
         : DgParameter<bool> (nameIn, valIn, validIn) { }
 
-      virtual string valToStr (void) const
-                        { return string(value() ? "true" : "false"); }
+      virtual std::string valToStr (void) const
+                        { return std::string(value() ? "true" : "false"); }
 
-      virtual bool strToVal (const string& strVal) const
+      virtual bool strToVal (const std::string& strVal) const
           {
              DgBoolParam* me = const_cast<DgBoolParam*>(this);
-             string lower = toLower(strVal);
+             std::string lower = toLower(strVal);
              me->setIsValid(true);
 
-             if (lower == string("true")) return true;
-             else if (lower == string("false")) return false;
+             if (lower ==std::string("true")) return true;
+             else if (lower ==std::string("false")) return false;
 
              // if we're here we have a bad value
 
              me->setIsValid(false);
 
-             me->setValidationErrMsg(string("Value '") + strVal +
-               string("' is not one of the allowed values 'true' or 'false'"));
+             me->setValidationErrMsg(std::string("Value '") + strVal +
+             std::string("' is not one of the allowed values 'true' or 'false'"));
 
              return false;
           }
@@ -310,13 +310,13 @@ class DgBoundedParam : public DgParameter<T> {
 
    public:
 
-      DgBoundedParam (const string& nameIn) : DgParameter<T> (nameIn) { }
+      DgBoundedParam (const std::string& nameIn) : DgParameter<T> (nameIn) { }
 
-      DgBoundedParam (const string& nameIn, const T& valIn, const T& minIn,
+      DgBoundedParam (const std::string& nameIn, const T& valIn, const T& minIn,
                       const T& maxIn, bool validIn = true)
        : DgParameter<T> (nameIn, valIn, validIn), min_ (minIn), max_ (maxIn) { }
 
-      DgBoundedParam (const string& nameIn, const T& minIn, const T& maxIn)
+      DgBoundedParam (const std::string& nameIn, const T& minIn, const T& maxIn)
           : DgParameter<T> (nameIn), min_ (minIn), max_ (maxIn) { }
 
       virtual bool validate (void)
@@ -359,25 +359,25 @@ class DgIntParam : public DgBoundedParam<int> {
 
    public:
 
-     DgIntParam (const string& nameIn, int minIn = INT_MIN,
+     DgIntParam (const std::string& nameIn, int minIn = INT_MIN,
                  int maxIn = INT_MAX)
           : DgBoundedParam<int> (nameIn, minIn, maxIn) { }
 
-      DgIntParam (const string& nameIn, const int& valIn,
+      DgIntParam (const std::string& nameIn, const int& valIn,
                   const int& minIn = INT_MIN, const int& maxIn = INT_MAX,
                   bool validIn = true)
         : DgBoundedParam<int> (nameIn, valIn, minIn, maxIn, validIn)
                 {
                   if (!validate()) {
                      report(
-                        string("Invalid initialization data for parameter:\n")
-                        + name() + " " + valToStr() + string("\n") +
+                       std::string("Invalid initialization data for parameter:\n")
+                        + name() + " " + valToStr() +std::string("\n") +
                         validationErrMsg(), DgBase::Fatal);
                   }
                 }
 
-      virtual string valToStr (void) const { return dgg::util::to_string(value_); }
-      virtual int strToVal (const string& strVal) const
+      virtual std::string valToStr (void) const { return dgg::util::to_string(value_); }
+      virtual int strToVal (const std::string& strVal) const
                 {
 			return dgg::util::from_string<int>(strVal);
                 }
@@ -386,7 +386,7 @@ class DgIntParam : public DgBoundedParam<int> {
                 {
                    DgBoundedParam<int>::validate();
                    if (!isValid()) {
-                      setValidationErrMsg(string("value out of range ") +
+                      setValidationErrMsg(std::string("value out of range ") +
                                   dgg::util::to_string(min()) + " to " +
                                   dgg::util::to_string(max()));
                    }
@@ -399,12 +399,12 @@ class DgLIntParam : public DgBoundedParam<long long int> {
 
    public:
 
-     DgLIntParam (const string& nameIn,
+     DgLIntParam (const std::string& nameIn,
                   long long int minIn = LLONG_MIN,
                   long long int maxIn = LLONG_MAX)
           : DgBoundedParam<long long int> (nameIn, minIn, maxIn) { }
 
-      DgLIntParam (const string& nameIn, const long long int& valIn,
+      DgLIntParam (const std::string& nameIn, const long long int& valIn,
                   const long long int& minIn = LLONG_MIN,
 		  const long long int& maxIn = LLONG_MAX,
                   bool validIn = true)
@@ -412,14 +412,14 @@ class DgLIntParam : public DgBoundedParam<long long int> {
                 {
                   if (!validate()) {
                      report(
-                        string("Invalid initialization data for parameter:\n")
-                        + name() + " " + valToStr() + string("\n") +
+                       std::string("Invalid initialization data for parameter:\n")
+                        + name() + " " + valToStr() +std::string("\n") +
                         validationErrMsg(), DgBase::Fatal);
                   }
                 }
 
-      virtual string valToStr (void) const { return dgg::util::to_string(value_); }
-      virtual long long int strToVal (const string& strVal) const
+      virtual std::string valToStr (void) const { return dgg::util::to_string(value_); }
+      virtual long long int strToVal (const std::string& strVal) const
                 {
 			return dgg::util::from_string<long long int>(strVal);
                 }
@@ -428,7 +428,7 @@ class DgLIntParam : public DgBoundedParam<long long int> {
                 {
                    DgBoundedParam<long long int>::validate();
                    if (!isValid()) {
-                      setValidationErrMsg(string("value out of range ") +
+                      setValidationErrMsg(std::string("value out of range ") +
                                   dgg::util::to_string(min()) + " to " + dgg::util::to_string(max()));
                    }
                    return isValid();
@@ -440,11 +440,11 @@ class DgULIntParam : public DgBoundedParam<unsigned long int> {
 
    public:
 
-     DgULIntParam (const string& nameIn, unsigned long int minIn = 0UL,
+     DgULIntParam (const std::string& nameIn, unsigned long int minIn = 0UL,
                  unsigned long int maxIn = ULONG_MAX)
           : DgBoundedParam<unsigned long int> (nameIn, minIn, maxIn) { }
 
-      DgULIntParam (const string& nameIn, const unsigned long int& valIn,
+      DgULIntParam (const std::string& nameIn, const unsigned long int& valIn,
                   const unsigned long int& minIn = 0UL,
                   const unsigned long int& maxIn = ULONG_MAX,
                   bool validIn = true)
@@ -453,21 +453,21 @@ class DgULIntParam : public DgBoundedParam<unsigned long int> {
                 {
                   if (!validate()) {
                      report(
-                        string("Invalid initialization data for parameter:\n")
-                        + name() + " " + valToStr() + string("\n") +
+                       std::string("Invalid initialization data for parameter:\n")
+                        + name() + " " + valToStr() +std::string("\n") +
                         validationErrMsg(), DgBase::Fatal);
                   }
                 }
 
-      virtual string valToStr (void) const { return dgg::util::to_string(value_); }
-      virtual unsigned long int strToVal (const string& strVal) const
+      virtual std::string valToStr (void) const { return dgg::util::to_string(value_); }
+      virtual unsigned long int strToVal (const std::string& strVal) const
                       { return dgg::util::from_string<unsigned long int>(strVal); }
 
       virtual bool validate (void)
                 {
                    DgBoundedParam<unsigned long int>::validate();
                    if (!isValid()) {
-                      setValidationErrMsg(string("value out of range ") +
+                      setValidationErrMsg(std::string("value out of range ") +
                                   dgg::util::to_string(min()) + " to " + dgg::util::to_string(max()));
                    }
                    return isValid();
@@ -479,11 +479,11 @@ class DgUint64Param : public DgBoundedParam<unsigned long long int> {
 
    public:
 
-      DgUint64Param (const string& nameIn, unsigned long long int minIn = 0ULL,
+      DgUint64Param (const std::string& nameIn, unsigned long long int minIn = 0ULL,
                    unsigned long long int maxIn = ULLONG_MAX)
           : DgBoundedParam<unsigned long long int> (nameIn, minIn, maxIn) { }
 
-      DgUint64Param (const string& nameIn, const unsigned long long int& valIn,
+      DgUint64Param (const std::string& nameIn, const unsigned long long int& valIn,
                     const unsigned long long int& minIn = 0ULL,
                     const unsigned long long int& maxIn = ULLONG_MAX,
                     bool validIn = true)
@@ -491,21 +491,21 @@ class DgUint64Param : public DgBoundedParam<unsigned long long int> {
                 {
                   if (!validate()) {
                      report(
-                        string("Invalid initialization data for parameter:\n")
-                        + name() + " " + valToStr() + string("\n") +
+                       std::string("Invalid initialization data for parameter:\n")
+                        + name() + " " + valToStr() +std::string("\n") +
                         validationErrMsg(), DgBase::Fatal);
                   }
                 }
 
-      virtual string valToStr (void) const { return dgg::util::to_string(value_); }
-      virtual unsigned long long int strToVal (const string& strVal) const
+      virtual std::string valToStr (void) const { return dgg::util::to_string(value_); }
+      virtual unsigned long long int strToVal (const std::string& strVal) const
                       { return dgg::util::from_string<unsigned long long int>(strVal); }
 
       virtual bool validate (void)
                 {
                    DgBoundedParam<unsigned long long int>::validate();
                    if (!isValid()) {
-                      setValidationErrMsg(string("value out of range ") +
+                      setValidationErrMsg(std::string("value out of range ") +
                               dgg::util::to_string(min()) + " to " + dgg::util::to_string(max()));
                    }
                    return isValid();
@@ -517,32 +517,32 @@ class DgDoubleParam : public DgBoundedParam<long double> {
 
    public:
 
-      DgDoubleParam (const string& nameIn, long double minIn = LDBL_MIN,
+      DgDoubleParam (const std::string& nameIn, long double minIn = LDBL_MIN,
                      long double maxIn = LDBL_MAX)
           : DgBoundedParam<long double> (nameIn, minIn, maxIn) { }
 
-      DgDoubleParam (const string& nameIn, const long double& valIn,
+      DgDoubleParam (const std::string& nameIn, const long double& valIn,
                      const long double& minIn = LDBL_MIN,
                      const long double& maxIn = LDBL_MAX, bool validIn = true)
           : DgBoundedParam<long double> (nameIn, valIn, minIn, maxIn, validIn)
                 {
                   if (!validate()) {
                      report(
-                        string("Invalid initialization data for parameter:\n")
-                        + name() + " " + valToStr() + string("\n") +
+                       std::string("Invalid initialization data for parameter:\n")
+                        + name() + " " + valToStr() +std::string("\n") +
                         validationErrMsg(), DgBase::Fatal);
                   }
                 }
 
-      virtual string valToStr (void) const { return dgg::util::to_string(value_); }
-      virtual long double strToVal (const string& strVal) const
+      virtual std::string valToStr (void) const { return dgg::util::to_string(value_); }
+      virtual long double strToVal (const std::string& strVal) const
                       { return dgg::util::from_string<long double>(strVal); }
 
       virtual bool validate (void)
                 {
                    DgBoundedParam<long double>::validate();
                    if (!isValid()) {
-                      setValidationErrMsg(string("value out of range ") +
+                      setValidationErrMsg(std::string("value out of range ") +
                                   dgg::util::to_string(min()) + " to " +
                                   dgg::util::to_string(max()));
                    }
@@ -556,11 +556,11 @@ class DgChoiceParam : public DgParameter<T> {
 
    public:
 
-      DgChoiceParam (const string& nameIn, const vector<T*>* choicesIn = 0)
+      DgChoiceParam (const std::string& nameIn, const std::vector<T*>* choicesIn = 0)
           : DgParameter<T> (nameIn) { if (choicesIn) addChoices(*choicesIn); }
 
-      DgChoiceParam (const string& nameIn, const T& valIn,
-                     const vector<T*>* choicesIn = 0, bool validIn = true)
+      DgChoiceParam (const std::string& nameIn, const T& valIn,
+                     const std::vector<T*>* choicesIn = 0, bool validIn = true)
         : DgParameter<T> (nameIn, valIn, validIn)
       {
           if (choicesIn)
@@ -570,12 +570,12 @@ class DgChoiceParam : public DgParameter<T> {
      ~DgChoiceParam (void)
            { clearChoices(); }
 
-      const vector<T*>& choices (void) const { return choices_; }
+      const std::vector<T*>& choices (void) const { return choices_; }
 
-      void addChoices (const vector<T*>& choicesIn) // makes copy
+      void addChoices (const std::vector<T*>& choicesIn) // makes copy
             {
                for (unsigned int i = 0; i < choicesIn.size(); i++) {
-                  choices_.push_back(new string(*choicesIn[i]));
+                  choices_.push_back(new std::string(*choicesIn[i]));
                }
             }
 
@@ -584,8 +584,8 @@ class DgChoiceParam : public DgParameter<T> {
 		dgg::util::release(choices_);
             }
 
-      virtual string valToStr (void) const = 0;
-      virtual T strToVal (const string& strVal) const = 0;
+      virtual std::string valToStr (void) const = 0;
+      virtual T strToVal (const std::string& strVal) const = 0;
 
       virtual bool validate (void)
                 {
@@ -594,7 +594,7 @@ class DgChoiceParam : public DgParameter<T> {
 		       return this->setIsValid(true);
                    }
 
-                   this->setValidationErrMsg(string("value not allowed"));
+                   this->setValidationErrMsg(std::string("value not allowed"));
 
                    return this->setIsValid(false);
                 }
@@ -616,27 +616,27 @@ class DgChoiceParam : public DgParameter<T> {
 
    protected:
 
-      vector<T*> choices_;
+      std::vector<T*> choices_;
 
 }; // class DgChoiceParam
 
 ////////////////////////////////////////////////////////////////////////////////
-class DgStringChoiceParam : public DgChoiceParam<string> {
+class DgStringChoiceParam : public DgChoiceParam<std::string> {
 
    public:
 
-      DgStringChoiceParam (const string& nameIn,
-                           const vector<string*>* choicesIn = 0)
-          : DgChoiceParam<string> (nameIn, choicesIn)
+      DgStringChoiceParam (const std::string& nameIn,
+                           const std::vector<std::string*>* choicesIn = 0)
+          : DgChoiceParam<std::string> (nameIn, choicesIn)
                 {
                    for (unsigned int i = 0; i < choices_.size(); i++) {
                       *choices_[i] = toLower(*choices_[i]);
                    }
                 }
 
-      DgStringChoiceParam (const string& nameIn, const string& valIn,
-                     const vector<string*>* choicesIn = 0, bool validIn = true)
-          : DgChoiceParam<string> (nameIn, valIn, choicesIn, validIn)
+      DgStringChoiceParam (const std::string& nameIn, const std::string& valIn,
+                     const std::vector<std::string*>* choicesIn = 0, bool validIn = true)
+          : DgChoiceParam<std::string> (nameIn, valIn, choicesIn, validIn)
                 {
                    for (unsigned int i = 0; i < choices_.size(); i++) {
                       *choices_[i] = toLower(*choices_[i]);
@@ -644,27 +644,27 @@ class DgStringChoiceParam : public DgChoiceParam<string> {
 
                    if (!validate()) {
                      report(
-                        string("Invalid initialization data for parameter:\n")
-                        + name() + " " + valToStr() + string("\n") +
+                       std::string("Invalid initialization data for parameter:\n")
+                        + name() + " " + valToStr() +std::string("\n") +
                         validationErrMsg(), DgBase::Fatal);
                    }
                 }
 
-      virtual string valToStr (void) const { return value_; }
-      virtual string strToVal (const string& strVal) const { return strVal; }
+      virtual std::string valToStr (void) const { return value_; }
+      virtual std::string strToVal (const std::string& strVal) const { return strVal; }
 
       virtual bool validate (void)
                 {
-                   string lower = toLower(value());
+                  std::string lower = toLower(value());
                    for (unsigned int i = 0; i < choices_.size(); i++) {
                       if (*choices_[i] == lower)
 		       return this->setIsValid(true);
                    }
 
-                   string err(string("Value '") + value() +
-                        string("' is not one of the allowed values:\n"));
+                  std::string err(std::string("Value '") + value() +
+                       std::string("' is not one of the allowed values:\n"));
                    for (unsigned int i = 0; i < choices_.size(); i++) {
-                      err = err + *choices_[i] + string("\n");
+                      err = err + *choices_[i] +std::string("\n");
                    }
 
                    setValidationErrMsg(err);

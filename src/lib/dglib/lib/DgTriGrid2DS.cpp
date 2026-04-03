@@ -25,10 +25,12 @@
 #include <cmath>
 
 #include <dglib/DgContCartRF.h>
+#include <dglib/DgDVec2D.h>
 #include <dglib/DgIVec2D.h>
-#include <dglib/DgDiscRF.h>
+#include <dglib/DgDiscTopoRF.h>
 #include <dglib/DgTriGrid2D.h>
 #include <dglib/DgTriGrid2DS.h>
+#include <dglib/DgDiscRFSGrids.h>
 
 using namespace dgg::topo;
 
@@ -36,8 +38,8 @@ using namespace dgg::topo;
 DgTriGrid2DS::DgTriGrid2DS (DgRFNetwork& networkIn,
                const DgRF<DgDVec2D, long double>& backFrameIn, int nResIn,
                unsigned int apertureIn, bool isCongruentIn, bool isAlignedIn,
-               const string& nameIn)
-        : DgDiscRFS2D (networkIn, backFrameIn, nResIn, apertureIn, Triangle, D3,
+               const std::string& nameIn)
+        : DgDiscRFS2D (networkIn, backFrameIn, nResIn, Triangle, D3, apertureIn,
                        isCongruentIn, isAlignedIn, nameIn)
 {
    if (!isCongruent())
@@ -64,19 +66,19 @@ DgTriGrid2DS::DgTriGrid2DS (DgRFNetwork& networkIn,
 
    for (int i = 0; i < nRes(); i++)
    {
-      string newName = name() + "_" + dgg::util::to_string(i);
+      std::string newName = name() + "_" + dgg::util::to_string(i);
 
-      //cout << newName << " " << fac << ' ' << trans << endl;
+      //cout << newName << " " << fac << ' ' << trans << std::endl;
 
-      const DgContCartRF* ccRF = DgContCartRF::makeRF(network(), newName + string("bf"));
+      const DgContCartRF* ccRF = DgContCartRF::makeRF(network(), newName + std::string("bf"));
 
       Dg2WayContAffineConverter(backFrame(), *ccRF, (long double) fac, 0.0, trans);
 
       (*grids_)[i] = DgTriGrid2D::makeRF(network(), *ccRF, newName);
-      Dg2WayResAddConverter<DgIVec2D, DgDVec2D, long double>(*this, *(grids()[i]), i);
+      Dg2WayTopoResAddConverter<DgIVec2D, DgDVec2D, long double>(*this, *(grids()[i]), i);
 
       fac *= radix();
-   }
+   } 
 
 } // DgTriGrid2DS::DgTriGrid2DS
 
@@ -107,7 +109,7 @@ void
 DgTriGrid2DS::setAddParents (const DgResAdd<DgIVec2D>& add,
                                DgLocVector& vec) const
 {
-//cout << "   setAddParents: " << add << endl;
+//cout << "   setAddParents: " << add << std::endl;
    if (isCongruent())
    {
       DgLocation* tmpLoc = makeLocation(add);
@@ -133,9 +135,9 @@ DgTriGrid2DS::setAddInteriorChildren (const DgResAdd<DgIVec2D>& add,
 {
    if (isCongruent())
    {
-//cout << "Children: " << add << " " << lowerLeft << endl;
+//cout << "Children: " << add << " " << lowerLeft << std::endl;
 
-      vector<DgAddressBase*>& v = vec.addressVec();
+      std::vector<DgAddressBase*>& v = vec.addressVec();
 
       if (DgTriGrid2D::isUp(add.address()))
       {
@@ -177,7 +179,7 @@ DgTriGrid2DS::setAddInteriorChildren (const DgResAdd<DgIVec2D>& add,
       report("DgTriGrid2DS::DgTriGrid2DS() only congruent triangle grid "
              "systems implemented", DgBase::Fatal);
    }
-//cout << vec << endl;
+//cout << vec << std::endl;
 
 } // void DgTriGrid2DS::setAddInteriorChildren
 

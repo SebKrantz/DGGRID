@@ -28,166 +28,28 @@
 #include <climits>
 #include <iostream>
 
-#include <dglib/DgConverter.h>
-#include <dglib/Dg2WayConverter.h>
+#include <dglib/DgHierNdxStringRF.h>
 
-class DgQ2DICoord;
-class DgIDGGBase;
-class DgZ7Coord;
-class DgZ7StringCoord;
-
-using namespace std;
+class DgZ7System;
 
 ////////////////////////////////////////////////////////////////////////////////
-class DgQ2DItoZ7StringConverter :
-        public DgConverter<DgQ2DICoord, long long int, DgZ7StringCoord, long long int>
-{
+class DgZ7StringRF : public DgHierNdxStringRF {
+
    public:
 
-      DgQ2DItoZ7StringConverter (const DgRF<DgQ2DICoord, long long int>& from,
-                                   const DgRF<DgZ7StringCoord, long long int>& to);
-
-      const DgIDGGBase& IDGG (void) const { return *pIDGG_; }
-
-      virtual DgZ7StringCoord convertTypedAddress
-                                (const DgQ2DICoord& addIn) const;
+      // abstract methods from above
+      // these have dummy definitions from the superclass
+      virtual DgHierNdxStringCoord quantify (const DgQ2DICoord& point) const;
+      virtual DgQ2DICoord invQuantify (const DgHierNdxStringCoord& add) const;
 
    protected:
 
-      const DgIDGGBase* pIDGG_;
-      int effRes_;
-      int effRadix_;
+    DgZ7StringRF (const DgHierNdxSystemRFBase& sysIn, int resIn, const std::string& nameIn);
+    
+    unsigned long long int unitScaleClassIres_;
 
-};
-
-////////////////////////////////////////////////////////////////////////////////
-class DgZ7StringToQ2DIConverter :
-        public DgConverter<DgZ7StringCoord, long long int, DgQ2DICoord, long long int>
-{
-   public:
-
-      DgZ7StringToQ2DIConverter (const DgRF<DgZ7StringCoord, long long int>& from,
-                                   const DgRF<DgQ2DICoord, long long int>& to);
-
-      const DgIDGGBase& IDGG (void) const { return *pIDGG_; }
-
-      virtual DgQ2DICoord convertTypedAddress
-                                (const DgZ7StringCoord& addIn) const;
-
-   protected:
-
-      const DgIDGGBase* pIDGG_;
-      int res_;
-      int numClassI_;
-      unsigned long long int unitScaleClassIres_;
-};
-
-////////////////////////////////////////////////////////////////////////////////
-class Dg2WayZ7StringConverter : public Dg2WayConverter {
-
-   public:
-
-      Dg2WayZ7StringConverter (const DgRF<DgQ2DICoord, long long int>& fromFrame,
-              const DgRF<DgZ7StringCoord, long long int>& toFrame)
-         : Dg2WayConverter (*(new DgQ2DItoZ7StringConverter(fromFrame, toFrame)),
-              *(new DgZ7StringToQ2DIConverter(toFrame, fromFrame))) {}
-};
-
-////////////////////////////////////////////////////////////////////////////////
-//
-//   Coordinate consisting of a string containing quad number, (aperture 3 hex
-//        level indicator), and digit-interleaved radix string
-//
-class DgZ7StringCoord  {
-
-   public:
-
-      static const DgZ7StringCoord undefDgZ7StringCoord;
-
-      DgZ7StringCoord (void) { }
-
-      DgZ7StringCoord (const string& valStrIn)
-         : valString_ (valStrIn) { }
-
-      DgZ7StringCoord (const DgZ7StringCoord& coord)
-              { valString_ = coord.valString(); }
-
-      void setValString (const string strIn) { valString_ = strIn; }
-
-      const string& valString (void) const { return valString_; }
-
-      operator string (void) const { return valString(); }
-
-      bool operator== (const DgZ7StringCoord& c) const
-          { return valString() == c.valString(); }
-
-      bool operator!= (const DgZ7StringCoord& c) const
-          { return !(*this == c); }
-
-      DgZ7StringCoord& operator= (const DgZ7StringCoord& add)
-          {
-             if (add != *this) setValString(add.valString());
-
-             return *this;
-          }
-
-   private:
-
-      string valString_;
-
-};
-
-////////////////////////////////////////////////////////////////////////////////
-inline ostream&
-operator<< (ostream& stream, const DgZ7StringCoord& coord)
-{ return stream << string(coord); }
-
-////////////////////////////////////////////////////////////////////////////////
-class DgZ7StringRF : public DgRF<DgZ7StringCoord, long long int> {
-
-   public:
-
-      static DgZ7StringRF* makeRF (DgRFNetwork& networkIn,
-               const string& nameIn, int resIn)
-         { return new DgZ7StringRF (networkIn, nameIn, resIn); }
-
-      int res      (void) const { return res_; }
-      int aperture (void) const { return 7; }
-
-      virtual long long int dist (const DgZ7StringCoord& add1,
-                        const DgZ7StringCoord& add2) const
-                       { return 0; }
-
-      virtual string add2str (const DgZ7StringCoord& add) const
-                       { return string(add); }
-
-      virtual string add2str (const DgZ7StringCoord& add, char delimiter)
-                                                                         const
-                       { return string(add); }
-
-      virtual const char* str2add (DgZ7StringCoord* add, const char* str,
-                                   char delimiter) const;
-
-      virtual string dist2str (const long long int& dist) const
-                       { return dgg::util::to_string(dist); }
-
-      virtual long double dist2dbl (const long long int& dist) const
-                       { return dist; }
-
-      virtual unsigned long long int dist2int (const long long int& dist) const
-                       { return dist; }
-
-      virtual const DgZ7StringCoord& undefAddress (void) const
-                       { return DgZ7StringCoord::undefDgZ7StringCoord; }
-
-   protected:
-
-      DgZ7StringRF (DgRFNetwork& networkIn, const string& nameIn,
-                         int resIn)
-         : DgRF<DgZ7StringCoord, long long int>(networkIn, nameIn),
-           res_ (resIn) { }
-
-      int res_;
+    friend DgZ7System;
+    template<class TINT, class TSTR> friend class DgHierNdxSystemRF;
 
 };
 

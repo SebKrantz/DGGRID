@@ -69,23 +69,15 @@ DgOutGdalFile::~DgOutGdalFile()
 void
 DgOutGdalFile::init (bool outputPoint, bool outputRegion,
                      bool outputNeighbors, bool outputChildren,
+                     bool outputNdxParent, bool outputNdxChildren,
                      const DgDataList* dataList)
 {
    fileNameOnly_ = DgOutLocFile::fileName();
 
    GDALAllRegister();
-//const char* path = "C:/Test/test.shp";
-   //OGRRegisterAll();
-//OGRDataSource *hDS;
-//OGRSFDriver *driver;
-   //OGRSFDriverRegistrar *registrar =  OGRSFDriverRegistrar::GetRegistrar();
-
-   //_driver = registrar->GetDriverByName(_gdalDriver.c_str());
    _driver = GetGDALDriverManager()->GetDriverByName(_gdalDriver.c_str());
    if (_driver == NULL)
         ::report( _gdalDriver + " driver not available.",  DgBase::Fatal);
-
-//GDALDataset *poDS;
 
    _dataset = _driver->Create(fileNameOnly_.c_str(), 0, 0, 0, GDT_Unknown, NULL );
    if (_dataset == NULL)
@@ -117,7 +109,7 @@ DgOutGdalFile::init (bool outputPoint, bool outputRegion,
          ::report( "Invalid GDAL file mode.", DgBase::Fatal );
    }
 
-   string baseName = dgg::util::baseName(fileNameOnly_);
+   std::string baseName = dgg::util::baseName(fileNameOnly_);
    _oLayer = _dataset->CreateLayer(baseName.c_str(), NULL, geomType, NULL );
    if (_oLayer == NULL)
       ::report( "Layer creation failed.", DgBase::Fatal );
@@ -152,16 +144,36 @@ DgOutGdalFile::init (bool outputPoint, bool outputRegion,
       delete fldDfn;
       fldDfn = NULL;
    }
+
+   if (outputNdxChildren) {
+      fldDfn = new OGRFieldDefn( "ndxChildren", OFTStringList );
+      fldDfn->SetWidth(32);
+      if (_oLayer->CreateField(fldDfn) != OGRERR_NONE)
+         ::report("Creating indexing children field failed.", DgBase::Fatal );
+      delete fldDfn;
+      fldDfn = NULL;
+   }
+
+   if (outputNdxParent) {
+      fldDfn = new OGRFieldDefn( "ndxParent", OFTString );
+      fldDfn->SetWidth(32);
+      if (_oLayer->CreateField(fldDfn) != OGRERR_NONE)
+         ::report("Creating indexing parent field failed.", DgBase::Fatal );
+      delete fldDfn;
+      fldDfn = NULL;
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 OGRFeature*
-DgOutGdalFile::createFeature (const string& label) const
+DgOutGdalFile::createFeature (const std::string& label) const
 {
    OGRFeature *feature = OGRFeature::CreateFeature(_oLayer->GetLayerDefn());
    if (!feature)
       ::report("GDAL feature creation failed.", DgBase::Fatal );
+
    feature->SetField("name", label.c_str());
+
    return feature;
 }
 
@@ -171,6 +183,31 @@ DgOutGdalFile::insert(const DgDVec2D&)
 {
    //Probably isn't needed but keep in for safety
    return *this;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void
+DgOutGdalFile::createAddressProperty (const DgIDGGBase& dgg, OGRFeature* feature,
+           const char* fieldName, const DgLocation& loc, const DgRFBase* outRF)
+{
+    DgLocation tmpLoc(loc);
+    dgg.convert(&tmpLoc);
+    std::string str;
+    if (!outRF) { // assumed seqnum
+        str = std::to_string(dgg.bndRF().seqNum(tmpLoc));
+    } else {
+        outRF->convert(&tmpLoc);
+        str = tmpLoc.asString(' ');
+    }
+
+    char* cstr = new char[str.length() + 1];
+    strcpy(cstr, str.c_str());
+
+   // add to the feature
+   feature->SetField(fieldName, cstr);
+
+   // cleanup
+   delete [] cstr;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -209,15 +246,17 @@ DgOutGdalFile::createAddressesProperty (const DgIDGGBase& dgg, OGRFeature* featu
 ////////////////////////////////////////////////////////////////////////////////
 DgOutLocFile&
 DgOutGdalFile::insert (const DgIDGGBase& dgg, DgCell& cell,
-           bool outputPoint, bool outputRegion, const DgIDGGBase& chdDgg,
-           const DgRFBase* outRF, const DgRFBase* chdOutRF,
-           const DgLocVector* neighbors, const DgLocVector* children)
+     bool outputPoint, bool outputRegion, const DgIDGGBase& chdDgg,
+     const DgIDGGBase* prtDgg, const DgRFBase* outRF,
+     const DgRFBase* chdOutRF, const DgRFBase* prtOutRF,
+     const DgLocVector* neighbors, const DgLocVector* children,
+     const DgLocation* ndxParent, const DgLocVector* ndxChildren)
 {
    if (_mode != Collection)
       ::report("invalid GDAL output file mode encountered.", DgBase::Fatal);
 
    if (!_oLayer)
-      init(outputPoint, outputRegion, neighbors, children, cell.dataList());
+      init(outputPoint, outputRegion, neighbors, children, ndxParent, ndxChildren, cell.dataList());
 
    // first build the geometry
 
@@ -258,6 +297,14 @@ DgOutGdalFile::insert (const DgIDGGBase& dgg, DgCell& cell,
    if (neighbors)
       createAddressesProperty(dgg, feature, "neighbors", *neighbors, outRF);
 
+   if (ndxParent && prtDgg) {
+      createAddressProperty (*prtDgg, feature, "ndxParent", *ndxParent, prtOutRF);
+   }
+
+   if (ndxChildren) {
+      createAddressesProperty (chdDgg, feature, "ndxChildren", *ndxChildren, chdOutRF);
+   }
+
    addFeature(feature);
 
    return *this;
@@ -285,9 +332,9 @@ DgOutGdalFile::createLinearRing (const DgPolygon& poly)
    linearRing = (OGRLinearRing*) OGRGeometryFactory::createGeometry(wkbLinearRing);
 
    // fill linearRing with points
-   const vector<DgAddressBase *>& v = poly.addressVec();
+   const std::vector<DgAddressBase *>& v = poly.addressVec();
    const DgRFBase& rf = poly.rf();
-   for (vector<DgAddressBase *>::const_iterator i = v.begin(); v.end() != i; ++i) {
+   for (std::vector<DgAddressBase *>::const_iterator i = v.begin(); v.end() != i; ++i) {
      DgDVec2D pt = rf.getVecAddress(*(*i));
      linearRing->addPoint(pt.x(), pt.y());
    }
@@ -349,14 +396,14 @@ DgOutGdalFile::addFeature (OGRFeature *feature) {
 
 ////////////////////////////////////////////////////////////////////////////////
 DgOutLocFile&
-DgOutGdalFile::insert (DgLocation& loc, const string* label,
+DgOutGdalFile::insert (DgLocation& loc, const std::string* label,
                   const DgDataList* dataList)
 {
    if (_mode != Point)
       ::report( "invalid GDAL output file mode encountered.", DgBase::Fatal );
 
    if (!_oLayer)
-      init(true, false, false, false, dataList);
+      init(true, false, false, false, false, false, dataList);
 
    // create the feature
    OGRFeature *feature = createFeature(*label);
@@ -376,7 +423,7 @@ DgOutGdalFile::insert (DgLocation& loc, const string* label,
 
 ////////////////////////////////////////////////////////////////////////////////
 DgOutLocFile&
-DgOutGdalFile::insert (DgLocVector&, const string*, const DgLocation*,
+DgOutGdalFile::insert (DgLocVector&, const std::string*, const DgLocation*,
                   const DgDataList*)
 {
    ::report( "polyline output not supported for GDAL file output", DgBase::Fatal );
@@ -385,7 +432,7 @@ DgOutGdalFile::insert (DgLocVector&, const string*, const DgLocation*,
 
 ////////////////////////////////////////////////////////////////////////////////
 DgOutLocFile&
-DgOutGdalFile::insert (DgPolygon& poly, const string* label,
+DgOutGdalFile::insert (DgPolygon& poly, const std::string* label,
                   const DgLocation* /* cent */,
                   const DgDataList* dataList)
 {
@@ -393,7 +440,7 @@ DgOutGdalFile::insert (DgPolygon& poly, const string* label,
       ::report( "invalid GDAL output file mode encountered.", DgBase::Fatal );
 
    if (!_oLayer)
-      init(false, true, false, false, dataList);
+      init(false, true, false, false, false, false, dataList);
 
    OGRPolygon* polygon = createPolygon(poly);
 

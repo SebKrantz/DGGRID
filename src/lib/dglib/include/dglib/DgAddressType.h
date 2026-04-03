@@ -26,40 +26,30 @@
 #define DGADDRESSTYPE_H
 
 #include <iostream>
+#include <dglib/DgUtil.h>
 
 namespace dgg { namespace addtype {
 
-enum DgAddressType { Geo, Plane, ProjTri, Q2DD, Q2DI, SeqNum, Vertex2DD,
-    HierNdx,
-    // remaining types deprecated
-    ZOrder, ZOrderString, Z3, Z3String, Z7, Z7String,
+using namespace dgg::util;
+
+enum DgAddressType { Geo, Plane, ProjTri, Q2DD, Q2DI, SeqNum, Vertex2DD, HierNdx,
     InvalidAddressType
 };
 
 static const std::string addTypeStrings[] = { "GEO", "PLANE", "PROJTRI", "Q2DD",
     "Q2DI", "SEQNUM", "VERTEX2DD", "HIERNDX",
-    // remaining types deprecated
-    "ZORDER", "ZORDER_STRING", "Z3", "Z3_STRING", "Z7", "Z7_STRING",
-    "INVALID"
+    "NONE"
 };
 
-enum class DgHierNdxSysType { ZOrder, Z3, Z7, InvalidHierNdxSysType };
-
+enum DgHierNdxSysType { Z7, ZOrder, Z3, InvalidHierNdxSysType };
 static const std::string hierNdxSysTypeStrings[] = {
-    "ZORDER", "Z3", "Z7", "INVALID"
+    "Z7", "ZORDER", "Z3", "NONE"
 };
 
 enum DgHierNdxFormType { Int64, DigitString, InvalidHierNdxFormType };
-
 static const std::string hierNdxFormTypeStrings[] = {
-    "INT64", "DIGIT_STRING", "INVALID"
+    "INT64", "DIGIT_STRING", "NONE"
 };
-
-/*
- static const std::string addTypeStrings[] = { "GEO", "PLANE", "PROJTRI", "Q2DD",
-     "Q2DI", "SEQNUM", "VERTEX2DD", "ZORDER", "ZORDER_STRING", "Z3", "Z3_STRING",
-     "Z7", "Z7_STRING", "INVALID" };
- */
 
 DgAddressType stringToAddressType (const std::string& str);
 const std::string& to_string (DgAddressType t);

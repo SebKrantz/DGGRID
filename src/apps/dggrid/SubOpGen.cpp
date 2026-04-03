@@ -67,25 +67,21 @@
 #include <dglib/DgZOrderStringRF.h>
 #include <dglib/DgZ3RF.h>
 #include <dglib/DgZ3StringRF.h>
-#include <dglib/DgZ7RF.h>
-#include <dglib/DgZ7StringRF.h>
 */
 #include "DgHexSF.h"
-
-//using namespace dgg::topo;
 
 #include "OpBasic.h"
 #include "SubOpGen.h"
 
-using namespace std;
-
 ////////////////////////////////////////////////////////////////////////////////
 SubOpGen::SubOpGen (OpBasic& op, bool _activate)
    : SubOpBasicMulti (op, _activate),
-     wholeEarth (false), regionClip (false), seqToPoly(false),
-     indexToPoly (false), pointClip (false),
-     cellClip (false), useGDAL (false),
+     wholeEarth (false), regionClip (false),
+     //seqToPoly(false), indexToPoly (false),
+     pointClip (false),
+     coarseCellClip (false), addressGen (false), useGDAL (false),
      clipAIGen (false), clipGDAL(false), clipShape(false), clipCellRes (0),
+     addressFiles(false),
      nClipCellDensify (1), nudge (0.001), doPointInPoly (true),
      doPolyIntersect (false)
 {
@@ -100,7 +96,7 @@ SubOpGen::SubOpGen (OpBasic& op, bool _activate)
 int
 SubOpGen::initializeOp (void)
 {
-   vector<string*> choices;
+   std::vector<std::string*> choices;
 
 #ifdef USE_GDAL
    // clip_using_holes <TRUE | FALSE>
@@ -110,19 +106,25 @@ SubOpGen::initializeOp (void)
    // geodetic_densify <long double: decimal degrees> (v >= 0.0)
    pList().insertParam(new DgDoubleParam("geodetic_densify", 0.0, 0.0, 360.0));
 
+/* v8
    // clip_subset_type <WHOLE_EARTH | AIGEN | SHAPEFILE | GDAL | SEQNUMS | ADDRESSES |
    //                    COARSE_CELLS | INPUT_ADDRESS_TYPE >
-   choices.push_back(new string("WHOLE_EARTH"));
-   choices.push_back(new string("AIGEN"));
-   choices.push_back(new string("SHAPEFILE"));
+   // KEVIN: currently no ADDRESSES or COARSE_CELL_FILES
+   // clip_subset_type <WHOLE_EARTH | AIGEN | SHAPEFILE | GDAL |
+   //                   ADDRESSES | ADDRESS_FILES | COARSE_CELLS | COARSE_CELL_FILES >
+*/
+   // KEVIN: currently no ADDRESSES or COARSE_CELL_FILES
+   // clip_subset_type <WHOLE_EARTH | AIGEN | SHAPEFILE | GDAL |
+   //                   ADDRESS_FILES | COARSE_CELLS >
+   choices.push_back(new std::string("WHOLE_EARTH"));
+   choices.push_back(new std::string("AIGEN"));
+   choices.push_back(new std::string("SHAPEFILE"));
 #ifdef USE_GDAL
-   choices.push_back(new string("GDAL"));
+   choices.push_back(new std::string("GDAL"));
 #endif
-   choices.push_back(new string("SEQNUMS"));
-   choices.push_back(new string("ADDRESSES"));
-   choices.push_back(new string("POINTS"));
-   choices.push_back(new string("COARSE_CELLS"));
-   choices.push_back(new string("INPUT_ADDRESS_TYPE"));
+   choices.push_back(new std::string("ADDRESS_FILES"));
+   choices.push_back(new std::string("INPUT_ADDRESS_TYPE")); // deprecated; same as ADDRESS_FILES
+   choices.push_back(new std::string("COARSE_CELLS"));
    pList().insertParam(new DgStringChoiceParam("clip_subset_type", "WHOLE_EARTH",
                &choices));
    dgg::util::release(choices);
@@ -140,7 +142,7 @@ SubOpGen::initializeOp (void)
    pList().insertParam(new DgStringParam("clip_region_files", "test.gen"));
 
    // clip_type <POLY_INTERSECT>
-   choices.push_back(new string("POLY_INTERSECT"));
+   choices.push_back(new std::string("POLY_INTERSECT"));
    pList().insertParam(new DgStringChoiceParam("clip_type", "POLY_INTERSECT",
                &choices));
    dgg::util::release(choices);
@@ -158,15 +160,27 @@ SubOpGen::setupOp (void)
 {
    /////// fill state variables from the parameter list //////////
 
-   string dummy;
+   std::string dummy;
    getParamValue(pList(), "clip_subset_type", dummy, false);
    dummy = dgg::util::toUpper(dummy);
+   // handle deprecated value
+   if (dummy == "INPUT_ADDRESS_TYPE") {
+      dummy = "ADDRESS_FILES";
+      ::report(
+         "clip_subset_type value INPUT_ADDRESS_TYPE has been renamed ADDRESS_FILES "
+         "in version 9.0b. The name INPUT_ADDRESS_TYPE will go away in a future version.", DgBase::Warning);
+   }
+
    wholeEarth = false;
    useGDAL = false;
    clipAIGen = false;
    clipGDAL = false;
-   seqToPoly = false;
-   indexToPoly = false;
+   coarseCellClip = false;
+   addressGen = false;
+   addressFiles = false;
+   //clipCellFiles = false;
+   //seqToPoly = false;
+   //indexToPoly = false;
    if (dummy == "WHOLE_EARTH")
       wholeEarth = true;
    else if (dummy == "AIGEN"){
@@ -182,6 +196,7 @@ SubOpGen::setupOp (void)
       useGDAL = true;
       clipGDAL  = true;
 #endif
+/*
    } else if (dummy == "SEQNUMS") {
       if (op.dggOp.isApSeq)
          ::report("clip_subset_type of SEQNUMS not supported for dggs_aperture_type of SEQUENCE",
@@ -190,13 +205,17 @@ SubOpGen::setupOp (void)
       seqToPoly = true;
    } else if (dummy == "POINTS") {
       pointClip = true;
-   } else if (dummy == "COARSE_CELLS") {
-      cellClip = true;
-   } else if (dummy == "INPUT_ADDRESS_TYPE") {
-      if (op.inOp.inAddType == dgg::addtype::SeqNum)
-         seqToPoly = true;
-      else
-         indexToPoly = true;
+*/
+//KEVIN: currently no ADDRESSES (on line in metafile)
+   } else if (dummy == "ADDRESSES" || dummy == "ADDRESS_FILES") {
+      addressGen = true;
+      if (dummy == "ADDRESS_FILES")
+          addressFiles = true;
+//KEVIN: currently no COARSE_CELL_FILES
+   } else if (dummy == "COARSE_CELLS" || dummy == "COARSE_CELL_FILES") {
+      coarseCellClip = true;
+      if (dummy == "COARSE_CELL_FILES")
+         addressFiles = true;
    } else
       ::report("Unrecognised value for 'clip_subset_type'", DgBase::Fatal);
 
@@ -206,7 +225,7 @@ SubOpGen::setupOp (void)
 
    //// region file names
 
-   string regFileStr;
+   std::string regFileStr;
    getParamValue(pList(), "clip_region_files", regFileStr, false);
 
    dgg::util::ssplit(regFileStr, regionFiles);

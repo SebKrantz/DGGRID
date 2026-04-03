@@ -31,6 +31,9 @@
 #include <dglib/DgGeoSphRF.h>
 #include <dglib/DgIDGGSBase.h>
 #include <dglib/DgAddressType.h>
+#include <dglib/DgOutLocFile.h>
+
+using namespace dgg::addtype;
 
 #include "SubOpBasic.h"
 
@@ -52,11 +55,15 @@ struct SubOpDGG : public SubOpBasic {
    const DgGeoSphDegRF& deg    (void) { return *_pDeg; }
    const DgIDGGBase&    chdDgg (void) { return *_pChdDgg; }
    const DgGeoSphDegRF& chdDeg (void) { return *_pChdDeg; }
+   // note the indexing children use the same DGG as the spatial children
+   const DgIDGGBase*    prtDgg (void) { return _pPrtDgg; }
+   const DgGeoSphDegRF* prtDeg (void) { return _pPrtDeg; }
 
    // set rf and chdRF based on type
    // return if seq num
-   bool addressTypeToRF (dgg::addtype::DgAddressType type, const DgRFBase** rf,
-             const DgRFBase** chdRF = nullptr, int forceRes = -1);
+   bool addressTypeToRF (dgg::addtype::DgAddressType type, dgg::addtype::DgHierNdxSysType hierNdxSysType,
+      dgg::addtype:: DgHierNdxFormType hierNdxForm, const DgRFBase** rf, const DgHierNdxSystemRFSBase** hierNdxSys = nullptr,
+      const DgRFBase** chdRF = nullptr, const DgRFBase** prtRF = nullptr, int forceRes = -1);
 
    // DgApSubOperation virtual methods that use the pList
    virtual int initializeOp (void);
@@ -78,13 +85,15 @@ struct SubOpDGG : public SubOpBasic {
    const DgGeoSphDegRF* _pDeg;
    const DgIDGGBase*    _pChdDgg;   // child res dgg
    const DgGeoSphDegRF* _pChdDeg;
+   const DgIDGGBase*    _pPrtDgg;   // indexing parent res dgg
+   const DgGeoSphDegRF* _pPrtDeg;
 
    // the parameters
-   string dggsType;              // preset DGGS type
+   std::string dggsType;              // preset DGGS type
    dgg::topo::DgGridTopology gridTopo;      // Diamond/Hexagon/Triangle
    dgg::topo::DgGridMetric   gridMetric;    // D4/D8
    int aperture;      // aperture
-   string projType;   // projection type
+   std::string projType;   // projection type
    int res;           // resolution (may be adjusted)
    int actualRes;     // original, actual resolution
    bool placeRandom;  // random grid placement?
@@ -98,15 +107,16 @@ struct SubOpDGG : public SubOpBasic {
    DgGeoCoord vert0;  // placement vert
    long double azimuthDegs; // orientation azimuth
    long double earthRadius; // earth radius in km
-   string datum;            // datum used to determine the earthRadius
-   string apertureType; // "PURE", "MIXED43", "SUPERFUND", or "SEQUENCE"
+   std::string datum;            // datum used to determine the earthRadius
+   std::string apertureType; // "PURE", "MIXED43", "SUPERFUND", or "SEQUENCE"
    bool   isMixed43;       // are we using mixed43 aperture?
    int numAp4;          // # of leading ap 4 resolutions in a mixed grid
    bool   isSuperfund;
    bool   isApSeq;      // are we using an aperture sequence?
    DgApSeq apSeq;
-   int   sfRes;         // superfund digit resolution
-   int z3invalidDigit;  // padding digit for all Z3 systems
+   int   sfRes; // superfund digit resolution
+   DgHierNdxSysType hierNdxSysType;
+   int z3invalidDigit;  // padding digit for all Z3 systems`k
 };
 
 ////////////////////////////////////////////////////////////////////////////////

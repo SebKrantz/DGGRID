@@ -28,7 +28,7 @@
 #include <cmath>
 
 #include <dglib/DgContCartRF.h>
-#include <dglib/DgDiscRF.h>
+#include <dglib/DgDiscTopoRF.h>
 #include <dglib/DgIDGGS4T.h>
 #include <dglib/DgTriGrid2D.h>
 #include <dglib/DgTriIDGG.h>
@@ -37,7 +37,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 DgIDGGS4T::DgIDGGS4T (DgRFNetwork& network, const DgGeoSphRF& backFrame,
                const DgGeoCoord& vert0, long double azDegs, int nRes,
-               const string& name, const string& projType)
+               const std::string& name, const std::string& projType)
         : DgIDGGS (network, backFrame, vert0, azDegs, 4, nRes,
                        Triangle, D3, name, projType)
 {
@@ -59,7 +59,7 @@ DgIDGGS4T::DgIDGGS4T (DgRFNetwork& network, const DgGeoSphRF& backFrame,
    }
 
    for (int r = 0; r < nRes; r++)
-      Dg2WayResAddConverter<DgQ2DICoord, DgGeoCoord, long double>(*this, *(grids()[r]), r);
+       Dg2WayTopoResAddConverter<DgQ2DICoord, DgGeoCoord, long double>(*this, *(grids()[r]), r);
 
 } // DgTriIDGGS::DgTriIDGGS
 
@@ -93,7 +93,7 @@ void
 DgIDGGS4T::setAddParents (const DgResAdd<DgQ2DICoord>& add,
                                DgLocVector& vec) const
 {
-//cout << "   setAddParents: " << add << endl;
+//cout << "   setAddParents: " << add << std::endl;
    if (isCongruent()) {
       DgLocation* tmpLoc = makeLocation(add);
       grids()[add.res() - 1]->convert(tmpLoc);
@@ -118,9 +118,9 @@ DgIDGGS4T::setAddInteriorChildren (const DgResAdd<DgQ2DICoord>& add,
 
    if (isCongruent())
    {
-//cout << "Children: " << add << " " << lowerLeft << endl;
+//cout << "Children: " << add << " " << lowerLeft << std::endl;
 
-      vector<DgAddressBase*>& v = vec.addressVec();
+      std::vector<DgAddressBase*>& v = vec.addressVec();
 
       if (DgTriGrid2D::isUp(add.address().coord()))
       {
@@ -165,7 +165,7 @@ DgIDGGS4T::setAddInteriorChildren (const DgResAdd<DgQ2DICoord>& add,
       report("DgIDGGS4T::DgIDGGS4T() only congruent triangle grid "
              "systems implemented", DgBase::Fatal);
    }
-//cout << vec << endl;
+//cout << vec << std::endl;
 
 } // void DgIDGGS4T::setAddInteriorChildren
 

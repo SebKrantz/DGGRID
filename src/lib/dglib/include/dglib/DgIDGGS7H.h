@@ -52,8 +52,7 @@ class DgIDGGS7H : public DgHexIDGGS {
       DgIDGGS7H (DgRFNetwork& networkIn, const DgGeoSphRF& backFrameIn,
                const DgGeoCoord& vert0, long double azDegs, int nResIn = 1,
                const std::string& nameIn = "ISEA7H", const std::string& projType = "ISEA")
-         : DgHexIDGGS (networkIn, backFrameIn, vert0, azDegs, 3, nResIn,
-                nameIn, projType)
+         : DgHexIDGGS (networkIn, backFrameIn, vert0, azDegs, 7, nResIn, nameIn, projType)
            { frequency_ = sqrtl(aperture()); }
 
       DgIDGGS7H (const DgIDGGS7H& rf);

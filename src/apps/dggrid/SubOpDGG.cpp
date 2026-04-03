@@ -300,7 +300,7 @@ SubOpDGG::initializeOp (void)
    // dggs_res_spec <int> (0 <= v <= MAX_DGG_RES)
    pList().insertParam(new DgIntParam("dggs_res_spec", 9, 0, MAX_DGG_RES));
 
-   // hier_indexing_system_type <ZX | ZORDER | Z3 | Z7 | NONE>
+   // hier_indexing_system_type <ZORDER | Z3 | Z7 | NONE>
    for (int i = 0; ; i++) {
        choices.push_back(new std::string(dgg::addtype::hierNdxSysTypeStrings[i]));
        if (dgg::addtype::hierNdxSysTypeStrings[i] == "NONE")

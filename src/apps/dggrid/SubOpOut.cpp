@@ -72,6 +72,10 @@
 
 using namespace dgg::addtype;
 
+namespace {
+const char* newline = "\n";
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 void
 SubOpOut::genRandPts (const DgQ2DICoord& add2D, const std::string& label)
@@ -98,10 +102,9 @@ SubOpOut::genRandPts (const DgQ2DICoord& add2D, const std::string& label)
 
    delete cp;
 
-   if (op.mainOp.megaVerbose)
-   {
+   if (op.mainOp.megaVerbose) {
       DgDVec2D tvec = cpv - cpv00;
-      dgcout << " " << tvec << std::endl;
+      dgcout << " " << tvec << newline;
    }
 
    DgDVec2D anchor;
@@ -113,7 +116,7 @@ SubOpOut::genRandPts (const DgQ2DICoord& add2D, const std::string& label)
       ccRF.convert(verts);
       anchor = *ccRF.getAddress(verts[0]); // use lower left corner
    }
-   if (op.mainOp.megaVerbose) dgcout << "anchor: " << anchor << std::endl;
+   if (op.mainOp.megaVerbose) dgcout << "anchor: " << anchor << newline;
 
    for (int i = 0; i < nRandPts; i++)
    {
@@ -182,7 +185,7 @@ SubOpOut::genRandPts (const DgQ2DICoord& add2D, const std::string& label)
                }
             }
 
-            if (op.mainOp.megaVerbose) dgcout << rp << std::endl;
+            if (op.mainOp.megaVerbose) dgcout << rp << newline;
          }
 
          rp += anchor;
@@ -198,7 +201,7 @@ SubOpOut::genRandPts (const DgQ2DICoord& add2D, const std::string& label)
 
          delete tloc;
 
-         if (op.mainOp.megaVerbose) dgcout << "->" << *nloc << std::endl;
+         if (op.mainOp.megaVerbose) dgcout << "->" << *nloc << newline;
 
          rpts.push_back(*nloc);
          delete nloc;
@@ -207,15 +210,15 @@ SubOpOut::genRandPts (const DgQ2DICoord& add2D, const std::string& label)
 
    // convert
 
-   if (op.mainOp.megaVerbose) dgcout << "rpts: " << rpts << std::endl;
+   if (op.mainOp.megaVerbose) dgcout << "rpts: " << rpts << newline;
 
    dgg.geoRF().convert(rpts);
 
-   if (op.mainOp.megaVerbose) dgcout << "-> " << rpts << std::endl;
+   if (op.mainOp.megaVerbose) dgcout << "-> " << rpts << newline;
 
    deg.convert(rpts);
 
-   if (op.mainOp.megaVerbose) dgcout << "-> " << rpts << std::endl;
+   if (op.mainOp.megaVerbose) dgcout << "-> " << rpts << newline;
 
    DgLocList pts;
    for (int i = 0; i < rpts.size(); i++) {
@@ -275,9 +278,9 @@ SubOpOut::outputCellAdd2D (const DgLocation& add2D, const std::string* labelIn,
 
    // unwrap the cell east/west if applicable
    DgPolygon* unwrappedVerts = new DgPolygon(verts);
-   if (op.mainOp.megaVerbose) dgcout << "before unwrap: " << *unwrappedVerts << std::endl;
+   if (op.mainOp.megaVerbose) dgcout << "before unwrap: " << *unwrappedVerts << newline;
    int wrapped = DgGeoSphRF::lonWrap(*unwrappedVerts, lonWrapMode);
-   if (op.mainOp.megaVerbose) dgcout << "unwrapped: " << *unwrappedVerts << std::endl;
+   if (op.mainOp.megaVerbose) dgcout << "unwrapped: " << *unwrappedVerts << newline;
 
    // wrap the cell center point if the boundary was wrapped
    if (unwrapPts && wrapped) {
@@ -300,20 +303,20 @@ SubOpOut::outputCellAdd2D (const DgLocation& add2D, const std::string* labelIn,
 //  dgcout << std::setprecision(15);
 //  dgcout << label << " " << area << " "
 //       << area * dgg.geoRF().earthRadiusKM() * dgg.geoRF().earthRadiusKM()
-//       << std::endl;
+//       << newline;
 
    delete tmpLoc;
 
    if (op.mainOp.megaVerbose)
-      dgcout << "accepted " << label << " " << add2D << std::endl;
+      dgcout << "accepted " << label << " " << add2D << newline;
 
    if (dataOut)
-      *dataOut << label << op.primarySubOp->dataToOutStr(dataList) << std::endl;
+      *dataOut << label << op.primarySubOp->dataToOutStr(dataList) << newline;
 
    const DgQ2DICoord& q2di = *dgg.getAddress(add2D);
    if (cellOut) {
       if (op.mainOp.megaVerbose)
-         dgcout << "outputting region: " << cell << std::endl;
+         dgcout << "outputting region: " << cell << newline;
 
       if (prCellOut) {
          prCellOut->insert(cell.region(), &(cell.label()));
@@ -327,7 +330,7 @@ SubOpOut::outputCellAdd2D (const DgLocation& add2D, const std::string* labelIn,
 	
    if (ptOut) {
       if (op.mainOp.megaVerbose)
-         dgcout << "outputting point: " << cell << std::endl;
+         dgcout << "outputting point: " << cell << newline;
 
       if (outPointAttributes)
          ptOutShp->setCurFields(curFields);

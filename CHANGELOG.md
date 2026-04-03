@@ -23,11 +23,12 @@ indexing_parent_output_file_name (default ndxPrt)
 ## [8.44] - 2026-03-30
 ### Fixed
 - replaced unnecessary/costly endl's with newlines in output (thanks to @wrenoud)
-- description in manual of clip_subset_type operation modes; added new v8.44 manual.
+- description in manual of clip_subset_type operation modes
 ### Added
 - web-based doxygen source code documentation (thanks to @allixender)
 ### Added
 - pre-built binaries for Windows, Linux, and MacOS using GitHub actions (thanks to @allixender)
+- manual pdf version 8.44
 
 ## [8.43] - 2025-12-01
 ### Fixed

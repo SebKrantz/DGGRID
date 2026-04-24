@@ -1,5 +1,5 @@
 /*******************************************************************************
-    Copyright (C) 2021 Kevin Sahr
+    Copyright (C) 2023 Kevin Sahr
 
     This file is part of DGGRID.
 
@@ -26,8 +26,8 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-DgOutLocTextFile::DgOutLocTextFile (const string& fileName, const DgRFBase& rf,
-                    bool isPointFile,  const string& suffix, int precision,
+DgOutLocTextFile::DgOutLocTextFile (const std::string& fileName, const DgRFBase& rf,
+                    bool isPointFile,  const std::string& suffix, int precision,
                     DgReportLevel failLevel)
    : DgOutputStream (fileName, suffix, failLevel),
      DgOutLocFile (fileName, rf, isPointFile, failLevel),

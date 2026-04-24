@@ -1,5 +1,5 @@
 /*******************************************************************************
-    Copyright (C) 2021 Kevin Sahr
+    Copyright (C) 2023 Kevin Sahr
 
     This file is part of DGGRID.
 
@@ -32,7 +32,7 @@ bool DgConverterBase::isTraceOn_ = true;
 bool DgConverterBase::isTraceOn_ = false;
 #endif
 
-ostream* DgConverterBase::traceStream_ = &dgcout;
+std::ostream* DgConverterBase::traceStream_ = &dgcout;
 
 ////////////////////////////////////////////////////////////////////////////////
 DgConverterBase::~DgConverterBase (void)
@@ -162,7 +162,7 @@ DgConverterBase::convert (DgLocation* loc) const
    delete loc->address_;
    loc->address_ = tmpAdd;
 
-   if (isTraceOn()) traceStream() << "->" << *loc << endl;
+   if (isTraceOn()) traceStream() << "->" << *loc << std::endl;
 
    return loc;
 

@@ -2,8 +2,10 @@
 *.d
 *.depends
 
-# Build directory
+# Build and working directories
 build/
+xcode/
+examples/WORKING
 
 # Compiled Object files
 *.slo
@@ -57,6 +59,11 @@ junk
 .*.swp
 .DS_Store
 .gdb_history
+docs
+documentation/source/_build
 
 .idea/
 cmake-build-debug/
+.venv/
+documentation/build/
+__pycache__/

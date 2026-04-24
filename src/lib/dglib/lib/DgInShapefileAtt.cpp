@@ -1,5 +1,5 @@
 /*******************************************************************************
-    Copyright (C) 2021 Kevin Sahr
+    Copyright (C) 2023 Kevin Sahr
 
     This file is part of DGGRID.
 
@@ -34,7 +34,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 DgInShapefileAtt::DgInShapefileAtt (const DgGeoSphRF& geoRFIn,
-            const string* fileNameIn, DgReportLevel failLevelIn)
+            const std::string* fileNameIn, DgReportLevel failLevelIn)
    : DgInShapefile (geoRFIn, fileNameIn, failLevelIn),
       dbfFile_ (NULL), numFields_ (0)
 {
@@ -47,7 +47,7 @@ DgInShapefileAtt::DgInShapefileAtt (const DgGeoSphRF& geoRFIn,
 
 ////////////////////////////////////////////////////////////////////////////////
 bool
-DgInShapefileAtt::open (const string* fileNameIn, DgReportLevel failLevelIn)
+DgInShapefileAtt::open (const std::string* fileNameIn, DgReportLevel failLevelIn)
 {
    if (!DgInShapefile::open(fileNameIn, failLevelIn))
       return false;
@@ -106,7 +106,7 @@ DgInShapefileAtt::getNextEntity (void)
 
    curObjFields_.clear();
 
-   for (set<DgDBFfield>::iterator it = fields_.begin(); it != fields_.end(); it++)
+   for (std::set<DgDBFfield>::iterator it = fields_.begin(); it != fields_.end(); it++)
    {
       if (!DBFIsAttributeNULL(dbfFile_, curRecNum_, it->fieldNum()))
          curObjFields_.insert(*it);

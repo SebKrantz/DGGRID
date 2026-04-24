@@ -1,5 +1,5 @@
 /*******************************************************************************
-    Copyright (C) 2021 Kevin Sahr
+    Copyright (C) 2023 Kevin Sahr
 
     This file is part of DGGRID.
 
@@ -36,7 +36,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 DgOutPRPtsFile::DgOutPRPtsFile (const DgRFBase& rfIn,
-        const string& fileNameIn, int precision, DgReportLevel failLevel)
+        const std::string& fileNameIn, int precision, DgReportLevel failLevel)
    : DgOutLocTextFile (fileNameIn, rfIn, true, "pts", precision, failLevel)
 {
    // test for override of vecAddress
@@ -74,7 +74,8 @@ DgOutPRPtsFile::insert (const DgDVec2D& pt)
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 DgOutLocFile&
-DgOutPRPtsFile::insert (DgLocation& loc, const string* label)
+DgOutPRPtsFile::insert (DgLocation& loc, const std::string* label,
+                  const DgDataList* /* dataList */)
 //
 // Put the point loc.
 //
@@ -87,8 +88,8 @@ DgOutPRPtsFile::insert (DgLocation& loc, const string* label)
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 DgOutLocFile&
-DgOutPRPtsFile::insert (DgLocation& loc, const string& type,
-                 const string* label)
+DgOutPRPtsFile::insert (DgLocation& loc, const std::string& type,
+                 const std::string* label)
 //
 // Put the point loc.
 //
@@ -112,7 +113,8 @@ DgOutPRPtsFile::insert (DgLocation& loc, const string& type,
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 DgOutLocFile&
-DgOutPRPtsFile::insert (DgLocVector&, const string*, const DgLocation*)
+DgOutPRPtsFile::insert (DgLocVector&, const std::string*, const DgLocation*,
+            const DgDataList* /* dataList */)
 //
 // Put the polyline vec.
 //
@@ -126,7 +128,8 @@ DgOutPRPtsFile::insert (DgLocVector&, const string*, const DgLocation*)
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 DgOutLocFile&
-DgOutPRPtsFile::insert (DgPolygon&, const string*, const DgLocation*)
+DgOutPRPtsFile::insert (DgPolygon&, const std::string*, const DgLocation*,
+           const DgDataList*)
 //
 // Put the polygon poly.
 //

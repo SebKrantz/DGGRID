@@ -1,5 +1,5 @@
 /*******************************************************************************
-    Copyright (C) 2021 Kevin Sahr
+    Copyright (C) 2023 Kevin Sahr
 
     This file is part of DGGRID.
 
@@ -28,6 +28,8 @@
 #define DGGRIDTOPO_H
 
 #include <iostream>
+
+#include <dglib/DgUtil.h>
 
 namespace dgg { namespace topo {
 

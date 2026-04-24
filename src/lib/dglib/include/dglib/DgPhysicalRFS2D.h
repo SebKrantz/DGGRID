@@ -1,5 +1,5 @@
 /*******************************************************************************
-    Copyright (C) 2021 Kevin Sahr
+    Copyright (C) 2023 Kevin Sahr
 
     This file is part of DGGRID.
 
@@ -52,13 +52,13 @@ template<class C> class DgPhysicalRFS2D :
 
       virtual void deleteAddContents (const DgResAdd<DgIVec2D>& add);
 
-      const vector<const DgPhysicalRF2D<C>*>& grids (void) const { return *grids_; }
+      const std::vector<const DgPhysicalRF2D<C>*>& grids (void) const { return *grids_; }
 
    protected:
 
       const DgBoundedRFS2D& boundedRFS2D_;
 
-      vector<DgPhysicalRF2D<C>*>* grids_;
+      std::vector<DgPhysicalRF2D<C>*>* grids_;
 
 };
 

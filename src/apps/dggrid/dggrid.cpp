@@ -1,5 +1,5 @@
 /*******************************************************************************
-    Copyright (C) 2021 Kevin Sahr
+    Copyright (C) 2023 Kevin Sahr
 
     This file is part of DGGRID.
 
@@ -24,77 +24,20 @@
 
 #include <iostream>
 
-using namespace std;
-
 #include <dglib/DgConstants.h>
-#include "dggrid.h"
-#include <dglib/DgProjGnomonicRF.h>
-#include <dglib/DgGeoProjConverter.h>
+#include <dglib/DgBase.h>
+
+#include "OpBasic.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-void orientGrid (MainParam& dp, DgGridPList& plist)
-//
-// Set the orientation parameters if not specified
-//
+void pause (const std::string& where)
 {
-   if (dp.placeRandom) // randomize grid orientation
-   {
-      dp.vert0 = dp.orientRand->nextGeo();
-
-      dp.azimuthDegs = dp.orientRand->randInRange(0.0, 360.0);
-
-      // set the paramlist to match so we can print it back out
-
-      plist.setParam("dggs_orient_specify_type", "SPECIFIED");
-      plist.setParam("dggs_num_placements", dgg::util::to_string(1));
-      plist.setParam("dggs_vert0_lon", dgg::util::to_string(dp.vert0.lonDegs()));
-      plist.setParam("dggs_vert0_lat", dgg::util::to_string(dp.vert0.latDegs()));
-      plist.setParam("dggs_vert0_azimuth", dgg::util::to_string(dp.azimuthDegs));
-
-      dgcout << "Grid " << dp.curGrid <<
-           " #####################################################" << endl;
-      dgcout << "grid #" << dp.curGrid << " orientation randomized to: " << endl;
-      dgcout << plist << endl;
-   }
-   else if (dp.orientCenter && dp.curGrid == 1)
-   {
-      DgRFNetwork netc;
-      const DgGeoSphRF& geoRF = *(DgGeoSphRF::makeRF(netc, "GS0", dp.earthRadius));
-
-      long double lonc = 0.0, latc = 0.0;
-      getParamValue(plist, "region_center_lon", lonc, false);
-      getParamValue(plist, "region_center_lat", latc, false);
-
-      const DgProjGnomonicRF& gnomc = *(DgProjGnomonicRF::makeRF(netc, "cgnom", DgGeoCoord(lonc, latc, false)));
-      Dg2WayGeoProjConverter(geoRF, gnomc);
-
-      DgLocation* gloc = gnomc.makeLocation(DgDVec2D(-7289214.618283,
-                                                      7289214.618283));
-      geoRF.convert(gloc);
-
-      DgGeoCoord p0 = *geoRF.getAddress(*gloc);
-      delete gloc;
-
-      gloc = gnomc.makeLocation(DgDVec2D(2784232.232959, 2784232.232959));
-      geoRF.convert(gloc);
-      DgGeoCoord p1 = *geoRF.getAddress(*gloc);
-      delete gloc;
-
-      dp.vert0 = p0;
-      dp.azimuthDegs = DgGeoSphRF::azimuth(p0, p1, false);
-   }
-
-} // void orientGrid
-
-////////////////////////////////////////////////////////////////////////////////
-void pause (const string& where)
-{
-   dgcout << "*** execution paused: " << where << endl;
+   dgcout << "*** execution paused: " << where << std::endl;
    dgcout << "*** press ENTER to continue: ";
    scanf("%*c");
 }
 
+////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 int main (int argc, char* argv[])
 {
@@ -104,7 +47,7 @@ int main (int argc, char* argv[])
 
    // could have up to 2 flags and a metafile
    if (argc < 2 || argc > 4) {
-      DgBase::testArgEqual(argc, argv, 1, string("metaFileName"));
+      DgBase::testArgEqual(argc, argv, 1, std::string("metaFileName"));
    }
 
    // if we're here we have a reasonable # of cla's
@@ -112,11 +55,11 @@ int main (int argc, char* argv[])
    bool hFlag = false;
    bool vFlag = false;
    bool hasMetaFile = false;
-   string metaFileName;
+   std::string metaFileName;
    for (int i = 1; i < argc; i++) {
       // check if it's a flag
       if (*argv[i] == '-') {
-         int numFlags = strlen(argv[i]) - 1;
+         int numFlags = (int) strlen(argv[i]) - 1;
          if (numFlags == 0 || numFlags > 2) {
             flagErr = true;
          } else { // 1 or 2 flags
@@ -141,93 +84,84 @@ int main (int argc, char* argv[])
             }
          }
       } else if (hasMetaFile) { // metafileName already encountered
-         report(string("invalid command line argument ") + string(argv[i]), DgBase::Fatal);
+         report(std::string("invalid command line argument ") + std::string(argv[i]), DgBase::Fatal);
       } else { // must be the metafileName
          hasMetaFile = true;
-         metaFileName = string(argv[i]);
+         metaFileName = std::string(argv[i]);
       }
 
       if (flagErr) {
-         report(string("invalid command line flag ") + string(argv[i]), DgBase::Fatal);
+         report(std::string("invalid command line flag ") + std::string(argv[i]), DgBase::Fatal);
       }
    }
 
    if (hFlag || (hFlag && vFlag)) { // output is currently redundant
-      dgcout << "DGGRID version " << DGGRID_VERSION << " released " << DGGRID_RELEASE_DATE << endl;
-      dgcout << "How to use:" << endl;
-      dgcout << endl;
-      dgcout << "dggrid metafileName" << endl;
-      dgcout << endl;
-      dgcout << "dggrid -v" << endl;
-      dgcout << "dggrid -h" << endl;
-      dgcout << endl;
-      dgcout << "Credits:" << endl;
-      dgcout << "Southern Terra Cognita Laboratory" << endl;
-      dgcout << "website: http://www.discreteglobalgrids.org/" << endl;
-      dgcout << "Kevin Sahr, Director" << endl;
-      dgcout << "http://www.linkedin.com/in/Kevin-Sahr" << endl;
-      dgcout << endl;
-      dgcout << "License: GNU Affero General Public License v3.0" << endl;
-      dgcout << endl;
-      dgcout << "Github development:" << endl;
-      dgcout << "https://github.com/sahrk/DGGRID" << endl;
+      dgcout << "DGGRID version " << DGGRID_VERSION << " released " << DGGRID_RELEASE_DATE << std::endl;
+#ifdef USE_GDAL
+      dgcout << "built with GDAL version " << std::string(GDALVersionInfo("VERSION_NUM")) << std::endl;
+#else
+      dgcout << "built without GDAL" << std::endl;;
+#endif
+      dgcout << "\nTo use:" << std::endl;
+      dgcout << std::endl;
+      dgcout << "dggrid metafileName" << std::endl;
+      dgcout << std::endl;
+      dgcout << "dggrid -v" << std::endl;
+      dgcout << "dggrid -h" << std::endl;
+      dgcout << std::endl;
+      dgcout << "From:" << std::endl;
+      dgcout << "Southern Terra Cognita Laboratory" << std::endl;
+      dgcout << "website: http://www.discreteglobalgrids.org/" << std::endl;
+      dgcout << "Kevin Sahr, Director" << std::endl;
+      dgcout << "http://www.linkedin.com/in/Kevin-Sahr" << std::endl;
+      dgcout << std::endl;
+      dgcout << "License: GNU Affero General Public License v3.0" << std::endl;
+      dgcout << std::endl;
+      dgcout << "Github development:" << std::endl;
+      dgcout << "https://github.com/sahrk/DGGRID" << std::endl;
    } else if (vFlag) {
-      dgcout << "DGGRID version " << DGGRID_VERSION << " released " << DGGRID_RELEASE_DATE << endl;
+      dgcout << "DGGRID version " << DGGRID_VERSION << " released " << DGGRID_RELEASE_DATE << std::endl;
+#ifdef USE_GDAL
+      dgcout << "built with GDAL version " << std::string(GDALVersionInfo("VERSION_NUM")) << std::endl;
+#else
+      dgcout << "built without GDAL" << std::endl;;
+#endif
    }
 
    if (!hasMetaFile)
       exit(0);
 
-
    //// build and load the parameter list ////
 
-   dgcout << "** executing DGGRID version " << DGGRID_VERSION << " **\n";
+   dgcout << "** executing DGGRID version " << DGGRID_VERSION;
+#ifdef USE_GDAL
+   dgcout << " with GDAL version " << std::string(GDALVersionInfo("VERSION_NUM"));
+#else
+   dgcout << " without GDAL";
+#endif
+   dgcout << " **\n";
    dgcout << "type sizes: big int: " << sizeof(long long int) * 8 << " bits / ";
    dgcout << "big double: " << sizeof(long double) * 8 << " bits\n";
+   dgcout << "\n** using meta file " << metaFileName << "..." << std::endl;
 
-   dgcout << "\n** loading meta file " << metaFileName << "..." << endl;
-
-   // first parse the meta file
-   DgGridPList plist; // builds the parameter list
-   plist.loadParams(metaFileName);
-
-   // now build our "global parameters" structure
-   string tmp;
-   getParamValue(plist, "dggrid_operation", tmp, false);
-   MainParam* pdp = 0;
-   if (tmp == "GENERATE_GRID")
-      pdp = new GridGenParam(plist);
-   else if (tmp == "OUTPUT_STATS")
-      pdp = new MainParam(plist);
-   else if (tmp == "BIN_POINT_VALS")
-      pdp = new BinValsParam(plist);
-   else if (tmp == "BIN_POINT_PRESENCE")
-      pdp = new BinPresenceParam(plist);
-   else if (tmp == "TRANSFORM_POINTS")
-      pdp = new TransformParam(plist);
+   // create the operation object using parameters in the meta file
+   OpBasic theOperation(metaFileName);
+   theOperation.initialize();
 
    // echo the parameter list
-   dgcout << "* using parameter values:\n";
-   dgcout << plist << endl;
+   dgcout << "* parameter values:\n";
+   dgcout << theOperation.pList << std::endl;
 
-   if (pdp->pauseOnStart)
+   if (theOperation.mainOp.pauseOnStart)
       pause("parameters loaded");
 
-   // execute the operation
-   if (tmp == "GENERATE_GRID")
-      doGridGen(static_cast<GridGenParam&>(*pdp), plist);
-   else if (tmp == "OUTPUT_STATS")
-      doTable(*pdp, plist);
-   else if (tmp == "BIN_POINT_VALS")
-      doBinVals(static_cast<BinValsParam&>(*pdp), plist);
-   else if (tmp == "BIN_POINT_PRESENCE")
-      doBinPresence(static_cast<BinPresenceParam&>(*pdp), plist);
-   else if (tmp == "TRANSFORM_POINTS")
-      doTransforms(static_cast<TransformParam&>(*pdp), plist);
+   // do the operation
+   theOperation.execute();
 
-   bool pauseBeforeExit = pdp->pauseBeforeExit;
+   // grab the value before the op is cleaned
+   bool pauseBeforeExit = theOperation.mainOp.pauseBeforeExit;
 
-   delete pdp;
+   theOperation.cleanupAll();
 
    if (pauseBeforeExit)
       pause("before exit");

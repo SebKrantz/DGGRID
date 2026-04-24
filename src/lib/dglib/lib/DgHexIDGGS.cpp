@@ -1,5 +1,5 @@
 /*******************************************************************************
-    Copyright (C) 2021 Kevin Sahr
+    Copyright (C) 2023 Kevin Sahr
 
     This file is part of DGGRID.
 
@@ -28,38 +28,52 @@
 
 #include <dglib/DgHexIDGGS.h>
 #include <dglib/DgContCartRF.h>
-#include <dglib/DgDiscRF.h>
+#include <dglib/DgDiscTopoRF.h>
 #include <dglib/DgHexC1Grid2D.h>
 #include <dglib/DgHexC2Grid2D.h>
+#include <dglib/DgHierNdxSystemRFSBase.h>
 
 ////////////////////////////////////////////////////////////////////////////////
+const DgHexIDGGS*
+DgHexIDGGS::makeRF (DgRFNetwork& network, const DgGeoSphRF& backFrame,
+         const DgGeoCoord& vert0, long double azDegs, unsigned int aperture,
+         int nRes, const std::string& name, const std::string& projType,
+         bool isApSeq, const DgApSeq& apSeq,
+         bool isMixed43, int numAp4, bool isSuperfund,
+         DgHierNdxSysType hierNdxSysType)
+{
+    DgHexIDGGS* idggs = new DgHexIDGGS(network, backFrame, vert0, azDegs, aperture, nRes, name,
+               projType, isApSeq, apSeq, isMixed43, numAp4, isSuperfund, hierNdxSysType);
+
+    return idggs;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 DgHexIDGGS::DgHexIDGGS (DgRFNetwork& network, const DgGeoSphRF& backFrame,
                   const DgGeoCoord& vert0, long double azDegs,
                   unsigned int aperture, int nRes,
-                  const string& name, const string& projType,
-                  const DgApSeq& apSeq, bool isApSeq,
-                  bool isMixed43, int numAp4, bool isSuperfund)
+                  const std::string& name, const std::string& projType,
+                  bool isApSeq, const DgApSeq& apSeq,
+                  bool isMixed43, int numAp4, bool isSuperfund,
+                  const DgHierNdxSysType hierNdxSysType)
         : DgIDGGS (network, backFrame, vert0, azDegs, aperture, nRes,
-                       Hexagon, D6, name, projType, isMixed43, numAp4,
-                       isSuperfund, isApSeq, apSeq),
+                       Hexagon, D6, name, projType, isApSeq, apSeq, isMixed43, numAp4,
+                       isSuperfund, hierNdxSysType),
           apSeq_ (apSeq)
 {
-   if (!isApSeq) // need to build the apSeq
-   {
+   if (!isApSeq) { // need to build the apSeq
+
       int r;
 
-      if (isMixed43)
-      {
+      if (isMixed43) {
          for (r = 0; r < numAp4; r++)
             apSeq_.addAperture(DgAperture(4));
 
          for (; r < nRes - 1; r++)
             apSeq_.addAperture(DgAperture(3));
-      }
-      else
+      } else
          for (r = 0; r < nRes - 1; r++)
-            apSeq_.addAperture(DgAperture((aperture == 3) ? 3 : 4));
+            apSeq_.addAperture(DgAperture((int) aperture));
    }
 
    if (nRes > apSeq_.nRes() + 1) // remember +1 resolution for res 0
@@ -86,7 +100,13 @@ DgHexIDGGS::DgHexIDGGS (DgRFNetwork& network, const DgGeoSphRF& backFrame,
    }
 
    for (int r = 0; r < nRes; r++)
-      Dg2WayResAddConverter<DgQ2DICoord, DgGeoCoord, long double>(*this, *(grids()[r]), r);
+       Dg2WayTopoResAddConverter<DgQ2DICoord, DgGeoCoord, long double>(*this, *(grids()[r]), r);
+
+
+    // create the hierarchical indexing system
+     if (hierNdxSysType != InvalidHierNdxSysType) {
+        hierNdxSystem_ = DgHierNdxSystemRFSBase::makeSystem(*this, hierNdxSysType, Int64);
+     }
 
 } // DgHexIDGGS::DgHexIDGGS
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
-    Copyright (C) 2021 Kevin Sahr
+    Copyright (C) 2023 Kevin Sahr
 
     This file is part of DGGRID.
 
@@ -23,14 +23,14 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <dglib/DgBoundedHexC2RF2D.h>
-#include <dglib/DgDiscRF.h>
+#include <dglib/DgDiscTopoRF.h>
 
 #include <climits>
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 DgBoundedHexC2RF2D::DgBoundedHexC2RF2D
-           (const DgDiscRF<DgIVec2D, DgDVec2D, long double>& rf,
+           (const DgDiscTopoRF<DgIVec2D, DgDVec2D, long double>& rf,
             const DgIVec2D& lowerLeft, const DgIVec2D& upperRight)
    : DgBoundedRF2D (rf, lowerLeft, upperRight)
 {

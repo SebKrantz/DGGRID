@@ -1,5 +1,5 @@
 /*******************************************************************************
-    Copyright (C) 2021 Kevin Sahr
+    Copyright (C) 2023 Kevin Sahr
 
     This file is part of DGGRID.
 
@@ -37,7 +37,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 DgOutShapefile::DgOutShapefile (const DgGeoSphDegRF& rfIn,
-            const string& fileNameIn, int precisionIn, bool isPointFileIn,
+            const std::string& fileNameIn, int precisionIn, bool isPointFileIn,
             int shapefileIdLen, DgReportLevel failLevelIn)
    : DgOutLocFile (fileNameIn, rfIn, isPointFileIn, failLevelIn),
      geoRF_ (rfIn.geoRF()), dbFile_ (NULL), shpFile_ (NULL), recNum_ (0),
@@ -58,7 +58,7 @@ DgOutShapefile::DgOutShapefile (const DgGeoSphDegRF& rfIn,
 
 ////////////////////////////////////////////////////////////////////////////////
 bool
-DgOutShapefile::open (const string& fileName, DgReportLevel failLevel)
+DgOutShapefile::open (const std::string& fileName, DgReportLevel failLevel)
 {
    // create the database file
 
@@ -105,9 +105,9 @@ DgOutShapefile::open (const string& fileName, DgReportLevel failLevel)
    recNum_ = 0;
 
    // create the projection file
-   string prjFileName = fileName + ".prj";
-   ofstream prjFile;
-   prjFile.open(prjFileName.c_str(), ios::out);
+   std::string prjFileName = fileName + ".prj";
+   std::ofstream prjFile;
+   prjFile.open(prjFileName.c_str(), std::ios::out);
    if (!prjFile.good())
       report("DgOutShapefile::open() unable to open file " + prjFileName,
              failLevel);
@@ -115,7 +115,7 @@ DgOutShapefile::open (const string& fileName, DgReportLevel failLevel)
       debug("DgOutShapefile::open() opened file " + prjFileName);
 
    int precision = 0;
-   string datumName;
+   std::string datumName;
    long double earthRadiusM = geoRF_.earthRadiusKM() * 1000.0;
    if (geoRF_.name() == "WGS84_AUTHALIC_SPHERE")
    {
@@ -138,7 +138,7 @@ DgOutShapefile::open (const string& fileName, DgReportLevel failLevel)
 
    prjFile << "GEOGCS[\"" << datumName;
    prjFile << "\",DATUM[\"D_unknown\",SPHEROID[\"" << datumName << "\",";
-   prjFile << std::fixed << setprecision(precision) << earthRadiusM;
+    prjFile << std::fixed << std::setprecision(precision) << earthRadiusM;
    prjFile << ",0]],PRIMEM[\"Greenwich\",0],";
    prjFile << "UNIT[\"Degree\",0.017453292519943295]]\n";
    prjFile.close();
@@ -149,15 +149,15 @@ DgOutShapefile::open (const string& fileName, DgReportLevel failLevel)
 
 ////////////////////////////////////////////////////////////////////////////////
 void
-DgOutShapefile::addFields (const set<DgDBFfield>& fields)
+DgOutShapefile::addFields (const std::set<DgDBFfield>& fields)
 {
    if (DBFGetRecordCount(dbFile_) > 0)
       report("cannot add fields to Shapefile after records have been added.",
              DgBase::Fatal);
 
-//cout << "Adding fields: " << endl;
+//cout << "Adding fields: " << std::endl;
 
-   for (set<DgDBFfield>::iterator it = fields.begin();
+   for (std::set<DgDBFfield>::iterator it = fields.begin();
            it != fields.end(); it++)
    {
       if (DBFAddField(dbFile_, it->fieldName().c_str(), it->type(),
@@ -166,7 +166,7 @@ DgOutShapefile::addFields (const set<DgDBFfield>& fields)
                 + " in file " + dbFileName_, DgBase::Fatal);
 
       //int fNum = DBFGetFieldIndex(dbFile_, it->fieldName().c_str());
-      //cout << fNum << " " << it->fieldName().c_str() << endl;
+      //cout << fNum << " " << it->fieldName().c_str() << std::endl;
    }
 
    DBFClose(dbFile_);
@@ -197,7 +197,7 @@ DgOutShapefile::insert (const DgDVec2D&)
 
 ////////////////////////////////////////////////////////////////////////////////
 void
-DgOutShapefile::writeDbf (const string& id)
+DgOutShapefile::writeDbf (const std::string& id)
 {
    // write the label
    if (id.length() > (unsigned int) idLen_)
@@ -209,7 +209,7 @@ DgOutShapefile::writeDbf (const string& id)
       report("DgOutShapefile::writeDbf() unable to write to " +
              dbFileName_, failLevel());
 
-//cout << "** recnum: " << recNum_ << endl;
+//cout << "** recnum: " << recNum_ << std::endl;
    if (numFields_ > 1)
    {
       // first null-out all the fields for this record
@@ -219,7 +219,7 @@ DgOutShapefile::writeDbf (const string& id)
                 dbFileName_, failLevel());
 
       // now write default values to the fields that are present
-      for (set<DgDBFfield>::iterator it = curFields_.begin();
+      for (std::set<DgDBFfield>::iterator it = curFields_.begin();
            it != curFields_.end(); it++)
       {
          int fNum = DBFGetFieldIndex(dbFile_, it->fieldName().c_str());
@@ -227,15 +227,15 @@ DgOutShapefile::writeDbf (const string& id)
 //cout << "writing " << fNum << " " << it->fieldName() << " ";
          switch (it->type()) {
             case FTString:
-//cout << defStrAttribute() << endl;
+//cout << defStrAttribute() << std::endl;
                res = DBFWriteStringAttribute(dbFile_, recNum_, fNum, defStrAttribute().c_str());
                break;
             case FTInteger:
-//cout << defIntAttribute() << endl;
+//cout << defIntAttribute() << std::endl;
                res = DBFWriteIntegerAttribute(dbFile_, recNum_, fNum, defIntAttribute());
                break;
             case FTDouble:
-//cout << defDblAttribute() << endl;
+//cout << defDblAttribute() << std::endl;
                res = DBFWriteDoubleAttribute(dbFile_, recNum_, fNum, defDblAttribute());
                break;
             case FTLogical:
@@ -263,7 +263,8 @@ DgOutShapefile::writeDbf (const string& id)
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 DgOutLocFile&
-DgOutShapefile::insert (DgLocation& loc, const string* label)
+DgOutShapefile::insert (DgLocation& loc, const std::string* label,
+                  const DgDataList* /* dataList */)
 //
 // Put the point loc.
 //
@@ -271,7 +272,7 @@ DgOutShapefile::insert (DgLocation& loc, const string* label)
 {
    rf().convert(&loc);
 
-   string id;
+   std::string id;
    if (label)
      id = *label;
    else
@@ -298,7 +299,8 @@ DgOutShapefile::insert (DgLocation& loc, const string* label)
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 DgOutLocFile&
-DgOutShapefile::insert (DgLocVector&, const string*, const DgLocation*)
+DgOutShapefile::insert (DgLocVector&, const std::string*, const DgLocation*,
+        const DgDataList*)
 //
 // Put the polyline vec.
 //
@@ -314,8 +316,9 @@ DgOutShapefile::insert (DgLocVector&, const string*, const DgLocation*)
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 DgOutLocFile&
-DgOutShapefile::insert (DgPolygon& poly, const string* label,
-                     const DgLocation* /* cent */)
+DgOutShapefile::insert (DgPolygon& poly, const std::string* label,
+                     const DgLocation* /* cent */,
+                  const DgDataList* /* dataList */)
 //
 // Put the polygon poly.
 //
@@ -323,14 +326,14 @@ DgOutShapefile::insert (DgPolygon& poly, const string* label,
 {
    rf().convert(poly);
 
-   string id;
+   std::string id;
    if (label)
      id = *label;
    else
      id = "0";
 
    // output the vertices
-   const vector<DgAddressBase*>& v = poly.addressVec();
+   const std::vector<DgAddressBase*>& v = poly.addressVec();
    int numVerts = (int) v.size() + 1;
    double *x = new double[numVerts];
    double *y = new double[numVerts];

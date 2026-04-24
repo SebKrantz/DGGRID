@@ -1,5 +1,5 @@
 /*******************************************************************************
-    Copyright (C) 2021 Kevin Sahr
+    Copyright (C) 2023 Kevin Sahr
 
     This file is part of DGGRID.
 
@@ -23,8 +23,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <list>
-
-using namespace std;
 
 #include <dglib/DgBase.h>
 #include <dglib/DgRFBase.h>
@@ -150,7 +148,7 @@ DgRFBase::convert (DgLocVector& vec) const
       return vec;
    }
 
-   vector<DgAddressBase*>& v = vec.addressVec();
+   std::vector<DgAddressBase*>& v = vec.addressVec();
    for (unsigned long i = 0; i < v.size(); i++) {
       if (v[i]) {
          DgAddressBase* addIn = v[i];
@@ -184,21 +182,21 @@ DgRFBase::buildLocation (DgAddressBase* addIn) const
 } // DgLocation* DgRFBase::buildLocation
 
 ////////////////////////////////////////////////////////////////////////////////
-ostream&
-DgRFBase::traceToGround (ostream& stream) const
+std::ostream&
+DgRFBase::traceToGround (std::ostream& stream) const
 {
    stream << "tracing " << name() << " {";
 
-   if (id() == 0) return stream << " at ground }" << endl;
+   if (id() == 0) return stream << " at ground }" << std::endl;
 
-   if (!connectTo()) return stream << " => NULL }" << endl;
+   if (!connectTo()) return stream << " => NULL }" << std::endl;
 
    stream << "\n";
 
    const DgRFBase* to = connectTo();
    while (true)
    {
-      if (!to) return stream << "  => NULL }" << endl;
+      if (!to) return stream << "  => NULL }" << std::endl;
 
       // at ground?
 
@@ -216,11 +214,11 @@ DgRFBase::traceToGround (ostream& stream) const
 
    // now go back from ground
 
-   list<const DgRFBase*> rev;
+   std::list<const DgRFBase*> rev;
    const DgRFBase* from = connectFrom();
    while (true)
    {
-      if (!from) return stream << "  => NULL }" << endl;
+      if (!from) return stream << "  => NULL }" << std::endl;
 
       // at ground?
 
@@ -232,15 +230,15 @@ DgRFBase::traceToGround (ostream& stream) const
       from = from->connectFrom();
    }
 
-   list<const DgRFBase*>::iterator it = rev.begin();
+   std::list<const DgRFBase*>::iterator it = rev.begin();
    for (; it != rev.end(); it++) stream << "  => " << (*it)->name() << "\n";
 
-   return stream << " => " << name() << " }" << endl;
+   return stream << " => " << name() << " }" << std::endl;
 
 } // void DgRFBase::traceToGround
 
 ////////////////////////////////////////////////////////////////////////////////
-string
+std::string
 DgRFBase::toString (const DgLocBase& lb) const
 {
    return lb.asString();
@@ -248,7 +246,7 @@ DgRFBase::toString (const DgLocBase& lb) const
 } // string DgRFBase::toString
 
 ////////////////////////////////////////////////////////////////////////////////
-string
+std::string
 DgRFBase::toAddressString (const DgLocBase& lb) const
 {
    return lb.asAddressString();
@@ -256,7 +254,7 @@ DgRFBase::toAddressString (const DgLocBase& lb) const
 } // string DgRFBase::toAddressString
 
 ////////////////////////////////////////////////////////////////////////////////
-string
+std::string
 DgRFBase::toString (const DgLocBase& lb, char delimiter) const
 {
    return lb.asString(delimiter);
@@ -264,7 +262,7 @@ DgRFBase::toString (const DgLocBase& lb, char delimiter) const
 } // string DgRFBase::toString
 
 ////////////////////////////////////////////////////////////////////////////////
-string
+std::string
 DgRFBase::toAddressString (const DgLocBase& lb, char delimiter) const
 {
    return lb.asAddressString(delimiter);

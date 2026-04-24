@@ -1,5 +1,5 @@
 /*******************************************************************************
-    Copyright (C) 2021 Kevin Sahr
+    Copyright (C) 2023 Kevin Sahr
 
     This file is part of DGGRID.
 
@@ -31,8 +31,6 @@
 
 #include <iostream>
 
-using namespace std;
-
 class DgEllipsoidRF;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -42,7 +40,7 @@ class DgProjGnomonicRF : public DgGeoProjRF {
    public:
 
       static const DgProjGnomonicRF* makeRF (DgRFNetwork& networkIn,
-                      const string& nameIn = "GnomonicRF",
+                      const std::string& nameIn = "GnomonicRF",
                       const DgGeoCoord& proj0In = DgGeoCoord(M_ZERO, M_ZERO),
                       long double x0In = M_ZERO, long double y0In = M_ZERO,
                       long double k0In = M_ONE, long double to_meterIn = M_ONE,
@@ -61,7 +59,7 @@ class DgProjGnomonicRF : public DgGeoProjRF {
    protected:
 
       DgProjGnomonicRF (DgRFNetwork& networkIn,
-                      const string& nameIn = "GnomonicRF",
+                      const std::string& nameIn = "GnomonicRF",
                       const DgGeoCoord& proj0In = DgGeoCoord(M_ZERO, M_ZERO),
                       long double x0In = M_ZERO, long double y0In = M_ZERO,
                       long double k0In = M_ONE, long double to_meterIn = M_ONE,

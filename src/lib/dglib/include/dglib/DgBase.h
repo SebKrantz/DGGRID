@@ -1,5 +1,5 @@
 /*******************************************************************************
-    Copyright (C) 2021 Kevin Sahr
+    Copyright (C) 2023 Kevin Sahr
 
     This file is part of DGGRID.
 
@@ -20,9 +20,6 @@
 //
 // DgBase.h: DgBase class definitions
 //
-// Version 7.0 - Kevin Sahr, 11/15/14
-// Version 6.1 - Kevin Sahr, 5/23/13
-//
 ////////////////////////////////////////////////////////////////////////////////
 
 #ifndef DGBASE_H
@@ -31,11 +28,9 @@
 #include <iostream>
 #include <string>
 
-using namespace std;
-
 #define DGDEBUG             0
-#define DGGRID_VERSION      "7.8"
-#define DGGRID_RELEASE_DATE "April 21, 2023"
+#define DGGRID_VERSION      "9.0b"
+#define DGGRID_RELEASE_DATE "April 2, 2026"
 
 // adapted from stackoverflow user Pierre
 #define WHERE fprintf(stderr,"[LOG]%s:%s#%d\n",__PRETTY_FUNCTION__,__FILE__,__LINE__);
@@ -69,7 +64,7 @@ class DgBase {
 
    private:
 
-      static const string defaultName;
+      static const std::string defaultName;
       static DgReportLevel minReportLevel_;
 
    public:
@@ -82,51 +77,51 @@ class DgBase {
       static DgReportLevel minReportLevel (void) { return minReportLevel_; }
 
       static bool testArgEqual (int argc, int expected,
-                     const string& message = string("invalid argument count"),
+                                const std::string& message = std::string("invalid argument count"),
                      DgReportLevel level = Fatal);
 
       static bool testArgEqual (int argc, char* argv[], int expected,
-                     const string& message = string("invalid argument count"));
+                                const std::string& message = std::string("invalid argument count"));
 
       static bool testArgMin (int argc, int minExpected,
-                     const string& message = string("invalid argument count"),
+                     const std::string& message = std::string("invalid argument count"),
                      DgReportLevel level = Fatal);
 
       static bool testArgMin (int argc, char* argv[], int minExpected,
-                     const string& message = string("invalid argument count"));
+                              const std::string& message = std::string("invalid argument count"));
 
-      DgBase (const string& instanceName = defaultName);
+      DgBase (const std::string& instanceName = defaultName);
 
-      DgBase (const string* instanceName = NULL);
+      DgBase (const std::string* instanceName = NULL);
 
-      void setInstanceName (const string& instanceName)
+      void setInstanceName (const std::string& instanceName)
               { instanceName_ = instanceName; }
 
-      const string& instanceName (void) const { return instanceName_; }
+      const std::string& instanceName (void) const { return instanceName_; }
 
    protected:
 
-      void report (const string& message, DgReportLevel level = Info) const;
-      void debug  (const string& message) const;
+      void report (const std::string& message, DgReportLevel level = Info) const;
+      void debug  (const std::string& message) const;
 
    private:
 
       // data members
 
-      string instanceName_;
+     std::string instanceName_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-extern "C" void report (const string& message,
+extern "C" void report (const std::string& message,
                         DgBase::DgReportLevel level = DgBase::Info);
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 inline void
 #if DGDEBUG
-DgBase::debug (const string& message) const
+DgBase::debug (const std::string& message) const
 #else
-DgBase::debug (const string&) const // unused parameter
+DgBase::debug (const std::string&) const // unused parameter
 #endif
 //
 // Print-out a debugging message if the DGDEBUG flag is set. Otherwise this
@@ -136,13 +131,13 @@ DgBase::debug (const string&) const // unused parameter
 {
 
 #if DGDEBUG
-   dgcout << "DEBUG: [" << instanceName_ << "] " << message << endl;
+   dgcout << "DEBUG: [" << instanceName_ << "] " << message << std::endl;
 #endif
 
 } // void DgBase::debug
 
 ////////////////////////////////////////////////////////////////////////////////
-inline ostream& operator<< (ostream& stream, const DgBase& b)
+inline std::ostream& operator<< (std::ostream& stream, const DgBase& b)
             { return stream << b.instanceName(); }
 
 #endif

@@ -1,5 +1,5 @@
 /*******************************************************************************
-    Copyright (C) 2021 Kevin Sahr
+    Copyright (C) 2023 Kevin Sahr
 
     This file is part of DGGRID.
 
@@ -25,11 +25,11 @@
 #include <climits>
 
 #include <dglib/DgBoundedRF2D.h>
-#include <dglib/DgDiscRF.h>
+#include <dglib/DgDiscTopoRF.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-DgBoundedRF2D::DgBoundedRF2D (const DgDiscRF<DgIVec2D, DgDVec2D, long double>& rf,
+DgBoundedRF2D::DgBoundedRF2D (const DgDiscTopoRF<DgIVec2D, DgDVec2D, long double>& rf,
                               const DgIVec2D& lowerLeftIn,
                               const DgIVec2D& upperRightIn)
    : DgBoundedRF<DgIVec2D, DgDVec2D, long double>

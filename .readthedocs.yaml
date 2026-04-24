@@ -1,0 +1,21 @@
+version: 2
+
+sphinx:
+  configuration: documentation/source/conf.py
+  fail_on_warning: false
+
+build:
+  os: "ubuntu-22.04"
+  tools:
+    python: "3.11"
+  apt_packages:
+    - doxygen
+    - graphviz
+  jobs:
+    pre_build:
+      - mkdir -p documentation/build/doxygen
+      - doxygen documentation/Doxyfile
+
+python:
+  install:
+    - requirements: documentation/requirements.txt

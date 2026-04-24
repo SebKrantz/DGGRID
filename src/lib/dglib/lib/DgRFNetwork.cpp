@@ -1,5 +1,5 @@
 /*******************************************************************************
-    Copyright (C) 2021 Kevin Sahr
+    Copyright (C) 2023 Kevin Sahr
 
     This file is part of DGGRID.
 
@@ -89,7 +89,7 @@ DgRFNetwork::getConverter (const DgRFBase& fromFrame,
       if (!fromFrame.connectTo() || !toFrame.connectFrom())
       {
          report("DgRFNetwork::getConverter() frames not connected: " +
-                 fromFrame.name() + string(" -> ") + toFrame.name(),
+                 fromFrame.name() + std::string(" -> ") + toFrame.name(),
                 DgBase::Fatal);
          return 0;
       }

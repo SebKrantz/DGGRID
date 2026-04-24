@@ -1,5 +1,5 @@
 /*******************************************************************************
-    Copyright (C) 2021 Kevin Sahr
+    Copyright (C) 2023 Kevin Sahr
 
     This file is part of DGGRID.
 
@@ -39,7 +39,7 @@ class DgIDGGS4T : public DgIDGGS {
 
       static const DgIDGGS4T* makeRF (DgRFNetwork& networkIn, const DgGeoSphRF& backFrameIn,
                const DgGeoCoord& vert0, long double azDegs, int nResIn = 1,
-               const string& nameIn = "ISEA4T", const string& projType = "ISEA")
+               const std::string& nameIn = "ISEA4T", const std::string& projType = "ISEA")
          { return new DgIDGGS4T(networkIn, backFrameIn, vert0, azDegs, nResIn,
                                     nameIn, projType); }
 
@@ -56,7 +56,7 @@ class DgIDGGS4T : public DgIDGGS {
 
       DgIDGGS4T (DgRFNetwork& networkIn, const DgGeoSphRF& backFrameIn,
                const DgGeoCoord& vert0, long double azDegs, int nResIn = 1,
-               const string& nameIn = "ISEA4T", const string& projType = "ISEA");
+               const std::string& nameIn = "ISEA4T", const std::string& projType = "ISEA");
 
       DgIDGGS4T (const DgIDGGS4T& rf);
 

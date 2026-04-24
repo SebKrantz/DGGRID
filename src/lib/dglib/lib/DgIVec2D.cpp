@@ -1,5 +1,5 @@
 /*******************************************************************************
-    Copyright (C) 2021 Kevin Sahr
+    Copyright (C) 2023 Kevin Sahr
 
     This file is part of DGGRID.
 
@@ -23,6 +23,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <climits>
+#include <string.h>
 
 #include <dglib/DgBase.h>
 #include <dglib/DgIVec2D.h>
@@ -58,7 +59,7 @@ DgIVec2D::fromString (const char* str, char delimiter)
     }
    catch(...)
     {
-      ::report("DgIVec2D::fromString() invalid value in string " + string(tok),
+      ::report("DgIVec2D::fromString() invalid value in string " + std::string(tok),
                DgBase::Fatal);
     }
 

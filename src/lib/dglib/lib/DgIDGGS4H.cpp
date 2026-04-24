@@ -1,5 +1,5 @@
 /*******************************************************************************
-    Copyright (C) 2021 Kevin Sahr
+    Copyright (C) 2023 Kevin Sahr
 
     This file is part of DGGRID.
 
@@ -28,7 +28,7 @@
 #include <cmath>
 
 #include <dglib/DgContCartRF.h>
-#include <dglib/DgDiscRF.h>
+#include <dglib/DgDiscTopoRF.h>
 #include <dglib/DgHexC1Grid2D.h>
 #include <dglib/DgHexC2Grid2D.h>
 #include <dglib/DgIDGGS4H.h>

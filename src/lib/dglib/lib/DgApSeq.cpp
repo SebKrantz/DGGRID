@@ -1,5 +1,5 @@
 /*******************************************************************************
-    Copyright (C) 2021 Kevin Sahr
+    Copyright (C) 2023 Kevin Sahr
 
     This file is part of DGGRID.
 
@@ -31,6 +31,6 @@
 const int DgAperture::defaultAperture = 4;
 
 const DgApSeq DgApSeq::defaultApSeq;
-const string DgApSeq::defaultEmptyApSeqStr = "EMPTY_APSEQ";
+const std::string DgApSeq::defaultEmptyApSeqStr = "EMPTY_APSEQ";
 
 ////////////////////////////////////////////////////////////////////////////////

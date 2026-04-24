@@ -1,5 +1,5 @@
 /*******************************************************************************
-    Copyright (C) 2021 Kevin Sahr
+    Copyright (C) 2023 Kevin Sahr
 
     This file is part of DGGRID.
 
@@ -28,6 +28,7 @@
 #include <cmath>
 #include <climits>
 #include <cfloat>
+#include <string.h>
 
 #include <dglib/DgIDGGutil.h>
 #include <dglib/DgIDGGBase.h>
@@ -214,10 +215,10 @@ DgQ2DDRF::str2add (DgQ2DDCoord* add, const char* str, char delimiter) const
    // get the quadNum
 
    char* tok = strtok(tmpStr, delimStr);
-   int q;
-   if (sscanf(tok, "%d", &q) != 1)
+   int q = -1;
+   if (!tok || sscanf(tok, "%d", &q) != 1)
    {
-      ::report("DgQ2DDRF::fromString() invalid value in string " + string(tok),
+      ::report("DgQ2DDRF::fromString() invalid value in string " + ((tok) ? std::string(tok) : std::string("\"\"")),
                DgBase::Fatal);
    }
 
@@ -247,21 +248,21 @@ DgVertex2DDRF::str2add (DgVertex2DDCoord* add, const char* str, char delimiter) 
    // get the vertNum
 
    char* tok = strtok(tmpStr, delimStr);
-   int vNum;
-   if (sscanf(tok, "%d", &vNum) != 1)
+   int vNum = -1;
+   if (!tok || sscanf(tok, "%d", &vNum) != 1)
    {
       ::report("DgVertex2DDCoord::fromString() invalid value in string " +
-               string(tok), DgBase::Fatal);
+               ((tok) ? std::string(tok) : std::string("\"\"")), DgBase::Fatal);
    }
 
    // get the triNum
 
    tok = strtok(NULL, delimStr);
-   int tNum;
-   if (sscanf(tok, "%d", &tNum) != 1)
+   int tNum = -1;
+   if (!tok || sscanf(tok, "%d", &tNum) != 1)
    {
       ::report("DgVertex2DDCoord::fromString() invalid value in string " +
-               string(tok), DgBase::Fatal);
+               ((tok) ? std::string(tok) : std::string("\"\"")), DgBase::Fatal);
    }
 
    // get the keeper
@@ -277,7 +278,7 @@ DgVertex2DDRF::str2add (DgVertex2DDCoord* add, const char* str, char delimiter) 
    else
    {
       ::report("DgVertex2DDCoord::fromString() invalid value in string " +
-               string(tok), DgBase::Fatal);
+               std::string(tok), DgBase::Fatal);
    }
 
    const char* tmp = &(str[(tok - tmpStr) + strlen(tok) + 1]);
@@ -313,13 +314,15 @@ DgQ2DDtoIConverter::convertTypedAddress (const DgQ2DDCoord& addIn) const
    DgLocation* loc = IDGG().ccFrame().makeLocation(addIn.coord());
 
 #if DGDEBUG
-dgcout << "\nDgQ2DDtoIConverter::convertTypedAddress loc: " << *loc << endl;
+dgcout << "\nDgQ2DDtoIConverter::convertTypedAddress loc: " << *loc << std::endl;
 #endif
 
     IDGG().grid2D().convert(loc);
 
+//dgcout << "XX " << addIn << " " << *loc << std::endl;
+
 #if DGDEBUG
-dgcout << " ---> A. " << *loc << endl;
+dgcout << " ---> A. " << *loc << std::endl;
 #endif
 
    DgIVec2D coord = *IDGG().grid2D().getAddress(*loc);
@@ -327,82 +330,185 @@ dgcout << " ---> A. " << *loc << endl;
 
    int quadNum = addIn.quadNum();
 
-   const long double nudge = 0.0000001L;
-   if (coord.i() < 0 || coord.j() < 0) // maybe round-off error?
-   {
-      DgDVec2D tmp(addIn.coord());
+#if DGDEBUG
+dgcout << " ---> B. " << coord << std::endl;
+#endif
 
+    long long int maxI = IDGG().maxI();
+    long long int maxJ = IDGG().maxJ();
+    long long int topEdgeI = maxI + 1;
+    long long int topEdgeJ = maxJ + 1;
+    /*
+    long long int maxTopOverageI = (IDGG().aperture() == 7 && IDGG().isClassI()) ? topEdgeI + 1 : topEdgeI;
+    long long int maxTopOverageJ = (IDGG().aperture() == 7 && IDGG().isClassI()) ? topEdgeJ + 1 : topEdgeJ;
+    long long int minBottomI = (IDGG().aperture() == 7 && IDGG().isClassI()) ? -1 : 0;
+    long long int minBottomJ = (IDGG().aperture() == 7 && IDGG().isClassI()) ? -1 : 0;
+     */
+    /*
+     long long int maxTopOverageI = (IDGG().aperture() == 7 && ! ? topEdgeI + 2 : topEdgeI;
+    long long int maxTopOverageJ = (IDGG().aperture() == 7) ? topEdgeJ + 2 : topEdgeJ;
+     */
+    /*
+    long long int maxTopOverageI = (IDGG().aperture() == 7 && IDGG().isClassI()) ? topEdgeI + 2 : topEdgeI;
+    long long int maxTopOverageJ = (IDGG().aperture() == 7 && IDGG().isClassI()) ? topEdgeJ + 2 : topEdgeJ;
+     */
+
+    long long int maxTopOverageI = (IDGG().aperture() == 7) ? topEdgeI + 2 : topEdgeI;
+    long long int maxTopOverageJ = (IDGG().aperture() == 7) ? topEdgeJ + 2 : topEdgeJ;
+
+    long long int minBottomI = (IDGG().aperture() == 7) ? -2 : 0;
+    long long int minBottomJ = (IDGG().aperture() == 7) ? -2 : 0;
+
+#if DGDEBUG
+    std::cout << maxI << " " << maxJ << " " << topEdgeI << " " << topEdgeJ << std::endl;
+    std::cout << minBottomI << " " << minBottomJ << " " << maxTopOverageI << " " << maxTopOverageJ << std::endl;
+#endif
+
+   // if out of range check for possible round-off error
+   const long double nudge = 0.0000001L;
+   bool underI, underJ, overI, overJ;
+   underI = coord.i() < minBottomI;
+   underJ = coord.j() < minBottomJ;
+   overI = coord.i() > maxTopOverageI;
+   overJ = coord.j() > maxTopOverageJ;
+
+   DgDVec2D tmp(addIn.coord());
+   bool overage = false;
+   if (underI || underJ) {
+      overage = true;
       tmp.setX(tmp.x() + nudge);
       tmp.setY(tmp.y() + nudge);
-
-      loc = IDGG().ccFrame().makeLocation(tmp);
-      IDGG().grid2D().convert(loc);
-      coord = *IDGG().grid2D().getAddress(*loc);
-      delete loc;
-   }
-
-#if DGDEBUG
-dgcout << " ---> B. " << coord << endl;
-#endif
-
-   long long int edgeI = IDGG().maxI() + 1;
-   long long int edgeJ = IDGG().maxJ() + 1;
-   if (coord.i() > edgeI || coord.j() > edgeJ) { // maybe round-off error?
-
-      DgDVec2D tmp(addIn.coord());
-
+   } else if (overI || overJ) {
+      overage = true;
       tmp.setX(tmp.x() - nudge);
       tmp.setY(tmp.y() - nudge);
+   }
 
+   if (overage) {
+      // nudge the incoming point and try again
       loc = IDGG().ccFrame().makeLocation(tmp);
       IDGG().grid2D().convert(loc);
       coord = *IDGG().grid2D().getAddress(*loc);
       delete loc;
+
+      // reset the overage conditions
+      underI = coord.i() < minBottomI;
+      underJ = coord.j() < minBottomJ;
+      overI = coord.i() > maxTopOverageI;
+      overJ = coord.j() > maxTopOverageJ;
+
+      // are we good?
+      if (underI || underJ || overI || overJ)
+         report("DgQ2DDtoIConverter::convertTypedAddress(): "
+                "coordinate out of range: " + std::to_string(quadNum) + " " + (std::string) coord, DgBase::Fatal);
    }
 
 #if DGDEBUG
-dgcout << " ---> C. " << coord << endl;
+dgcout << " ---> C. " << coord << std::endl;
 #endif
+   // we'll reuse the booleans above set to based on the actual quad i,j ranges
+   underI = coord.i() < 0;
+   underJ = coord.j() < 0;
+   overI = coord.i() > maxI;
+   overJ = coord.j() > maxJ;
+   int numOver = underI + underJ + overI + overJ; // works because bool is an int
 
-   if (coord.i() < 0 || coord.j() < 0 ||
-       coord.i() > edgeI || coord.j() > edgeJ) {
-      report("DgQ2DDtoIConverter::convertTypedAddress(): "
-             " coordinate out of range: " + (string) coord, DgBase::Fatal);
-   } else if (coord.i() == edgeI || coord.j() == edgeJ) {
-      const DgQuadEdgeCells& ec = IDGG().edgeTable(quadNum);
+    if (numOver) {
+        //if (overI || overJ) {
+        const DgQuadEdgeCells& ec = IDGG().edgeTable(quadNum);
 
-      if (ec.isType0()) {
-         if (coord.j() == edgeJ) {
-            if (coord.i() == 0) {
-               quadNum = ec.loneVert();
-               coord = DgIVec2D(0, 0);
-            } else {
-               quadNum = ec.upQuad();
-               coord = DgIVec2D(0, edgeI - coord.i());
+        // special case first
+        if (overI && overJ) {
+#if DGDEBUG
+            std::cout << "BOTH OVER: " << !ec.isType0() << " " << quadNum << " " << coord.i() << " " << coord.j();
+#endif
+            // must be upper right corner
+            if (ec.isType0()) {
+                quadNum = ec.upQuad();
+                coord = DgIVec2D(0, 0);
+            } else { // TypeI
+                quadNum = ec.rightQuad();
+                coord = DgIVec2D(0, 0);
             }
-         } else { // i == edgeI
-            quadNum = ec.rightQuad();
-            coord.setI(0);
-         }
-      } else { // type 1
-         if (coord.i() == edgeI) {
-            if (coord.j() == 0) {
-               quadNum = ec.loneVert();
-               coord = DgIVec2D(0, 0);
-            } else {
-               quadNum = ec.rightQuad();
-               coord = DgIVec2D(edgeJ - coord.j(), 0);
+        } else if (numOver > 1) {
+            report("DgQ2DDtoIConverter::convertTypedAddress(): "
+                   "coordinate has multiple overages: " + std::to_string(quadNum) + " " + (std::string) coord, DgBase::Fatal);
+        } else if (underI) {
+#if DGDEBUG
+            std::cout << "UNDER I: " << !ec.isType0() << " " << quadNum << " " << coord.i() << " " << coord.j();
+#endif
+            quadNum = ec.leftQuad();
+            if (ec.isType0()) {
+                coord = DgIVec2D(topEdgeJ - coord.j() + coord.i(), topEdgeJ + coord.i());
+            } else { // TypeI
+                coord.setI(topEdgeI + coord.i());
             }
-         } else { // j == edgeJ
-            quadNum = ec.upQuad();
-            coord.setJ(0);
-         }
-      }
-   }
+        } else if (underJ) {
+#if DGDEBUG
+            std::cout << "UNDER J: " << !ec.isType0() << " " << quadNum << " " << coord.i() << " " << coord.j();
+#endif
+            quadNum = ec.downQuad();
+            if (ec.isType0()) {
+                coord = DgIVec2D(coord.i(), topEdgeJ + coord.j());
+            } else { // TypeI
+                coord = DgIVec2D(topEdgeJ + coord.j(), (topEdgeI - coord.i()) + coord.j());
+            }
+        } else if (overI) {
+#if DGDEBUG
+            std::cout << "OVER I: " << !ec.isType0() << " " << quadNum << " " << coord.i() << " " << coord.j();
+#endif
+            if (ec.isType0()) {
+                quadNum = ec.rightQuad();
+                coord.setI(coord.i() - topEdgeI);
+            } else { // TypeI
+                if (coord.j() == 0) {
+                    quadNum = ec.loneVert();
+                    coord = DgIVec2D(0, 0);
+                } else {
+                    quadNum = ec.rightQuad();
+                    long long int iOverage = coord.i() - topEdgeI;
+                    coord = DgIVec2D((topEdgeJ - coord.j()) + iOverage, iOverage);
+                }
+            }
+        } else if (overJ) {
+#if DGDEBUG
+            std::cout << "OVER J: " << !ec.isType0() << " " << quadNum << " " << coord.i() << " " << coord.j();
+#endif
+            if (ec.isType0()) {
+                if (coord.i() == 0) {
+                    quadNum = ec.loneVert();
+                    coord = DgIVec2D(0, 0);
+                } else {
+                    quadNum = ec.upQuad();
+                    long long int jOverage = coord.j() - topEdgeJ;
+                    coord = DgIVec2D(jOverage, topEdgeI - coord.i() + jOverage);
+                }
+            } else { // TypeI
+                quadNum = ec.upQuad();
+                coord.setJ(coord.j() - topEdgeJ);
+            }
+        }
+    }
 
 #if DGDEBUG
-dgcout << " ---> D. " << coord << endl;
+    if (underI || underJ || overI || overJ)
+        std::cout << " -> " << quadNum << " " << coord.i() << " " << coord.j() << std::endl;
 #endif
+
+#if DGDEBUG
+dgcout << " ---> D. " << coord << std::endl;
+#endif
+
+    // reset the overage conditions
+    underI = coord.i() < 0;
+    underJ = coord.j() < 0;
+    overI = coord.i() > maxI;
+    overJ = coord.j() > maxJ;
+
+    // are we good?
+    if (underI || underJ || overI || overJ)
+       report("DgQ2DDtoIConverter::convertTypedAddress(): "
+           "final coordinate out of range: " + std::to_string(quadNum) + " " + (std::string) coord, DgBase::Fatal);
 
    DgQ2DICoord result(quadNum, coord);
 

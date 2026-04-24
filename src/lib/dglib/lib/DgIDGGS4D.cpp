@@ -1,5 +1,5 @@
 /*******************************************************************************
-    Copyright (C) 2021 Kevin Sahr
+    Copyright (C) 2023 Kevin Sahr
 
     This file is part of DGGRID.
 
@@ -28,7 +28,7 @@
 #include <cmath>
 
 #include <dglib/DgContCartRF.h>
-#include <dglib/DgDiscRF.h>
+#include <dglib/DgDiscTopoRF.h>
 #include <dglib/DgDmdD4Grid2D.h>
 #include <dglib/DgDmdD8Grid2D.h>
 #include <dglib/DgDmdIDGG.h>
@@ -38,7 +38,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 DgIDGGS4D::DgIDGGS4D (DgRFNetwork& network, const DgGeoSphRF& backFrame,
                const DgGeoCoord& vert0, long double azDegs, int nRes,
-               const string& name, const string& projType, DgGridMetric gridMetric)
+               const std::string& name, const std::string& projType, DgGridMetric gridMetric)
         : DgIDGGS (network, backFrame, vert0, azDegs, 4, nRes,
                        Diamond, gridMetric, name, projType)
 {
@@ -60,7 +60,7 @@ DgIDGGS4D::DgIDGGS4D (DgRFNetwork& network, const DgGeoSphRF& backFrame,
    }
 
    for (int r = 0; r < nRes; r++)
-      Dg2WayResAddConverter<DgQ2DICoord, DgGeoCoord, long double>(*this, *(grids()[r]), r);
+       Dg2WayTopoResAddConverter<DgQ2DICoord, DgGeoCoord, long double>(*this, *(grids()[r]), r);
 
 } // DgDmdIDGGS::DgDmdIDGGS
 
@@ -94,7 +94,7 @@ void
 DgIDGGS4D::setAddParents (const DgResAdd<DgQ2DICoord>& add,
                                DgLocVector& vec) const
 {
-//cout << "   setAddParents: " << add << endl;
+//cout << "   setAddParents: " << add << std::endl;
    //if (isCongruent()) {
       DgLocation* tmpLoc = makeLocation(add);
       grids()[add.res() - 1]->convert(tmpLoc);
@@ -113,12 +113,12 @@ DgIDGGS4D::setAddParents (const DgResAdd<DgQ2DICoord>& add,
       DgPolygon* verts = makeVertices(*tmpLoc);
       delete tmpLoc;
 
-//cout << "   verts 1: " << *verts << endl;
+//cout << "   verts 1: " << *verts << std::endl;
 
       grids()[add.res() - 1]->convert(*verts);
-//cout << "   verts 2: " << *verts << endl;
+//cout << "   verts 2: " << *verts << std::endl;
       convert(*verts);
-//cout << "   verts 3: " << *verts << endl;
+//cout << "   verts 3: " << *verts << std::endl;
 
       for (int i = 0; i < verts->size(); i++)
       {
@@ -129,16 +129,16 @@ DgIDGGS4D::setAddParents (const DgResAdd<DgQ2DICoord>& add,
 //cout << "  " << i << " " << j << " " << (*verts)[i] << " " << vec[j];
             if ((*verts)[i] == vec[j])
             {
-//cout << " YES" << endl;
+//cout << " YES" << std::endl;
                found = true;
                break;
             }
-//cout << " NO" << endl;
+//cout << " NO" << std::endl;
          }
 
          if (!found) vec.push_back((*verts)[i]);
       }
-//cout << "   parents: " << vec << endl;
+//cout << "   parents: " << vec << std::endl;
 
       delete verts;
    }
@@ -155,7 +155,7 @@ DgIDGGS4D::setAddInteriorChildren (const DgResAdd<DgQ2DICoord>& add,
       const int radix = 2;
       const DgIVec2D& lowerLeft = add.address().coord() * radix;
 
-      vector<DgAddressBase*>& v = vec.addressVec();
+      std::vector<DgAddressBase*>& v = vec.addressVec();
       for (int i = 0; i < radix; i++)
       {
          for (int j = 0; j < radix; j++)

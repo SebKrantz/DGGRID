@@ -1,5 +1,5 @@
 /*******************************************************************************
-    Copyright (C) 2021 Kevin Sahr
+    Copyright (C) 2023 Kevin Sahr
 
     This file is part of DGGRID.
 
@@ -28,7 +28,7 @@ DgPhysicalRFS2D<C>::DgPhysicalRFS2D (const DgBoundedRFS2D& rfIn, bool allocate)
 {
    int nRes = rfIn.grids().size();
 
-   grids_ = new vector<DgPhysicalRF2D<C>*>(nRes);
+   grids_ = new std::vector<DgPhysicalRF2D<C>*>(nRes);
 
    for (int i = 0; i < nRes; i++)
    {

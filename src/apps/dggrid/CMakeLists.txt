@@ -1,23 +1,39 @@
-cmake_minimum_required (VERSION 3.9)
+cmake_minimum_required (VERSION 3.20)
 
 add_executable(dggrid
-  binpres.cpp
-  binvals.cpp
-  clipper.cpp
-  dggrid.cpp
-  DgHexSF.cpp
-  gridgen.cpp
-  param.cpp
-  quadclip.cpp
-  table.cpp
-  transform.cpp
-  util.cpp
+   DgHexSF.cpp
+   OpBasic.cpp
+   SubOpBasic.cpp
+   SubOpBasicMulti.cpp
+   SubOpBinPts.cpp
+   SubOpDGG.cpp
+   SubOpGen.cpp
+   SubOpGenHelper.cpp
+   SubOpIn.cpp
+   SubOpMain.cpp
+   SubOpOut.cpp
+   SubOpStats.cpp
+   SubOpTransform.cpp
+   clipper.cpp
+   dggrid.cpp
+   DgHexSF.h
+   OpBasic.h
+   SubOpBasic.h
+   SubOpBasicMulti.h
+   SubOpBinPts.h
+   SubOpDGG.h
+   SubOpGen.h
+   SubOpIn.h
+   SubOpMain.h
+   SubOpOut.h
+   SubOpStats.h
+   SubOpTransform.h
 )
 
 if(GDAL_FOUND)
   target_compile_definitions(dggrid PRIVATE USE_GDAL)
 endif()
 
-# If GDAL isn't present than ${GDAL_LIBRARIES} gives an empty string
-target_link_libraries(dggrid PRIVATE dglib shapelib ${GDAL_LIBRARIES})
+# If GDAL isn't present than ${GDAL_LIBRARIES} gives an empty std::string
+target_link_libraries(dggrid PRIVATE dglib dgaplib shapelib ${GDAL_LIBRARIES})
 target_compile_features(dggrid PRIVATE cxx_std_11)

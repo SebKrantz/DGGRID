@@ -1,5 +1,5 @@
 /*******************************************************************************
-    Copyright (C) 2021 Kevin Sahr
+    Copyright (C) 2023 Kevin Sahr
 
     This file is part of DGGRID.
 
@@ -26,22 +26,59 @@
 #define DGADDRESSTYPE_H
 
 #include <iostream>
+#include <dglib/DgUtil.h>
 
 namespace dgg { namespace addtype {
 
-enum DgAddressType { Geo, Plane, ProjTri, Q2DD, Q2DI, SeqNum, Vertex2DD,
-                     ZOrder, ZOrderString, Z3, Z3String, InvalidAddressType };
+using namespace dgg::util;
+
+enum DgAddressType { Geo, Plane, ProjTri, Q2DD, Q2DI, SeqNum, Vertex2DD, HierNdx,
+    InvalidAddressType
+};
 
 static const std::string addTypeStrings[] = { "GEO", "PLANE", "PROJTRI", "Q2DD",
-    "Q2DI", "SEQNUM", "VERTEX2DD", "ZORDER", "ZORDER_STRING", "Z3", "Z3_STRING",
-    "INVALID" };
+    "Q2DI", "SEQNUM", "VERTEX2DD", "HIERNDX",
+    "NONE"
+};
+
+enum DgHierNdxSysType { Z7, ZOrder, Z3, InvalidHierNdxSysType };
+static const std::string hierNdxSysTypeStrings[] = {
+    "Z7", "ZORDER", "Z3", "NONE"
+};
+
+enum DgHierNdxFormType { Int64, DigitString, InvalidHierNdxFormType };
+static const std::string hierNdxFormTypeStrings[] = {
+    "INT64", "DIGIT_STRING", "NONE"
+};
 
 DgAddressType stringToAddressType (const std::string& str);
 const std::string& to_string (DgAddressType t);
 
+DgHierNdxSysType stringToHierNdxSysType (const std::string& str);
+const std::string& to_string (DgHierNdxSysType t);
+
+DgHierNdxFormType stringToHierNdxFormType (const std::string& str);
+const std::string& to_string (DgHierNdxFormType  t);
+
 ////////////////////////////////////////////////////////////////////////////////
 inline std::ostream&
 operator<< (std::ostream& stream, DgAddressType obj)
+{
+   return stream << to_string(obj);
+
+} // std::ostream& operator<<
+
+////////////////////////////////////////////////////////////////////////////////
+inline std::ostream&
+operator<< (std::ostream& stream, DgHierNdxSysType obj)
+{
+   return stream << to_string(obj);
+
+} // std::ostream& operator<<
+
+////////////////////////////////////////////////////////////////////////////////
+inline std::ostream&
+operator<< (std::ostream& stream, DgHierNdxFormType obj)
 {
    return stream << to_string(obj);
 

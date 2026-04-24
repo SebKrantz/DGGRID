@@ -1,5 +1,5 @@
 /*******************************************************************************
-    Copyright (C) 2021 Kevin Sahr
+    Copyright (C) 2023 Kevin Sahr
 
     This file is part of DGGRID.
 
@@ -100,8 +100,8 @@ DgPolygon::densify (int ptsPerEdge)
 
    DgPolygon densVerts(*cc);
 
-   vector<DgAddressBase*>& v0 = addressVec();
-   vector<DgAddressBase*>& v1 = densVerts.addressVec();
+   std::vector<DgAddressBase*>& v0 = addressVec();
+   std::vector<DgAddressBase*>& v1 = densVerts.addressVec();
 
    // for each edge
    for (unsigned long i = 0; i < v0.size(); i++) {

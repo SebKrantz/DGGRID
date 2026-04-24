@@ -1,5 +1,5 @@
 /*******************************************************************************
-    Copyright (C) 2021 Kevin Sahr
+    Copyright (C) 2023 Kevin Sahr
 
     This file is part of DGGRID.
 
@@ -50,7 +50,7 @@ template <class A> class DgAddress : public DgAddressBase {
 
    protected:
 
-      virtual ostream& writeTo (ostream& stream) const
+      virtual std::ostream& writeTo (std::ostream& stream) const
                                     { return stream << address_; }
 
    private:

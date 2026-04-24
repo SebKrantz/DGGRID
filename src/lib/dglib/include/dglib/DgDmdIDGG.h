@@ -1,5 +1,5 @@
 /*******************************************************************************
-    Copyright (C) 2021 Kevin Sahr
+    Copyright (C) 2023 Kevin Sahr
 
     This file is part of DGGRID.
 
@@ -43,7 +43,7 @@ class DgDmdIDGG : public DgIDGGBase {
    public:
 
       DgDmdIDGG (const DgIDGGS4D& dggs, unsigned int aperture = 4,
-              int res = 0, const string& name = "DmdIDGG",
+              int res = 0, const std::string& name = "DmdIDGG",
               DgGridMetric gridMetric = D4,
               unsigned int precision = DEFAULT_PRECISION);
 

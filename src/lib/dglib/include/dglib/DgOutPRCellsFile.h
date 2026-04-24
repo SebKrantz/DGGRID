@@ -1,5 +1,5 @@
 /*******************************************************************************
-    Copyright (C) 2021 Kevin Sahr
+    Copyright (C) 2023 Kevin Sahr
 
     This file is part of DGGRID.
 
@@ -41,18 +41,23 @@ class DgOutPRCellsFile : public DgOutLocTextFile {
 
    public:
 
-      DgOutPRCellsFile (const DgRFBase& rfIn, const string& fileNameIn = "",
+      DgOutPRCellsFile (const DgRFBase& rfIn, const std::string& fileNameIn = "",
                    int precision = 7, DgReportLevel failLevel = DgBase::Fatal);
 
       virtual ~DgOutPRCellsFile (void) { if (good()) close(); }
 
-      virtual void close (void) { ofstream::close(); }
+      virtual void close (void) { std::ofstream::close(); }
 
-      virtual DgOutLocFile& insert (DgLocation& loc, const string* label = NULL);
-      virtual DgOutLocFile& insert (DgLocVector& vec, const string* label = NULL,
-                                const DgLocation* cent = NULL);
-      virtual DgOutLocFile& insert (DgPolygon& poly, const string* label = NULL,
-                                const DgLocation* cent = NULL);
+      virtual DgOutLocFile& insert (DgLocation& loc, const std::string* label = nullptr,
+                                const DgDataList* dataList = nullptr);
+
+      virtual DgOutLocFile& insert (DgLocVector& vec, const std::string* label = nullptr,
+                                const DgLocation* cent = nullptr,
+                                const DgDataList* dataList = nullptr);
+
+      virtual DgOutLocFile& insert (DgPolygon& poly, const std::string* label = nullptr,
+                                const DgLocation* cent = nullptr,
+                                const DgDataList* dataList = nullptr);
 
    private:
 
@@ -60,7 +65,7 @@ class DgOutPRCellsFile : public DgOutLocTextFile {
 
       virtual void setFormatStr(void)
       {
-          ostringstream os;
+          std::ostringstream os;
           os << " %#." << getPrecision() << "LF, "
              << "%#." << getPrecision() << "LF";
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
-    Copyright (C) 2021 Kevin Sahr
+    Copyright (C) 2023 Kevin Sahr
 
     This file is part of DGGRID.
 
@@ -30,72 +30,77 @@
 #include <string>
 #include <iostream>
 #include <dglib/DgIVec3D.h>
+#include "SubOpGen.h"
 
-using namespace std;
-
+class MainParam;
 class GridGenParam;
 class DgIDGGSBase;
 class DgIDGGBase;
 class DgContCartRF;
 class DgEvalData;
 
+struct OpBasic;
+
 ////////////////////////////////////////////////////////////////////////////////
 class DgHexSF {
 
    public:
 
-      static const string all;
-      static const string cs4;
-      static const string cs3A;
-      static const string cs3B;
-      static const string cs3rA;
-      static const string cs3rB;
-      static const string cs3rC;
-      static const string cs3rD;
-      static const string cs3rE;
-      static const string cs3rF;
+      static const std::string all;
+      static const std::string cs4;
+      static const std::string cs3A;
+      static const std::string cs3B;
+      static const std::string cs3rA;
+      static const std::string cs3rB;
+      static const std::string cs3rC;
+      static const std::string cs3rD;
+      static const std::string cs3rE;
+      static const std::string cs3rF;
 
-      DgHexSF (void)
+      DgHexSF (SubOpGen& _genOp)
          : type_ ('A'), res_ (0), ijkCoord_(0, 0, 0), classI_ (true),
-           quadNum_ (0) { }
+           quadNum_ (0), op_ (_genOp.op), genOp_ (_genOp) { }
 
       DgHexSF (const DgHexSF& h)
          : type_ (h.type_), res_ (h.res_), ijkCoord_(0, 0, 0), classI_ (true),
-           quadNum_ (h.quadNum_) { }
+           quadNum_ (h.quadNum_), op_ (h.op_), genOp_ (h.genOp_) { }
 
-      DgHexSF (const DgIVec3D& ijk, int res = 0, bool classI = true,
+      DgHexSF (SubOpGen& _genOp, const DgIVec3D& ijk, int res = 0, bool classI = true,
                int quadNum = 0)
          : type_ ('A'), res_ (res), ijkCoord_ (ijk), classI_ (classI),
-           quadNum_ (quadNum) { }
+           quadNum_ (quadNum), op_ (_genOp.op), genOp_ (_genOp) { }
 
-      DgHexSF (int i, int j, int k, int res = 0, bool classI = true,
+      DgHexSF (SubOpGen& _genOp, int i, int j, int k, int res = 0, bool classI = true,
                int quadNum = 0)
          : type_ ('A'), res_ (res), ijkCoord_ (i, j, k), classI_ (classI),
-           quadNum_ (quadNum) { }
+           quadNum_ (quadNum), op_ (_genOp.op), genOp_ (_genOp) { }
 
      ~DgHexSF (void) { }
 
-      inline operator string (void) const;
+      inline operator std::string (void) const;
 
-      inline string superFundIndex (void) const;
+      inline std::string superFundIndex (void) const;
 
-      const DgIVec3D& ijkCoord (void) const { return ijkCoord_; }
-      char            type     (void) const { return type_; }
-      int             res      (void) const { return res_; }
-      bool            classI   (void) const { return classI_; }
-      const string&   ciNdx    (void) const { return ciNdx_; }
-      const string&   sfNdx    (void) const { return sfNdx_; }
-      int             quadNum  (void) const { return quadNum_; }
+      const DgIVec3D&    ijkCoord (void) const { return ijkCoord_; }
+      char               type     (void) const { return type_; }
+      int                res      (void) const { return res_; }
+      bool               classI   (void) const { return classI_; }
+      const std::string& ciNdx    (void) const { return ciNdx_; }
+      const std::string& sfNdx    (void) const { return sfNdx_; }
+      int                quadNum  (void) const { return quadNum_; }
 
       void setIjkCoord (const DgIVec3D& c) { ijkCoord_ = c; }
       void setType     (char c)            { type_ = c; }
       void setRes      (int r)             { res_ = r; }
       void setClassI   (bool classI)       { classI_ = classI; }
-      void setCiNdx    (string ciNdx)      { ciNdx_ = ciNdx; }
-      void setSfNdx    (string sfNdx)      { sfNdx_ = sfNdx; }
+      void setCiNdx    (std::string ciNdx) { ciNdx_ = ciNdx; }
+      void setSfNdx    (std::string sfNdx) { sfNdx_ = sfNdx; }
       void setQuadNum  (int quadNum)       { quadNum_ = quadNum; }
 
-      string cpiNdx (void) const;
+      OpBasic&  op    (void) { return op_; }
+      SubOpGen& genOp (void) { return genOp_; }
+
+      std::string cpiNdx (void) const;
 
       void addSf3Digit (int digit);
 
@@ -109,11 +114,11 @@ class DgHexSF {
       bool operator!= (const DgHexSF& h) const
             { return !operator==(h); }
 
-      unsigned long long int depthFirstTraversal (GridGenParam& dp,
-                  const DgIDGGSBase& dggs, const DgIDGGBase& dgg,
-                  const DgContCartRF& deg, int numAp4Res, DgEvalData* ed = NULL);
+      unsigned long long int depthFirstTraversal (const DgIDGGSBase& dggs,
+                  const DgIDGGBase& dgg, const DgContCartRF& deg, int numAp4Res,
+                  DgEvalData* ed = NULL);
 
-      unsigned long long int visitMe (GridGenParam& dp, const DgIDGGSBase& dggs,
+      unsigned long long int visitMe (const DgIDGGSBase& dggs,
                   const DgIDGGBase& dgg, const DgContCartRF& deg, DgEvalData* ed);
 
       DgHexSF downAp4 (void);
@@ -122,7 +127,7 @@ class DgHexSF {
 
       DgHexSF dirFromCenter (int digit);
 
-      friend ostream& operator<< (ostream& stream, const DgHexSF& h);
+      friend std::ostream& operator<< (std::ostream& stream, const DgHexSF& h);
 
    private:
 
@@ -130,13 +135,16 @@ class DgHexSF {
       int res_;
       DgIVec3D ijkCoord_;
       bool classI_;
-      string ciNdx_;
-      string sfNdx_;
+      std::string ciNdx_;
+      std::string sfNdx_;
       int quadNum_;
+
+      OpBasic& op_;
+      SubOpGen& genOp_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-inline string
+inline std::string
 DgHexSF::superFundIndex (void) const
 {
    // build the res 1 base tile index out of the quad number and res 1 digit
@@ -154,10 +162,10 @@ DgHexSF::superFundIndex (void) const
 
    //string completeNdx = dgg::util::to_string(quadNum_, 2) + sfNdx_;
 
-   string remainder = "";
+   std::string remainder = "";
    if (sfNdx_.length() > 1) remainder = sfNdx_.substr(1, sfNdx_.length() - 1);
 
-   string completeNdx = dgg::util::to_string(res1tile, 2) + remainder;
+   std::string completeNdx = dgg::util::to_string(res1tile, 2) + remainder;
 
    return completeNdx;
 
@@ -168,20 +176,20 @@ inline void
 DgHexSF::addSf3Digit (int digit)
 // assumes the previous res and this res are both aperture 3
 {
-   string dStr = dgg::util::to_string(digit);
+   std::string dStr = dgg::util::to_string(digit);
    if (!classI_ || sfNdx_.length() < 1)
       sfNdx_ += dStr;
    else
    {
-      string pairs[] = {
+      std::string pairs[] = {
         "11", "12", "13", "21", "22", "23", "31", "32", "33" };
         //"00", "01", "02", "10", "11", "12", "20", "21", "22" };
-      string digits[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+      std::string digits[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
       int lastNdx = (int) sfNdx_.length() - 1;
       sfNdx_.append(dStr);
-      string lastTwo = sfNdx_.substr(lastNdx, 2);
-      string newDigit = "";
+      std::string lastTwo = sfNdx_.substr(lastNdx, 2);
+      std::string newDigit = "";
       for (int i = 0; i < 9; i++)
          if (!lastTwo.compare(pairs[i])) newDigit = digits[i];
 
@@ -207,18 +215,18 @@ DgHexSF::operator= (const DgHexSF& h)
 } // DgHexSF& DgHexSF::operator=
 
 ////////////////////////////////////////////////////////////////////////////////
-inline DgHexSF::operator string (void) const
+inline DgHexSF::operator std::string (void) const
 {
-   return string("{ ") + type_ + ", " + ((classI_) ? "I" : "II") + ", res " +
+   return std::string("{ ") + type_ + ", " + ((classI_) ? "I" : "II") + ", res " +
                  dgg::util::to_string(res_) + ", quad " +
-                 dgg::util::to_string(quadNum_) + string(ijkCoord_) + " } " +
+                 dgg::util::to_string(quadNum_) + std::string(ijkCoord_) + " } " +
                  ciNdx_ + " " + sfNdx_;
 
-} // DgHexSF::operator string
+} // DgHexSF::operator std::string
 
 ////////////////////////////////////////////////////////////////////////////////
-inline ostream& operator<< (ostream& stream, const DgHexSF& h)
-            { return stream << string(h); }
+inline std::ostream& operator<< (std::ostream& stream, const DgHexSF& h)
+            { return stream << std::string(h); }
 
 ////////////////////////////////////////////////////////////////////////////////
 

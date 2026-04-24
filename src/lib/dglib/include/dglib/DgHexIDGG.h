@@ -1,5 +1,5 @@
 /*******************************************************************************
-    Copyright (C) 2021 Kevin Sahr
+    Copyright (C) 2023 Kevin Sahr
 
     This file is part of DGGRID.
 
@@ -44,7 +44,7 @@ class DgHexIDGG : public DgIDGG {
    public:
 
       DgHexIDGG (const DgHexIDGGS& dggs, unsigned int aperture = 4,
-              int res = 0, const string& name = "HexIDGG",
+              int res = 0, const std::string& name = "HexIDGG",
               unsigned int precision = DEFAULT_PRECISION);
 
       DgHexIDGG (const DgHexIDGG& grd);

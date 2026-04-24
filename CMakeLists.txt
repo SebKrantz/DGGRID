@@ -1,7 +1,7 @@
-cmake_minimum_required (VERSION 3.9)
+cmake_minimum_required (VERSION 3.20)
 
 project (dggrid
-  VERSION 7.8
+  VERSION 9.0
   LANGUAGES C CXX
 )
 
@@ -11,6 +11,7 @@ find_package(Doxygen)
 if(MSVC)
   # add_compile_options(/W4 /WX)
   add_compile_options(/W2)
+  add_compile_definitions(_USE_MATH_DEFINES)
 else()
   add_compile_options(-Wall -pedantic)
 endif()
@@ -31,6 +32,7 @@ else()
 endif()
 
 add_subdirectory(src/lib/dglib)
+add_subdirectory(src/lib/dgaplib)
 add_subdirectory(src/lib/proj4lib)
 # add_subdirectory(src/lib/shapelib)
 

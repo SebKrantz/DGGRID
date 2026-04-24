@@ -3,6 +3,125 @@ All notable changes to this project will be documented in this file.
 
 All changes are by Kevin Sahr, unless otherwise noted.
 
+## [9.0b] - 2026-04-02
+### Changed
+- re-architected the discrete RF hierarchy to allow grids with an explicitly discrete back frame (cell geometry specification RF).
+- hierarchical indexing system classes now exist independent of particular input/output forms
+- manual upgraded to v9.0b
+### Fixed
+- removed unicode characters from comments in clipper.cpp to suppress warnings
+- crashes on some forms of invalid address input
+### Added 
+- indexing parent/children output with new parameters (see user documentation):
+hier_indexing_system_type (default NONE)
+indexing_children_output_type (default NONE)
+indexing_children_output_file_name (default ndxChld)
+indexing_parent_output_type (default NONE)
+indexing_parent_output_file_name (default ndxPrt)
+- IGEO7 preset includes hier_indexing_system_type of Z7
+
+## [8.44] - 2026-03-30
+### Fixed
+- replaced unnecessary/costly endl's with newlines in output (thanks to @wrenoud)
+- description in manual of clip_subset_type operation modes
+### Added
+- web-based doxygen source code documentation (thanks to @allixender)
+- pre-built binaries for Windows, Linux, and MacOS using GitHub actions (thanks to @allixender)
+- manual pdf version 8.44
+
+## [8.43] - 2025-12-01
+### Fixed
+- correctly handle preset DGGS's when operation has no input or output
+
+## [8.42] - 2025-09-21
+### Fixed
+- put quotes around name field values in non-gdal geojson output files
+- correctly handle lower case string parameter values
+
+## [8.41] - 2025-05-31
+### Changed
+- updated manual to this version
+- updated IGEO7 preset to use the new HIERNDX address specification
+### Added
+- web-based version of the documentation (thanks to @allixender)
+- new parameters (see manual for details): input_hier_ndx_form, input_hier_ndx_system, output_hier_ndx_form, output_hier_ndx_system.
+
+## [8.4] - 2025-05-29
+### Added
+- parameter z3_invalid_digit which specifies the digit to use for unused bits in a Z3 INT64 index. The current
+default value is 0. The default will switch from 0 to 3 starting with DGGRID version 9.0. Set parameter 
+z3_invalid_digit if you want a different digit used.
+- parameters input/output_hier_ndx_system and input/output_hier_ndx_form. The input_/output_address_type values of ZORDER, ZORDER_STRING, Z3, Z3_STRING, Z7, and Z7_STRING are deprecated and will go away in version 9.0. Instead set input_address_type to HIERNDX, new parameter input_hier_ndx_system to the desired system ZORDER, Z3, or Z7 (Z3 is the default), and new parameter input_hier_ndx_form to the specific input format INT64 or DIGIT_STRING (default is INT64).
+### Changed
+- all Z* examples to use new parameters
+- all Z3 examples to use the version 9 value of 3 for z3_invalid_digit
+
+## [8.36] - 2025-05-11
+### Fixed
+- errors indexing pentagonal descendents with Z7 indexing. NOTE: this changes some of the the outputs from the Z7 examples.
+### Changed
+- minimum cmake version to 3.20
+
+## [8.35] - 2024-11-28
+### Changed
+- cell output format in example gdalExample was changed to GeoJSON to avoid potential issues with GDAL KML driver
+### Fixed
+- incorrect parsing of text input lines in SubOpBasicMulti::inStrToPointLoc
+
+## [8.34] - 2024-11-13
+### Fixed
+- correctly handles math constants in Windows (thanks to @allixender)
+
+## [8.33] - 2024-10-16
+### Added
+- output whether or not built with GDAL
+### Fixed
+- suppressed remaining compiler warnings
+
+## [8.32] - 2024-09-18
+### Fixed
+- template definition errors in DgPhysicalRF
+
+## [8.31] - 2024-07-05
+### Changed
+- igeo7 DGGS preset defaults output_cell_label_type to OUTPUT_ADDRESS_TYPE
+### Fixed
+- added #define to ensure PRIx64 gets defined
+
+## [8.3] - 2024-07-03
+### Added
+- new hierarchical index address types Z7 and Z7_STRING to parameters input_address_type and output_address_type
+- new DGGS preset IGEO7 (see new example igeo7WholeEarth)
+- added new examples quads, z7CellClip, z7Nums, z7WholeEarth, z7Collection and z7Transform
+### Changed
+- changed example z3Transform so that it takes non-GEO input
+### Fixed
+- yet more bugs binning some points that are very close to certain icosahedron edges into odd aperture 7 resolutions
+
+## [8.2] - 2024-06-15
+### Fixed
+- bug binning some points that are very close to certain icosahedron edges into odd aperture 7 resolutions
+- failure when performing a TRANSFORM operation with input files other than lat/lon
+- fixed macro names in Z3RF
+
+## [8.1b] - 2024-01-10
+### Added
+- pure aperture 7 hexagon grids (ISEA7H/FULLER7H) are now first class DGGS that support all operations (just like aperture 3 and 4 hexagon DGGS)
+### Changed
+- removed altitude component from built-in GeoJSON and KML output files
+
+## [8.0b] - 2023-10-24
+### Added
+- dgaplib glue library for dglib application development
+- example multipleOrientations to demonstrate/test creating multiple random grid placements
+- new version 8 examples binpresV8, binvalsV8, genPtsV8, and transformV8.
+### Changed
+- complete re-architecture of DGGRID application to use dgaplib approach
+- all operations now use complete cell output infrastructure previously used by GENERATE_GRID.
+- added operation GENERATE_GRID_FROM_POINTS
+- operations GENERATE_GRID_FROM_POINTS, BIN_POINT_VALS, and BIN_POINT_PRESENCE can use GDAL file input
+- see new V8 examples and the manual for information on the new parameters 
+
 ## [7.81] - 2023-05-06
 ### Added
 - command-line -v and -h flags

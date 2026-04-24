@@ -1,5 +1,5 @@
 /*******************************************************************************
-    Copyright (C) 2021 Kevin Sahr
+    Copyright (C) 2023 Kevin Sahr
 
     This file is part of DGGRID.
 
@@ -57,7 +57,7 @@ class DgOutGdalFile : public DgOutLocFile
       ~DgOutGdalFile();
 
       // direct the DgOutLocFile abstract methods to the DgOutputStream ones
-      virtual bool open (const string& /* fileName */,
+      virtual bool open (const std::string& /* fileName */,
                        DgReportLevel /* failLevel = DgBase::Fatal */) {
          return true;
       }
@@ -66,17 +66,41 @@ class DgOutGdalFile : public DgOutLocFile
          GDALClose( _dataset );
       }
 
-      virtual DgOutLocFile& insert (DgLocation& loc, const string* label = NULL);
-      virtual DgOutLocFile& insert (DgLocVector& vec, const string* label = NULL,
-                                    const DgLocation* cent = NULL);
-      virtual DgOutLocFile& insert (DgPolygon& poly, const string* label = NULL,
-                                    const DgLocation* cent = NULL);
+      virtual DgOutLocFile& insert (DgLocation& loc, const std::string* label = nullptr,
+                                const DgDataList* dataList = nullptr);
+
+      virtual DgOutLocFile& insert (DgLocVector& vec, const std::string* label = nullptr,
+                                const DgLocation* cent = nullptr,
+                                const DgDataList* dataList = nullptr);
+
+      virtual DgOutLocFile& insert (DgPolygon& poly, const std::string* label = nullptr,
+                                const DgLocation* cent = nullptr,
+                                const DgDataList* dataList = nullptr);
 
       // collection output
+    /*
       virtual DgOutLocFile& insert (const DgIDGGBase& dgg, DgCell& cell,
            bool outputPoint, bool outputRegion, const DgIDGGBase& chdDgg,
-           const DgRFBase* outRF, const DgRFBase* chdOutRF,
-           const DgLocVector* neighbors, const DgLocVector* children);
+           const DgIDGGBase* prtDgg, const DgRFBase* outRF,
+           const DgRFBase* chdOutRF, const DgRFBase* prtOutRF,
+           const DgLocVector* neighbors, const DgLocVector* children,
+           const DgLocation* ndxParent, const DgLocVector* ndxChildren);
+     */
+    virtual DgOutLocFile& insert (const DgIDGGBase& dgg, DgCell& cell,
+         bool outputPoint, bool outputRegion, const DgIDGGBase& chdDgg,
+         const DgIDGGBase* prtDgg, const DgRFBase* outRF,
+         const DgRFBase* chdOutRF, const DgRFBase* prtOutRF,
+         const DgLocVector* neighbors, const DgLocVector* children,
+         const DgLocation* ndxParent, const DgLocVector* ndxChildren);
+
+/*
+      virtual DgOutLocFile& insert (const DgIDGGBase& dgg, DgCell& cell,
+           bool outputPoint, bool outputRegion, const DgIDGGBase& chdDgg,
+           const DgIDGGBase& ndxPrtDgg, const DgRFBase* outRF, const DgRFBase* chdOutRF,
+           const DgRFBase* ndxPrtOutRF, const DgRFBase* ndxChdOutRF,
+           const DgLocVector* neighbors, const DgLocVector* children,
+           const DgLocation* ndxParent, const DgLocVector* ndxChildren);
+*/
 
       virtual void setFormatStr(void) { }
 
@@ -86,10 +110,13 @@ class DgOutGdalFile : public DgOutLocFile
 
       virtual DgOutLocFile& insert(const DgDVec2D& pt);
 
-      OGRFeature* createFeature (const string& label) const;
+      OGRFeature* createFeature (const std::string& label) const;
       OGRPoint* createPoint (const DgLocation& loc) const;
       //OGRPolygon createPolygon (const DgPolygon& poly) const;
       OGRGeometryCollection* createCollection (const DgCell& cell) const;
+
+    void createAddressProperty (const DgIDGGBase& dgg, OGRFeature* feature,
+         const char* fieldName, const DgLocation& loc, const DgRFBase* outRF);
 
       void createAddressesProperty (const DgIDGGBase& dgg, OGRFeature* feature,
            const char* fieldName, const DgLocVector& vec, const DgRFBase* outRF);
@@ -107,7 +134,9 @@ class DgOutGdalFile : public DgOutLocFile
       std::string fileNameOnly_;
 
       void init (bool outputPoint, bool outputRegion = false,
-              bool outputNeighbors = false, bool outputChildren = false);
+              bool outputNeighbors = false, bool outputChildren = false,
+              bool outputNdxParent = false, bool outputNdxChildren = false,
+              const DgDataList* dataList = nullptr);
 };
 
 #endif

@@ -1,5 +1,5 @@
 /*******************************************************************************
-    Copyright (C) 2021 Kevin Sahr
+    Copyright (C) 2023 Kevin Sahr
 
     This file is part of DGGRID.
 
@@ -29,8 +29,6 @@
 #include <dglib/DgConverter.h>
 #include <dglib/DgGeoSphRF.h>
 #include <dglib/DgProjTriRF.h>
-
-using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 class DgIcosaProj : public Dg2WayConverter {
